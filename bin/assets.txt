@@ -1,0 +1,39 @@
+Texture   MainMenuBackground images/MainMenu_Background.png
+Texture   TexExplode    images/misc/explosion128.png
+Texture   TexRunDown    images/tloz/run_down.png              
+Texture   TexRunRight   images/tloz/run_right.png
+Texture   TexRunUp      images/tloz/run_up.png
+Texture   TexStandD     images/tloz/stand_down.png              
+Texture   TexStandR     images/tloz/stand_right.png
+Texture   TexStandU     images/tloz/stand_up.png
+Texture   TexAtkDown    images/tloz/attack_down.png
+Texture   TexAtkRight   images/tloz/attack_right.png
+Texture   TexAtkUp      images/tloz/attack_up.png
+Texture   TexSwordUp    images/tloz/item_sword_up.png
+Texture   TexSwordRight images/tloz/item_sword_right.png
+Texture   TexArrowRight images/tloz/item_arrow_right.png
+Texture   TexArrowUp    images/tloz/item_arrow_up.png
+Texture   TexBowRight   images/tloz/item_bow.png
+Texture   TexBowUp    	images/tloz/item_bow_up.png
+Animation Explosion     TexExplode     48    2 
+Animation RunDown       TexRunDown      2   15   
+Animation RunRight      TexRunRight     2   15    
+Animation RunUp         TexRunUp        2   15
+Animation StandDown     TexStandD       1    0   
+Animation StandRight    TexStandR       1    0    
+Animation StandUp       TexStandU       1    0
+Animation AtkUp         TexAtkUp        1    0
+Animation AtkDown       TexAtkDown      1    0
+Animation AtkRight      TexAtkRight     1    0   
+Animation SwordUp       TexSwordUp      1    0
+Animation SwordRight    TexSwordRight   1    0
+Animation ArrowRight    TexArrowRight   1    0
+Animation ArrowUp    	TexArrowUp	1    0
+Animation BowUp    	TexBowUp	1    0
+Animation BowRight    	TexBowRight	1    0
+Sound     MusicTitle    sounds/MenuMusic.ogg
+Sound     MusicLevel    sounds/music.ogg
+Font      Arial         fonts/arial.ttf
+Font      Mario         fonts/mario.ttf
+Font      Megaman    fonts/megaman.ttf
+Font	  Gypsy		fonts/GypsyCurse.ttf
