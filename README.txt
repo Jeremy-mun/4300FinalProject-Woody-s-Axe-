@@ -25,7 +25,7 @@ Examples of gameplay scenarios involving each of the game mechanics described be
 
 Collisions: The Player, NPCs collide with level tiles to platform through the levels, weapons need to collide with an enemy or a player to inflict or receive damage. The player will use his abilities and weapons to clear out level paths which will be done by using collision detection between his attacks and the level tiles.
 
-Bullets / Weapons: The player will have access to two different weapons a melee and a ranged weapon which they can swap between fights and use to platform through levels
+Bullets / Weapons: The player will have access to 3 different distinct weapons
 
 NPCs: There will be basic enemies who will have melee attacks and ranged attacks and some which will cling to the ceiling and upon detecting the player will drop down on them and boss level enemies who will have specific powers and movement systems based on the level. They will be patrolling their region and wont react until they detect the player.
 
