@@ -11,10 +11,13 @@ Game name / genre / overall theme / main gameplay style
 
 Game Name
 Woody’s axe
+
 Genre
 2D Side Scroller Action / Adventure / Metroidvania.
+
 Theme
 Fantasy / Horror
+
 Main Gameplay Style
 Hack ‘n slash style combat in a Metroidvania style game.
 
