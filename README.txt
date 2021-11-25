@@ -2,10 +2,10 @@ Project Proposal
 
 Group member names and student numbers
 
-Jeremy Porter: 201553849
-Tarun Subramanian: 201746641
 Nayandip Banerjee: 201719986
 Kyle Avery: 201834256
+Jeremy Porter: 201553849
+Tarun Subramanian: 201746641
 
 Game name / genre / overall theme / main gameplay style
 
