@@ -1016,7 +1016,7 @@ void Scene_MainGame::sRender()
 {
     // RENDERING DONE FOR YOU
                            
-    m_game->window().clear(sf::Color(255, 192, 122));
+    m_game->window().clear(sf::Color(0, 0, 0));
     sf::RectangleShape tick({ 1.0f, 6.0f });
     tick.setFillColor(sf::Color::Black);
     
