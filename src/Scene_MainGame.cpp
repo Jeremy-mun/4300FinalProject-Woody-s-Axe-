@@ -20,9 +20,10 @@ void Scene_MainGame::init(const std::string& levelPath)
 
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(sf::Keyboard::P, "PAUSE");
-    registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");      // Toggle follow camera
+    registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");       // Toggle follow camera
     registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");      // Toggle drawing (T)extures
     registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");    // Toggle drawing (C)ollision Boxes
+    registerAction(sf::Keyboard::G, "TOGGLE_GRID");         // Toggle drawing (G)rid Boxes
     registerAction(sf::Keyboard::W, "UP");
     registerAction(sf::Keyboard::S, "DOWN");
     registerAction(sf::Keyboard::A, "LEFT");
@@ -396,6 +397,7 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
         else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
         else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision;}
+        else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
         else if (action.name() == "UP") { m_player->getComponent<CInput>().up = true; }
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}

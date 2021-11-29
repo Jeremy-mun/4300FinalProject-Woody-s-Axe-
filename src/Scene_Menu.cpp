@@ -1,6 +1,7 @@
 
 #include "Scene_Menu.h"
 #include "Scene_MainGame.h"
+#include "Scene_Level_Editor.h"
 #include "Common.h"
 #include "Assets.h"
 #include "GameEngine.h"
@@ -24,6 +25,8 @@ void Scene_Menu::init()
     m_menuStrings.push_back("Level  1");
     m_menuStrings.push_back("Level  2");
     m_menuStrings.push_back("Level  3");
+    m_menuStrings.push_back("Level  Editor");
+    m_menuStrings.push_back("Load Level");
 
     m_levelPaths.push_back("level1.txt");
     m_levelPaths.push_back("level2.txt");
@@ -59,7 +62,14 @@ void Scene_Menu::sDoAction(const Action& action)
         }
         else if (action.name() == "MainGame")
         {
-            m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPaths[m_selectedMenuIndex]));
+            if (m_selectedMenuIndex < 3)
+            {
+                m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPaths[m_selectedMenuIndex]));
+            }
+            else
+            {
+                m_game->changeScene("Level_Editor", std::make_shared<Scene_Level_Editor>(m_game, "blankLevel.txt"));
+            }
             m_game->assets().getSound("MusicTitle").stop();
         }
         else if (action.name() == "QUIT")
