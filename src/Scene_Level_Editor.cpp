@@ -203,10 +203,16 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "LEFT") { }
         else if (action.name() == "RIGHT") { }
         else if (action.name() == "PLACE_BLOCK") { std::string x;
-        std::cout << "Type animation Name: "; // Type animation Name
-        std::cin >> x; // Get user input from the keyboard
-        std::cout << "Your animation name is: " << x ;
-        placeTile(m_game->assets().getAnimation(x));
+        //std::cout << "Type animation Name: "; // Type animation Name
+        //std::cin >> x; // Get user input from the keyboard
+        //std::cout << "Your animation name is: " << x ;
+        
+        placeTile(m_game->assets().getAnimation(TilesPresent[tileIndex]));
+        tileIndex++;
+        if (tileIndex >= TilesPresent->size())
+        {
+            tileIndex = 0;
+        }
         }
     }
     else if (action.type() == "END")

@@ -39,6 +39,7 @@ protected:
     std::string             configRead;
     const Vec2              m_gridSize = { 64, 64 };
     bool                    m_drawGrid = true;
+    std::string TilesPresent[3] = { "Bush", "BowRight", "AtkUp" };
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
     bool                    m_drawTextures = true;
@@ -49,6 +50,7 @@ protected:
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
+    int                     tileIndex = 0;
     sf::Text                m_gridText;
     sf::Text                m_tutorialText;
     sf::Text                m_levelText;
