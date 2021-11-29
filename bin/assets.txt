@@ -15,6 +15,7 @@ Texture   TexArrowRight images/tloz/item_arrow_right.png
 Texture   TexArrowUp    images/tloz/item_arrow_up.png
 Texture   TexBowRight   images/tloz/item_bow.png
 Texture   TexBowUp    	images/tloz/item_bow_up.png
+Texture   TexBush    	images/tloz/brown/tile_bush.png
 Animation Explosion     TexExplode     48    2 
 Animation RunDown       TexRunDown      2   15   
 Animation RunRight      TexRunRight     2   15    
@@ -31,6 +32,7 @@ Animation ArrowRight    TexArrowRight   1    0
 Animation ArrowUp    	TexArrowUp	1    0
 Animation BowUp    	TexBowUp	1    0
 Animation BowRight    	TexBowRight	1    0
+Animation Bush    	TexBush		1    0
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
 Font      Arial         fonts/arial.ttf
