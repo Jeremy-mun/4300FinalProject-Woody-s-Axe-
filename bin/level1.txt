@@ -1,5 +1,5 @@
-Tile Ground   0  0 0  11 1 1
-Tile Ground   0  0 1  11 1 1
+Tile Ground   	0  0 0  11 1 1
+Tile Ground   	0  0 1  11 1 1
 Tile Ground	0  0 2  11 1 1
 Tile Ground	0  0 3  11 1 1
 Tile Ground	0  0 4  11 1 1
@@ -24,4 +24,6 @@ Tile Ground	0 1 8  11 1 1
 Tile Ground	0 1 9  11 1 1
 Tile Ground	0 1 10  11 1 1
 Tile Ground	0 1 11  11 1 1
+
+NPC  GhostShriek 0 0  1  4 0 0 2 1 Follow 0
 Player 640 360 48 48 5 3 2

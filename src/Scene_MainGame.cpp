@@ -41,7 +41,6 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setFont(m_game->assets().getFont("Arial"));
     m_walletText.setCharacterSize(12);
     m_walletText.setFillColor(sf::Color::White);
-
 }
 
 void Scene_MainGame::loadLevel(const std::string& filename)
@@ -268,7 +267,7 @@ void Scene_MainGame::sMovement()
         {
             pTransform.velocity.y = -7 * m_playerConfig.SPEED;
             pTransform.facing = Vec2(0, -1);
-            pState.state = "RunUp";
+            pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
         }
         else if (!pInput.up && pInput.down)
@@ -369,6 +368,7 @@ void Scene_MainGame::sMovement()
     {
         m_FrameSinceGrounded++;
         pTransform.velocity.y += m_FrameSinceGrounded * m_player->getComponent<CGravity>().gravity;
+
         //if (pInput.up == false)
         //{
         //    //m_playerHitTile = true;
