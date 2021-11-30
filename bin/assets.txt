@@ -19,6 +19,7 @@ Texture   TexBush    	images/tloz/brown/tile_bush.png
 Texture   TexGround     images/gothic/tile.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/gothic/ghost-shriek.png
+Texture   TexHellHound images/gothic/hell-hound-run.png
 Animation Explosion     TexExplode     48    2 
 Animation RunDown       TexRunDown      2   15   
 Animation RunRight      TexRunRight     24   2    
@@ -39,6 +40,7 @@ Animation Bush    	TexBush		1    0
 Animation Ground        TexGround       1    0
 Animation Tektite       TexTektite      2   10
 Animation GhostShriek   TexGhostShriek  4    10
+Animation HellHound   	TexHellHound  5    5
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
 Font      Arial         fonts/arial.ttf

@@ -461,6 +461,17 @@ void Scene_MainGame::sAI()
                 if (int(length) > 1)
                 {
                     desired = desired / length;
+                    // when npc is following the player to the right
+                    if (desired.x > 0)
+                    {
+                        e->getComponent<CTransform>().scale.x = -1;
+                    }
+
+                    // when npc is following the player to the left
+                    else if (desired.x < 0)
+                    {
+                        e->getComponent<CTransform>().scale.x = 1;
+                    }
                     e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
                     e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
                 }
