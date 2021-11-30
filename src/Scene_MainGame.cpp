@@ -975,7 +975,7 @@ void Scene_MainGame::sCamera()
 {
     // get the current view, which we will modify in the if-statement below
     sf::View view = m_game->window().getView();
-
+    view.setSize(520, 520);
     if (m_follow)
     {
         Vec2 playerPos = m_player->getComponent<CTransform>().pos;

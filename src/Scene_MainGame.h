@@ -43,7 +43,7 @@ protected:
     NPCConfig               m_npcConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
-    bool                    m_follow = false;
+    bool                    m_follow = true;
     bool                    m_teleported = false;
     bool                    m_weaponSwitch = false;
     bool                    m_playerOnGround = false;
