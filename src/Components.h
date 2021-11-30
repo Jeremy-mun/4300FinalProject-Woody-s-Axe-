@@ -10,6 +10,7 @@ public:
     bool has = false;
 };
 
+
 class CTransform : public Component
 {
 public:
@@ -64,6 +65,13 @@ public:
     CHealth() {}
     CHealth(int m, int c)
         : max(m), current(c) {}
+};
+class CGravity : public Component
+{
+public:
+    float gravity = 0;
+    CGravity() {}
+    CGravity(float g) : gravity(g) {}
 };
 
 class CInput : public Component

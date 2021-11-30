@@ -30,6 +30,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(sf::Keyboard::D, "RIGHT");
     registerAction(sf::Keyboard::Space, "ATTACK");
     registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
+    registerAction(sf::Keyboard::O, "Zoom Map");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -58,7 +59,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
 
             if (configRead == "Player")
             {
-                config >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH;
+                config >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH >> m_playerConfig.GRAVITY;
                 continue;
             }   
             if (configRead == "Tile")
@@ -155,7 +156,8 @@ void Scene_MainGame::spawnPlayer()
     m_player->addComponent<CState>("StandDown");
     m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandDown"), true);
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
-    m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);                       
+    m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
+    m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
 }
 
 void Scene_MainGame::spawnSword(std::shared_ptr<Entity> entity)
@@ -253,18 +255,18 @@ void Scene_MainGame::update()
 
 void Scene_MainGame::sMovement()
 {
+
     auto& pInput = m_player->getComponent<CInput>();
     auto& pTransform = m_player->getComponent<CTransform>();
     auto& pState= m_player->getComponent<CState>();
 
 #pragma region Running State
     // if velocity in x direction was 0 last frame check for movement in y direction else check for movement in x direction
-    if (pTransform.velocity.x == 0)
-    {
-        // if only one y directional key is pressed move in that direction otherwise stop.
+
+   
         if (pInput.up && !pInput.down)
         {
-            pTransform.velocity.y = -1 * m_playerConfig.SPEED;
+            pTransform.velocity.y = -7 * m_playerConfig.SPEED;
             pTransform.facing = Vec2(0, -1);
             pState.state = "RunUp";
             pTransform.scale = Vec2(1, 1);
@@ -280,13 +282,7 @@ void Scene_MainGame::sMovement()
         {
             pTransform.velocity.y = 0;
         }
-    }
-    else
-    {
-        pTransform.velocity.y = 0;
-    }
-    if (pTransform.velocity.y == 0)
-    {
+   
         // if only one x directional key is pressed move in that direction otherwise stop.
         if (pInput.left && !pInput.right)
         {
@@ -310,11 +306,8 @@ void Scene_MainGame::sMovement()
         {
             pTransform.velocity.x = 0;
         }
-    }
-    else
-    {
-        pTransform.velocity.x = 0;
-    }
+   
+  
 #pragma endregion
 
 #pragma region Attacking State
@@ -371,6 +364,20 @@ void Scene_MainGame::sMovement()
     }
 #pragma endregion
 
+
+    if (!m_playerOnGround)
+    {
+        m_FrameSinceGrounded++;
+        pTransform.velocity.y += m_FrameSinceGrounded * m_player->getComponent<CGravity>().gravity;
+        //if (pInput.up == false)
+        //{
+        //    //m_playerHitTile = true;
+        //}
+    }
+    else
+    {
+        m_FrameSinceGrounded = 0;
+    }
     pTransform.pos += pTransform.velocity;
 }
 
@@ -398,16 +405,17 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
         else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision;}
         else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
-        else if (action.name() == "UP") { m_player->getComponent<CInput>().up = true; }
+        else if (action.name() == "UP") { m_player->getComponent<CInput>().up = true; m_playerOnGround = false; }
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
         else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { spawnSword(m_player);  m_player->getComponent<CInput>().attack = true;
         } }
-        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) {  m_weaponTextClock.restart(); m_weaponSwitch = !(m_weaponSwitch); }
-        sf::View view = m_game->window().getView();
-        view.zoom(0.5f);
-        m_game->window().setView(view);
+        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) {  m_weaponTextClock.restart(); m_weaponSwitch = !(m_weaponSwitch); }}
+        else if (action.name() == "Zoom Map") {
+            sf::View view = m_game->window().getView();
+            view.zoom(0.5f);
+            m_game->window().setView(view);
         }
     }
     else if (action.type() == "END")
@@ -575,6 +583,7 @@ void Scene_MainGame::sTileCollision()
 {
     // Tile collisions with entities are implemented here
     auto& playerTransform = m_player->getComponent<CTransform>();
+    m_playerOnGround = false;
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -594,6 +603,7 @@ void Scene_MainGame::sTileCollision()
                     else
                     {
                         playerTransform.pos.y -= playerTileOverlap.y;
+                        m_playerOnGround = true;
                     }
                 }
                 else
@@ -975,7 +985,7 @@ void Scene_MainGame::sCamera()
    
     m_levelText.setCharacterSize(12);
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
-    m_tutorialText.setString(" Move:W, A, S D\n Zoom In: Tab \n Zoom Out: P");
+    m_tutorialText.setString(" Move:W, A, S D Weapon Swap: TAB\n Zoom In: O   Zoom Out: P");
     m_levelText.setString("Sword Activated");
     if (m_weaponSwitch)
     {
@@ -987,7 +997,7 @@ void Scene_MainGame::sCamera()
     }
     if (m_tutorialTextClock.getElapsedTime().asSeconds() > 3)
     {
-        m_tutorialText.setString("");
+        //m_tutorialText.setString("");
     }
     if (m_walletClock.getElapsedTime().asSeconds() > 1)
     {

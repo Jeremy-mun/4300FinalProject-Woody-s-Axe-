@@ -13,7 +13,7 @@ class Scene_MainGame : public Scene
                            
     struct PlayerConfig
     {
-        float X, Y, CX, CY, SPEED, HEALTH;
+        float X, Y, CX, CY, SPEED, HEALTH, GRAVITY;
         std::string WEAPON;
     };
 
@@ -46,9 +46,11 @@ protected:
     bool                    m_follow = false;
     bool                    m_teleported = false;
     bool                    m_weaponSwitch = false;
+    bool                    m_playerOnGround = false;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
+    int                     m_FrameSinceGrounded = 0;
     sf::Text                m_gridText;
     sf::Text                m_tutorialText;
     sf::Text                m_levelText;
@@ -56,6 +58,7 @@ protected:
     sf::Clock               m_weaponTextClock;
     sf::Clock               m_tutorialTextClock;
     sf::Clock               m_walletClock;
+
     
     void init(const std::string & levelPath);
 
