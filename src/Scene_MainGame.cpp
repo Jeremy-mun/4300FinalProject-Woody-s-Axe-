@@ -976,6 +976,7 @@ void Scene_MainGame::sCamera()
     // get the current view, which we will modify in the if-statement below
     sf::View view = m_game->window().getView();
     view.setSize(520, 520);
+    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     if (m_follow)
     {
         Vec2 playerPos = m_player->getComponent<CTransform>().pos;
@@ -1022,6 +1023,45 @@ void Scene_MainGame::sCamera()
 
     // then set the window view
     m_game->window().setView(view);
+}
+
+void Scene_MainGame::drawMinimap()
+{
+    sf::View minimapView = m_game->window().getView();
+    minimapView.setViewport(sf::FloatRect(0.74f, 0.01f, 0.25f, 0.25f));
+    minimapView.zoom(2.0f);
+    m_game->window().setView(minimapView);
+
+    float leftX = m_game->window().getView().getCenter().x - width() / 2;
+    float rightX = leftX + width() + m_gridSize.x;
+    float nextGridX = leftX - ((int)leftX % (int)m_gridSize.x);
+
+    for (float x = nextGridX; x < rightX; x += m_gridSize.x)
+    {
+        drawLine(Vec2(x, 0), Vec2(x, height()));
+    }
+
+    for (float y = 0; y < height(); y += m_gridSize.y)
+    {
+        drawLine(Vec2(leftX, height() - y), Vec2(rightX, height() - y));
+
+        for (float x = nextGridX; x < rightX; x += m_gridSize.x)
+        {
+            std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
+            std::string yCell = std::to_string((int)y / (int)m_gridSize.y);
+            m_gridText.setString("(" + xCell + "," + yCell + ")");
+            m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
+            m_game->window().draw(m_gridText);
+        }
+    }
+
+    for (auto e : m_entityManager.getEntities())
+    {
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
 }
 
 void Scene_MainGame::onEnd()
@@ -1179,6 +1219,7 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
+    drawMinimap();
 
 }
                            

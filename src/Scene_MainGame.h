@@ -84,6 +84,7 @@ protected:
     void sRupeeCollision();
     void sTeleportCollision();
     void sCamera();
+    void drawMinimap();
     
 
 public:
