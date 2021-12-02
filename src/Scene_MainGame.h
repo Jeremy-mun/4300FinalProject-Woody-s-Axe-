@@ -30,6 +30,12 @@ class Scene_MainGame : public Scene
         bool BM, BV;
         std::string Name, AI;
     };
+    struct ItemConfig
+    {
+        float RX, RY, TX, TY;
+        bool BM, BV;
+        std::string Name;
+    };
                            
 protected:
 
@@ -41,6 +47,7 @@ protected:
     bool                    m_drawGrid = true;
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
+    ItemConfig              m_itemConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = true;
