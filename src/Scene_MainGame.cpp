@@ -65,35 +65,40 @@ void Scene_MainGame::loadLevel(const std::string& filename)
             if (configRead == "Tile")
             {
                 config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
-                if (m_tileConfig.Name == "Heart")
+
+                auto tile = m_entityManager.addEntity("tile");
+                tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
+                tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                continue;
+            }
+            if (configRead == "Item")
+            {
+                config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;
+                if (m_itemConfig.Name == "Coin")
+                {
+                    auto coin = m_entityManager.addEntity("coins");
+                    coin->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "Heart")
                 {
                     auto heart = m_entityManager.addEntity("hearts");
                     heart->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                    heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
                 }
-                else if (m_tileConfig.Name == "Black")
+                else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
                 {
-                    auto teleport = m_entityManager.addEntity("teleport");
-                    teleport->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    teleport->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    teleport->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                    auto potion = m_entityManager.addEntity("potions");
+                    potion->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
                 }
-                else if (m_tileConfig.Name == "Rupee" || m_tileConfig.Name == "RupeeBlue")
-                {
-                    auto rupee = m_entityManager.addEntity("rupee");
-                    rupee->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    rupee->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    rupee->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                }
-                else if (m_tileConfig.Name != "Heart" || m_tileConfig.Name != "Black")
-                {
-                    auto tile = m_entityManager.addEntity("tile");
-                    tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                }
-                continue;
             }
             if (configRead == "NPC")
             {

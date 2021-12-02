@@ -1,6 +1,5 @@
 Texture   MainMenuBackground images/MainMenu_Background.png
-Texture   TexExplode    images/misc/explosion128.png
-Texture   TexRunDown    images/tloz/run_down.png              
+Texture   TexExplode    images/misc/explosion128.png        
 Texture   TexRunRight   images/gothic/run_right.png
 Texture   TexJump      	images/gothic/jump.png
 Texture   TexStandD     images/gothic/idle.png              
@@ -14,9 +13,15 @@ Texture   TexBush    	images/tloz/brown/tile_bush.png
 Texture   TexGround     images/gothic/tile.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/gothic/ghost-shriek.png
-Texture   TexHellHound images/gothic/hell-hound-run.png
+Texture   TexHellHound  images/gothic/hell-hound-run.png
+Texture	  TexCoin	images/Items/Coin.png
+Texture	  TexHeart	images/Items/Heart.png
+Texture	  TexRedPotion	images/Items/RedPotion.png
+Texture	  TexGreenPotion images/Items/GreenPotion.png
+Texture	  TexPurplePotion images/Items/PurplePotion.png
+Texture	  TexGoldPotion	images/Items/GoldPotion.png
+Texture	  TexBluePotion	images/Items/BluePotion.png
 Animation Explosion     TexExplode     	48   2 
-Animation RunDown       TexRunDown       2  15   
 Animation RunRight      TexRunRight     24   2    
 Animation Jump         	TexJump        	19   2
 Animation StandDown     TexStandD       18   6   
@@ -31,6 +36,13 @@ Animation Ground        TexGround        1   0
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
 Animation HellHound   	TexHellHound  	 5   5
+Animation Coin		TexCoin		 1   0
+Animation Heart		TexHeart	 1   0
+Animation RedPotion	TexRedPotion	 1   0
+Animation GreenPotion	TexGreenPotion	 1   0
+Animation PurplePotion	TexPurplePotion	 1   0
+Animation GoldPotion	TexGoldPotion	 1   0
+Animation BluePotion	TexBluePotion	 1   0
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
 Font      Arial         fonts/arial.ttf
