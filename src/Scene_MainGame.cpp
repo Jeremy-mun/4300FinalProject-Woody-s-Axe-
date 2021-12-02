@@ -31,6 +31,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Space, "ATTACK");
     registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
     registerAction(sf::Keyboard::O, "Zoom Map");
+    registerAction(sf::Keyboard::M, "MiniMap");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -363,6 +364,7 @@ void Scene_MainGame::sDoAction(const Action& action)
             view.zoom(0.5f);
             m_game->window().setView(view);
         }
+        else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
     }
     else if (action.type() == "END")
     {
@@ -930,6 +932,7 @@ void Scene_MainGame::sCamera()
     // get the current view, which we will modify in the if-statement below
     sf::View view = m_game->window().getView();
     view.setSize(520, 520);
+    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
     sf::Vector2f newCamPos(playerPos.x,playerPos.y);
     if (newCamPos.x < view.getSize().x / 2)
@@ -988,6 +991,7 @@ void Scene_MainGame::drawMinimap()
     float leftX = m_game->window().getView().getCenter().x - width() / 2;
     float rightX = leftX + width() + m_gridSize.x;
     float nextGridX = leftX - ((int)leftX % (int)m_gridSize.x);
+
     for (float x = nextGridX; x < rightX; x += m_gridSize.x)
     {
         drawLine(Vec2(x, 0), Vec2(x, height()));
@@ -1172,5 +1176,10 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
 
+    if (m_minimap)
+    {
+        drawMinimap();
+
+    } 
 }
                            

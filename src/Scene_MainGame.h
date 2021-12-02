@@ -47,6 +47,7 @@ protected:
     bool                    m_teleported = false;
     int                     m_weaponSwitch = 0;
     bool                    m_playerOnGround = false;
+    bool                    m_minimap = true;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
