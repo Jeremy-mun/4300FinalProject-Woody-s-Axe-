@@ -931,6 +931,7 @@ void Scene_MainGame::sCamera()
 {
     // get the current view, which we will modify in the if-statement below
     sf::View view = m_game->window().getView();
+
     view.setSize(520, 520);
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
@@ -1039,7 +1040,7 @@ void Scene_MainGame::sRender()
     sf::RectangleShape tick({ 1.0f, 6.0f });
     tick.setFillColor(sf::Color::Black);
     
-   
+    
     // draw all Entity textures / animations
     if (m_drawTextures)
     {
@@ -1171,11 +1172,10 @@ void Scene_MainGame::sRender()
             }
         }
     }
-
+    
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
-
     if (m_minimap)
     {
         drawMinimap();
