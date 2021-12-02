@@ -27,17 +27,9 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     registerAction(sf::Keyboard::A, "LEFT");
     registerAction(sf::Keyboard::D, "RIGHT");
     registerAction(sf::Keyboard::Q, "PLACE_BLOCK");
+
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
-    m_levelText.setFont(m_game->assets().getFont("Arial"));
-    m_levelText.setFillColor(sf::Color::White);
-    m_tutorialText.setFont(m_game->assets().getFont("Arial"));
-    m_tutorialText.setCharacterSize(20);
-    m_tutorialText.setFillColor(sf::Color::White);
-    m_walletText.setFont(m_game->assets().getFont("Arial"));
-    m_walletText.setCharacterSize(12);
-    m_walletText.setFillColor(sf::Color::White);
-
 }
 
 void Scene_Level_Editor::loadLevel(const std::string& filename)
@@ -88,6 +80,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
                     tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
                     tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                    tile->addComponent<CDraggable>();
                 }
                 continue;
             }
@@ -95,6 +88,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
             {
                 config >> m_npcConfig.Name >> m_npcConfig.RX >> m_npcConfig.RY >> m_npcConfig.TX >> m_npcConfig.TY >> m_npcConfig.BM >> m_npcConfig.BV >> m_npcConfig.H >> m_npcConfig.D >> m_npcConfig.AI >> m_npcConfig.S;
                 auto npc = m_entityManager.addEntity("npc");
+                npc->addComponent<CDraggable>();
                 if (m_npcConfig.AI == "Follow")
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
@@ -133,6 +127,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 }
             }
         }
+        spawnPlayer();
     }
 
 }
@@ -160,19 +155,23 @@ void Scene_Level_Editor::placeTile(Animation animation)
 
 }
 
+void Scene_Level_Editor::spawnPlayer()
+{
+    m_player = m_entityManager.addEntity("player");
+    m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
+    m_player->addComponent<CState>("StandDown");
+    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandDown"), true);
+    m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
+    m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
+    m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
+    m_player->addComponent<CDraggable>();
+}
+
 void Scene_Level_Editor::update()
 {
     m_entityManager.update();
-    // When the game is paused
-    if (m_paused)
-    {
-        m_levelText.setString("Paused");
-        m_levelText.setCharacterSize(24);
-        m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));
-        m_game->pauseSound("MusicLevel");
-
-        return;
-    }
+    sCamera();
+    sDragAndDrop();
     m_currentFrame++;
 }
 
@@ -183,45 +182,84 @@ Vec2 Scene_Level_Editor::getPosition(int rx, int ry, int tx, int ty) const
     return Vec2(x, y);
 }
 
+bool Scene_Level_Editor::isInside(const Vec2& pos, std::shared_ptr<Entity> e)
+{
+    if (!e->hasComponent<CAnimation>()) { return false; }
+
+    auto& halfsize = e->getComponent<CAnimation>().animation.getSize() / 2;
+
+    Vec2 delta = (e->getComponent<CTransform>().pos - pos).abs();
+
+    return (delta.x <= halfsize.x) && (delta.y <= halfsize.y);
+}
+
 void Scene_Level_Editor::sDoAction(const Action& action)
 {
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {
-            m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);
-            sf::View view = m_game->window().getView();
-            view.zoom(2.0f);
-            m_game->window().setView(view);
-        }
-        else if (action.name() == "QUIT") { onEnd(); }
-        else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
-        else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
+             if (action.name() == "PAUSE")            { }
+        else if (action.name() == "QUIT")             { onEnd(); }
+        else if (action.name() == "TOGGLE_FOLLOW")    { m_follow = !m_follow; }
+        else if (action.name() == "TOGGLE_TEXTURE")   { m_drawTextures = !m_drawTextures; }
         else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision; }
-        else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
-        else if (action.name() == "UP") { }
-        else if (action.name() == "DOWN") { }
-        else if (action.name() == "LEFT") { }
-        else if (action.name() == "RIGHT") { }
-        else if (action.name() == "PLACE_BLOCK") { std::string x;
-        //std::cout << "Type animation Name: "; // Type animation Name
-        //std::cin >> x; // Get user input from the keyboard
-        //std::cout << "Your animation name is: " << x ;
-        
-        placeTile(m_game->assets().getAnimation(TilesPresent[tileIndex]));
-        tileIndex++;
-        if (tileIndex >= TilesPresent->size())
-        {
-            tileIndex = 0;
-        }
-        }
+        else if (action.name() == "TOGGLE_GRID")      { m_drawGrid = !m_drawGrid; }
+        else if (action.name() == "UP")               { }
+        else if (action.name() == "DOWN")             { }
+        else if (action.name() == "LEFT")             { }
+        else if (action.name() == "RIGHT")            { }
+        else if (action.name() == "LEFT_CLICK")       { grab(); }
+        else if (action.name() == "PLACE_BLOCK")      { }
     }
     else if (action.type() == "END")
     {
-        if (action.name() == "UP") {  }
-        else if (action.name() == "DOWN") {  }
-        else if (action.name() == "LEFT") { }
+             if (action.name() == "UP")    { }
+        else if (action.name() == "DOWN")  { }
+        else if (action.name() == "LEFT")  { }
         else if (action.name() == "RIGHT") { }
     }
+
+    if (action.name() == "MOUSE_MOVE")
+    {
+        auto xDiff = m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2;
+        auto yDiff = m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2;
+        m_mPos = Vec2(action.pos().x + xDiff, action.pos().y + yDiff);
+        //std::cout << m_mPos.x << ", " << m_mPos.y << std::endl;
+    }
+}
+
+void Scene_Level_Editor::grab()
+{
+    for (auto e : m_entityManager.getEntities())
+    {
+        if (e->hasComponent<CDraggable>() && 
+            isInside(m_mPos, e))
+        {
+            e->getComponent<CDraggable>().dragging = !e->getComponent<CDraggable>().dragging;
+            std::cout << "Entity Clicked: " << e->tag() << std::endl;
+            break;
+        }
+    }
+}
+
+void Scene_Level_Editor::sCamera()
+{
+    auto prevCenter = m_game->window().getView().getCenter();
+
+    sf::View view = m_game->window().getView();
+    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+    sf::Vector2f newCamPos = prevCenter;
+    if (newCamPos.x < view.getSize().x / 2)
+    {
+        newCamPos.x = view.getSize().x / 2;
+    }
+    view.setCenter(newCamPos);
+    if (prevCenter != newCamPos)
+    {
+        auto xDiff = m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2;
+        auto yDiff = m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2;
+        m_mPos = Vec2(m_mPos.x + xDiff, m_mPos.y + yDiff);
+    }
+    //std::cout << m_mPos.x << ", " << m_mPos.y << std::endl;
 }
 
 void Scene_Level_Editor::onEnd()
@@ -383,5 +421,17 @@ void Scene_Level_Editor::sRender()
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
 
+}
+
+void Scene_Level_Editor::sDragAndDrop()
+{
+    for (auto e : m_entityManager.getEntities())
+    {
+        if (e->hasComponent<CDraggable>() &&
+            e->getComponent<CDraggable>().dragging)
+        {
+            e->getComponent<CTransform>().pos = m_mPos;
+        }
+    }
 }
 

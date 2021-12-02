@@ -19,7 +19,8 @@ typedef std::tuple<
     CDamage,
     CHealth,
     CInvincibility,
-    CGravity
+    CGravity,
+    CDraggable
 > ComponentTuple;
                            
 class Entity

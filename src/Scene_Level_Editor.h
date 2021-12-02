@@ -13,7 +13,7 @@ class Scene_Level_Editor : public Scene
 
     struct PlayerConfig
     {
-        float X, Y, CX, CY, SPEED, HEALTH;
+        float X, Y, CX, CY, SPEED, HEALTH, GRAVITY;
         std::string WEAPON;
     };
 
@@ -38,6 +38,7 @@ protected:
     PlayerConfig            m_playerConfig;
     std::string             configRead;
     const Vec2              m_gridSize = { 64, 64 };
+    Vec2                    m_mPos = Vec2(0.0f, 0.0f);
     bool                    m_drawGrid = true;
     std::string TilesPresent[3] = { "Bush", "BowRight", "AtkUp" };
     TileConfig              m_tileConfig;
@@ -68,6 +69,11 @@ protected:
     Vec2 getPosition(int sx, int sy, int tx, int ty) const;
     void drawLine(const Vec2& p1, const Vec2& p2);
     void placeTile(Animation animation);
+    void sDragAndDrop();
+    void sCamera();
+    bool isInside(const Vec2& pos, std::shared_ptr<Entity> e);
+    void grab();
+    void spawnPlayer();
 
 public:
 

@@ -68,7 +68,7 @@ void Scene_Menu::sDoAction(const Action& action)
             }
             else
             {
-                m_game->changeScene("Level_Editor", std::make_shared<Scene_Level_Editor>(m_game, "blankLevel.txt"));
+                m_game->changeScene("Level_Editor", std::make_shared<Scene_Level_Editor>(m_game, "Level1.txt"));
             }
             m_game->assets().getSound("MusicTitle").stop();
         }
