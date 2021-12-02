@@ -31,7 +31,6 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Space, "ATTACK");
     registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
     registerAction(sf::Keyboard::O, "Zoom Map");
-    registerAction(sf::Keyboard::M, "MiniMap");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -160,69 +159,26 @@ void Scene_MainGame::spawnPlayer()
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
 }
 
-void Scene_MainGame::spawnSword(std::shared_ptr<Entity> entity)
+void Scene_MainGame::startAttack(std::shared_ptr<Entity> entity)
 {
-    // Creates the sword object and plays the sound
-    //m_game->playSound("Slash");
-    auto& eTransform = entity->getComponent<CTransform>();
-    auto& eAnimation = entity->getComponent<CAnimation>();
+    m_frameSinceAttack = 0;
+    // check which weapon is selected (dagger, bow, axe) and play the proper animation.
+    auto& eState = entity->getComponent<CState>();
     
-    // if weapon has been switched to bow. Use bow, else use sword
-    if (!m_weaponSwitch)
+    // use Dagger Animation
+    if (m_weaponSwitch == 0)
     {
-        auto& sword = m_entityManager.addEntity("weapon");
-        
-        // place the sword in the right direction.
-        if (eTransform.facing.x != 0)
-        {
-            sword->addComponent<CTransform>(Vec2(eTransform.pos.x + (eAnimation.animation.getSize().x * eTransform.facing.x), eTransform.pos.y));
-            sword->getComponent<CTransform>().scale.x = eTransform.facing.x;
-            sword->addComponent<CAnimation>(m_game->assets().getAnimation("SwordRight"), 0);
-            sword->addComponent<CBoundingBox>(m_game->assets().getAnimation("SwordRight").getSize());
-        }
-        else
-        {
-            sword->addComponent<CTransform>(Vec2(eTransform.pos.x, eTransform.pos.y + (eAnimation.animation.getSize().y * eTransform.facing.y)));
-            sword->getComponent<CTransform>().scale.y *= eTransform.facing.y * -1;
-            sword->addComponent<CAnimation>(m_game->assets().getAnimation("SwordUp"), 0);
-            sword->addComponent<CBoundingBox>(m_game->assets().getAnimation("SwordUp").getSize());
-        }
-        sword->addComponent<CLifeSpan>(10, currentFrame());
-        sword->addComponent<CDamage>(1);
+         eState.state = "Dagger";
     }
 
-    // Spawning Bow And Arrow
+    // use Bow Animation
+    else if(m_weaponSwitch == 1)
+    {
+        eState.state = "Bow";
+    }
     else
     {
-        auto& bow = m_entityManager.addEntity("weapon");
-        auto& arrow = m_entityManager.addEntity("arrow");
-        
-        //place bow in right direction.
-        if (eTransform.facing.x != 0)
-        {
-            bow->addComponent<CTransform>(Vec2(eTransform.pos.x + (eAnimation.animation.getSize().x * eTransform.facing.x), eTransform.pos.y));
-            bow->getComponent<CTransform>().scale.x = eTransform.facing.x;
-            bow->addComponent<CAnimation>(m_game->assets().getAnimation("BowRight"), 0);
-            arrow->addComponent<CTransform>(Vec2(eTransform.pos.x + (eAnimation.animation.getSize().x * eTransform.facing.x), eTransform.pos.y));
-            arrow->getComponent<CTransform>().scale.x = eTransform.facing.x;
-            arrow->getComponent<CTransform>().velocity.x =  5 * eTransform.facing.x;
-            arrow->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowRight"), 1);
-            arrow->addComponent<CBoundingBox>(m_game->assets().getAnimation("ArrowRight").getSize());
-        }
-        else
-        {
-            bow->addComponent<CTransform>(Vec2(eTransform.pos.x, eTransform.pos.y + (eAnimation.animation.getSize().y * eTransform.facing.y)));
-            bow->getComponent<CTransform>().scale.y *= eTransform.facing.y * -1;
-            bow->addComponent<CAnimation>(m_game->assets().getAnimation("BowUp"), 0);
-            arrow->addComponent<CTransform>(Vec2(eTransform.pos.x, eTransform.pos.y + (eAnimation.animation.getSize().y * eTransform.facing.y)));
-            arrow->getComponent<CTransform>().scale.y = eTransform.facing.y * -1;
-            arrow->getComponent<CTransform>().velocity.y = 5 * eTransform.facing.y;
-            arrow->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowUp"), 1);
-            arrow->addComponent<CBoundingBox>(m_game->assets().getAnimation("ArrowUp").getSize());
-        }
-        bow->addComponent<CLifeSpan>(10, currentFrame());
-        arrow->addComponent<CLifeSpan>(40, currentFrame());
-        arrow->addComponent<CDamage>(1);
+        eState.state = "Axe";
     }
 }
                            
@@ -243,6 +199,10 @@ void Scene_MainGame::update()
         
         return;
     } 
+    if (m_player->getComponent<CInput>().attack)
+    {
+        m_frameSinceAttack++;
+    }
     sAI();
     sMovement();
     sArrowMovement();
@@ -264,18 +224,11 @@ void Scene_MainGame::sMovement()
     // if velocity in x direction was 0 last frame check for movement in y direction else check for movement in x direction
 
    
-        if (pInput.up && !pInput.down)
+        if (pInput.up)
         {
             pTransform.velocity.y = -7 * m_playerConfig.SPEED;
             pTransform.facing = Vec2(0, -1);
             pState.state = "Jump";
-            pTransform.scale = Vec2(1, 1);
-        }
-        else if (!pInput.up && pInput.down)
-        {
-            pTransform.velocity.y = m_playerConfig.SPEED;
-            pTransform.facing = Vec2(0, 1);
-            pState.state = "RunDown";
             pTransform.scale = Vec2(1, 1);
         }
         else
@@ -314,25 +267,17 @@ void Scene_MainGame::sMovement()
     // if the player is attacking give it an attacking state.
     if (pInput.attack)
     {
-        if (pTransform.facing == Vec2(1, 0))
+        if (m_weaponSwitch == 0)
         {
-            pState.state = "AtkRight";
-            pTransform.scale = Vec2(1, 1);
+            pState.state = "Dagger";
         }
-        else if (pTransform.facing == Vec2(-1, 0))
+        else if (m_weaponSwitch == 1)
         {
-            pState.state = "AtkRight";
-            pTransform.scale = Vec2(-1, 1);
+            pState.state = "Bow";
         }
-        else if (pTransform.facing == Vec2(0, -1))
+        else 
         {
-            pState.state = "AtkUp";
-            pTransform.scale = Vec2(1, 1);
-        }
-        else
-        {
-            pState.state = "AtkDown";
-            pTransform.scale = Vec2(1, 1);
+            pState.state = "Axe";
         }
     }
 #pragma endregion
@@ -410,15 +355,14 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
-        else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { spawnSword(m_player);  m_player->getComponent<CInput>().attack = true;
-        } }
-        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) {  m_weaponTextClock.restart(); m_weaponSwitch = !(m_weaponSwitch); }}
-        else if (action.name() == "Zoom Map") {
+        else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { startAttack(m_player);  m_player->getComponent<CInput>().attack = true; } }
+        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) { m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } } }
+        else if (action.name() == "Zoom Map") 
+        {
             sf::View view = m_game->window().getView();
             view.zoom(0.5f);
             m_game->window().setView(view);
         }
-        else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
     }
     else if (action.type() == "END")
     {
@@ -559,7 +503,7 @@ void Scene_MainGame::sStatus()
                 e->destroy();
 
                 // checking if the destroyed animation was of a weapon
-                if (e->getComponent<CAnimation>().animation.getName() == "SwordUp" || e->getComponent<CAnimation>().animation.getName() == "SwordRight" || e->getComponent<CAnimation>().animation.getName() == "BowUp" || e->getComponent<CAnimation>().animation.getName() == "BowRight" )
+                if (e->getComponent<CAnimation>().animation.getName() == "Dagger" || e->getComponent<CAnimation>().animation.getName() == "Axe" || e->getComponent<CAnimation>().animation.getName() == "Bow")
                 {
                     m_player->getComponent<CInput>().attack = false;
                 }
@@ -585,7 +529,7 @@ void Scene_MainGame::sCollision()
 {
     sTileCollision();
     sPlayerCollision();
-    sSwordCollision();
+    sMeleeCollision();
     sArrowCollision();
     sHeartCollision();
     sRupeeCollision();
@@ -697,44 +641,77 @@ void Scene_MainGame::sPlayerCollision()
     }
     
 }
-void Scene_MainGame::sSwordCollision()
+void Scene_MainGame::sMeleeCollision()
 {
-    //Sword collisions with NPC's are implemented here
-    for (auto& weapon : m_entityManager.getEntities("weapon"))
+    //Melee collisions with NPC's are implemented here
+    if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 10)
     {
-        if (weapon->getComponent<CAnimation>().animation.getName() == "SwordUp" || weapon->getComponent<CAnimation>().animation.getName() == "SwordRight")
+        auto& playerTransform = m_player->getComponent<CTransform>();
+        auto& axe = m_entityManager.addEntity("weapon");
+        axe->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().animation.getSize());
+        axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
+        axe->addComponent<CDamage>(5);
+        axe->addComponent<CLifeSpan>(0, m_currentFrame);
+        for (auto& e : m_entityManager.getEntities("npc"))
         {
-            auto& weaponLifespan = weapon->getComponent<CLifeSpan>();
-            if (currentFrame() == weaponLifespan.frameCreated + 1)
+            auto& npcHealth = e->getComponent<CHealth>();
+            auto npcWeaponOverlap = Physics::GetOverlap(axe, e);
+            if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
-                auto& weaponDamage = weapon->getComponent<CDamage>();
-                for (auto& e : m_entityManager.getEntities("npc"))
+                npcHealth.current -= axe->getComponent<CDamage>().damage;
+                if (npcHealth.current <= 0)
                 {
-                    auto& npcHealth = e->getComponent<CHealth>();
-                    auto npcWeaponOverlap = Physics::GetOverlap(weapon, e);
-                    if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
-                    {
-                        npcHealth.current -= weaponDamage.damage;
-                        //m_game->playSound("EnemyHit");
-                        if (npcHealth.current <= 0)
-                        {
-                            //m_game->playSound("EnemyDie");
-                            auto ex = m_entityManager.addEntity("explosion");
-                            ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
-                            ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
-                            e->destroy();
-                            break;
-                        }
-                    }
+                    //m_game->playSound("EnemyDie");
+                    auto ex = m_entityManager.addEntity("explosion");
+                    ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                    ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
+                    e->destroy();
+                    break;
                 }
             }
         }
-        else { continue; }
+    }
+    if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 2 || m_frameSinceAttack == 9 || m_frameSinceAttack == 16))
+    {
+        auto& playerTransform = m_player->getComponent<CTransform>();
+        auto& axe = m_entityManager.addEntity("weapon");
+        axe->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x*2/3, m_player->getComponent<CAnimation>().animation.getSize().y));
+        axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
+        axe->addComponent<CDamage>(1);
+        axe->addComponent<CLifeSpan>(0, m_currentFrame);
+        for (auto& e : m_entityManager.getEntities("npc"))
+        {
+            auto& npcHealth = e->getComponent<CHealth>();
+            auto npcWeaponOverlap = Physics::GetOverlap(axe, e);
+            if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
+            {
+                npcHealth.current -= axe->getComponent<CDamage>().damage;
+                if (npcHealth.current <= 0)
+                {
+                    //m_game->playSound("EnemyDie");
+                    auto ex = m_entityManager.addEntity("explosion");
+                    ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                    ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
+                    e->destroy();
+                    break;
+                }
+            }
+        }
     }
 }
 void Scene_MainGame::sArrowCollision()
 {
-    //Sword collisions with NPC's are implemented here
+    if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10)
+    {
+        auto& playerTransform = m_player->getComponent<CTransform>();
+        auto& arrow = m_entityManager.addEntity("arrow");
+        arrow->addComponent<CAnimation>(m_game->assets().getAnimation("Arrow"), true);
+        arrow->addComponent<CBoundingBox>(m_game->assets().getAnimation("Arrow").getSize());
+        arrow->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5,playerTransform.pos.y),Vec2(5 * playerTransform.scale.x,0),playerTransform.scale,0);
+        arrow->addComponent<CDamage>(1);
+        arrow->addComponent<CLifeSpan>(180, m_currentFrame);
+    }
+    //Arrow collisions with NPC's are implemented here
     for (auto& arrow : m_entityManager.getEntities("arrow"))
     {
         auto& arrowDamage = arrow->getComponent<CDamage>();
@@ -878,42 +855,17 @@ void Scene_MainGame::sAnimation()
     if (playerAnimation.animation.getName() == playerState.state)
     {
         playerAnimation.animation.update();
+        if (playerInput.attack)
+        {
+            if (playerAnimation.animation.hasEnded())
+            {
+                playerInput.attack = false;
+            }
+        }
     }
     else
     {
         playerAnimation.animation = m_game->assets().getAnimation(playerState.state);
-    }
-    for (auto& e : m_entityManager.getEntities("weapon"))
-    {
-        auto& eAnimation = e->getComponent<CAnimation>();
-        auto& eTransform = e->getComponent<CTransform>();
-
-        if (playerTransform.facing.x != 0)
-        {
-            eTransform.pos = Vec2(playerTransform.pos.x + (playerAnimation.animation.getSize().x * playerTransform.facing.x), playerTransform.pos.y);
-            if (eAnimation.animation.getName() == "SwordRight" || eAnimation.animation.getName() == "SwordUp")
-            {
-                eAnimation.animation = m_game->assets().getAnimation("SwordRight");
-            }
-            else
-            {
-                eAnimation.animation = m_game->assets().getAnimation("BowRight");
-            }
-            eTransform.scale.x = playerTransform.facing.x;
-        }
-        else if (playerTransform.facing.y != 0)
-        {
-            eTransform.pos = Vec2(playerTransform.pos.x, playerTransform.pos.y + (playerAnimation.animation.getSize().y * playerTransform.facing.y));
-            if (eAnimation.animation.getName() == "SwordRight" || eAnimation.animation.getName() == "SwordUp")
-            {
-                eAnimation.animation = m_game->assets().getAnimation("SwordUp");
-            }
-            else
-            {
-                eAnimation.animation = m_game->assets().getAnimation("BowUp");
-            }
-            eTransform.scale.y = -1 * playerTransform.facing.y;
-        }
     }
 #pragma endregion
 
@@ -978,32 +930,31 @@ void Scene_MainGame::sCamera()
     // get the current view, which we will modify in the if-statement below
     sf::View view = m_game->window().getView();
     view.setSize(520, 520);
-    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
-    if (m_follow)
+    Vec2 playerPos = m_player->getComponent<CTransform>().pos;
+    sf::Vector2f newCamPos(playerPos.x,playerPos.y);
+    if (newCamPos.x < view.getSize().x / 2)
     {
-        Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-        sf::Vector2f newCamPos(playerPos.x,playerPos.y);
-        view.setCenter(newCamPos);
-       
+        newCamPos.x = view.getSize().x / 2;
     }
-    else
-    {
-        // calcluate view for room-based camera
-        Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-        sf::Vector2u windowSize = m_game->window().getSize();
-        sf::Vector2f newCamPos(floor(playerPos.x/windowSize.x)*windowSize.x +(windowSize.x/2), floor(playerPos.y / windowSize.y)*windowSize.y +(windowSize.y/2));
-        view.setCenter(newCamPos); 
-    }
+    view.setCenter(newCamPos);
+    
     
 #pragma region Setting Up strings and positions of UI Texts
    
     m_levelText.setCharacterSize(12);
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
     m_tutorialText.setString(" Move:W, A, S D Weapon Swap: TAB\n Zoom In: O   Zoom Out: P");
-    m_levelText.setString("Sword Activated");
-    if (m_weaponSwitch)
+    if (m_weaponSwitch == 0)
+    {
+        m_levelText.setString("Dagger Activated");
+    }
+    else if (m_weaponSwitch == 1)
     {
         m_levelText.setString("  Bow Activated");
+    }
+    else
+    {
+        m_levelText.setString("  Axe Activated");
     }
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
     {
@@ -1221,9 +1172,5 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
 
-    if (m_minimap)
-    {
-        drawMinimap();
-    }
 }
                            

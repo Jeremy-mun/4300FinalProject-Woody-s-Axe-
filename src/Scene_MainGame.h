@@ -45,9 +45,8 @@ protected:
     bool                    m_drawCollision = false;
     bool                    m_follow = true;
     bool                    m_teleported = false;
-    bool                    m_weaponSwitch = false;
+    int                     m_weaponSwitch = 0;
     bool                    m_playerOnGround = false;
-    bool                    m_minimap = true;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
@@ -59,6 +58,7 @@ protected:
     sf::Clock               m_weaponTextClock;
     sf::Clock               m_tutorialTextClock;
     sf::Clock               m_walletClock;
+    int                     m_frameSinceAttack;
 
     
     void init(const std::string & levelPath);
@@ -68,7 +68,7 @@ protected:
     void onEnd();
     void update();
     void spawnPlayer();
-    void spawnSword(std::shared_ptr<Entity> entity);
+    void startAttack(std::shared_ptr<Entity> entity);
     Vec2 getPosition(int sx, int sy, int tx, int ty) const;
     void drawLine(const Vec2& p1, const Vec2& p2);
     void sMovement();
@@ -79,13 +79,12 @@ protected:
     void sCollision();
     void sTileCollision();
     void sPlayerCollision();
-    void sSwordCollision();
+    void sMeleeCollision();
     void sArrowCollision();
     void sHeartCollision();
     void sRupeeCollision();
     void sTeleportCollision();
     void sCamera();
-    void drawMinimap();
     
 
 public:
