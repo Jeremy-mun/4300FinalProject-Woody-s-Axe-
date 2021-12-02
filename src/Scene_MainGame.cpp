@@ -1037,7 +1037,6 @@ void Scene_MainGame::drawMinimap()
     float leftX = m_game->window().getView().getCenter().x - width() / 2;
     float rightX = leftX + width() + m_gridSize.x;
     float nextGridX = leftX - ((int)leftX % (int)m_gridSize.x);
-
     for (float x = nextGridX; x < rightX; x += m_gridSize.x)
     {
         drawLine(Vec2(x, 0), Vec2(x, height()));
