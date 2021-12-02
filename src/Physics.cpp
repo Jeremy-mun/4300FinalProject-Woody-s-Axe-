@@ -66,12 +66,10 @@ bool Physics::IsInside(const Vec2& pos, std::shared_ptr<Entity> e)
 {
     auto& eTransform = e->getComponent<CTransform>();
     auto& eBoundingBox = e->getComponent<CBoundingBox>();
-    float x, y;
-    if (pos.x > eTransform.pos.x)
-    {
-        return true;
-    }
-    if (pos.y > eTransform.pos.y)
+    float x= eTransform.pos.x, y = eTransform.pos.y;
+    float sx = x + eBoundingBox.size.x;
+    float sy = y + eBoundingBox.size.y;
+    if (pos.x > x && pos.x < sx && pos.y > y && pos.y < sy )
     {
         return true;
     }
