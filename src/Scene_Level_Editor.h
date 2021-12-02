@@ -13,7 +13,7 @@ class Scene_Level_Editor : public Scene
 
     struct PlayerConfig
     {
-        float X, Y, CX, CY, SPEED, HEALTH;
+        float X, Y, CX, CY, SPEED, HEALTH, GRAVITY;
         std::string WEAPON;
     };
 
@@ -71,6 +71,9 @@ protected:
     void placeTile(Animation animation);
     void sDragAndDrop();
     void sCamera();
+    bool isInside(const Vec2& pos, std::shared_ptr<Entity> e);
+    void grab();
+    void spawnPlayer();
 
 public:
 
