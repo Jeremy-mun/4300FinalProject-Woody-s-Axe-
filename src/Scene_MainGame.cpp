@@ -31,6 +31,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Space, "ATTACK");
     registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
     registerAction(sf::Keyboard::O, "Zoom Map");
+    registerAction(sf::Keyboard::M, "MiniMap");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -417,6 +418,7 @@ void Scene_MainGame::sDoAction(const Action& action)
             view.zoom(0.5f);
             m_game->window().setView(view);
         }
+        else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
     }
     else if (action.type() == "END")
     {
@@ -1219,7 +1221,10 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
-    drawMinimap();
 
+    if (m_minimap)
+    {
+        drawMinimap();
+    }
 }
                            
