@@ -405,7 +405,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         {
             inventory.item = "Empty";
             auto& transform = entity->getComponent<CTransform>();
-            transform.tempSpeed = 2;
+            transform.tempSpeed = 3;
             transform.duration = 600;
         }
         else if (inventory.item == "GreenPotion")
@@ -1021,7 +1021,7 @@ void Scene_MainGame::sCamera()
     // get the current view, which we will modify in the if-statement below
     sf::View view = m_game->window().getView();
 
-    view.setSize(520, 520);
+    view.setSize(1280, 768);
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
     sf::Vector2f newCamPos(playerPos.x,playerPos.y);
