@@ -20,6 +20,8 @@ public:
     Vec2 velocity = { 0.0, 0.0 };
     Vec2 facing = { 0.0, 1.0 };
     float angle = 0;
+    int tempSpeed = 0;
+    int duration = 0;
 
     CTransform() {}
     CTransform(const Vec2& p)
@@ -43,6 +45,9 @@ class CDamage : public Component
 {
 public:
     int damage = 1;
+    int tempDamage = 0;
+    int duration = 0;
+
     CDamage() {}
     CDamage(int d)
         : damage(d) {}
@@ -144,4 +149,16 @@ class CDraggable : public Component
 public:
     bool dragging = false;
     CDraggable() {}
+};
+
+class CInventory : public Component
+{
+public:
+    int money = 0;
+    std::string item = "Empty";
+    CInventory() {}
+    CInventory(int m)
+        : money(m) {}
+    CInventory(int m, std::string i)
+        : money(m), item(i) {}
 };

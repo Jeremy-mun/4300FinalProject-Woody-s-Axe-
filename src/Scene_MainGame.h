@@ -90,10 +90,13 @@ protected:
     void sMeleeCollision();
     void sArrowCollision();
     void sHeartCollision();
-    void sRupeeCollision();
+    void sCoinCollision();
+    void sItemCollision();
     void sTeleportCollision();
     void sCamera();
     void drawMinimap();
+    void sInteract();
+    void sUseItem(std::shared_ptr<Entity> entity);
     
 
 public:
