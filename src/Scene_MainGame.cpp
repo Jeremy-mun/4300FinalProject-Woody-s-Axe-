@@ -28,6 +28,8 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(sf::Keyboard::S, "DOWN");
     registerAction(sf::Keyboard::A, "LEFT");
     registerAction(sf::Keyboard::D, "RIGHT");
+    registerAction(sf::Keyboard::F, "INTERACT");
+    registerAction(sf::Keyboard::E, "USE_ITEM");
     registerAction(sf::Keyboard::Space, "ATTACK");
     registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
     registerAction(sf::Keyboard::O, "Zoom Map");
@@ -78,7 +80,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 if (m_itemConfig.Name == "Coin")
                 {
                     auto coin = m_entityManager.addEntity("coins");
-                    coin->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    coin->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
@@ -86,7 +88,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Heart")
                 {
                     auto heart = m_entityManager.addEntity("hearts");
-                    heart->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    heart->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
@@ -94,7 +96,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
                 {
                     auto potion = m_entityManager.addEntity("potions");
-                    potion->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    potion->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
@@ -163,6 +165,8 @@ void Scene_MainGame::spawnPlayer()
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
+    m_player->addComponent<CDamage>(1);
+    m_player->addComponent<CInventory>();
 }
 
 void Scene_MainGame::startAttack(std::shared_ptr<Entity> entity)
@@ -232,7 +236,7 @@ void Scene_MainGame::sMovement()
    
         if (pInput.up)
         {
-            pTransform.velocity.y = -7 * m_playerConfig.SPEED;
+            pTransform.velocity.y = -7 * (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(0, -1);
             pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
@@ -245,14 +249,14 @@ void Scene_MainGame::sMovement()
         // if only one x directional key is pressed move in that direction otherwise stop.
         if (pInput.left && !pInput.right)
         {
-            pTransform.velocity.x = -1 * m_playerConfig.SPEED;
+            pTransform.velocity.x = -1 * (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(-1, 0);
             pState.state = "RunRight";
             pTransform.scale = Vec2(-1, 1);
         }
         else if (!pInput.left && pInput.right)
         {
-            pTransform.velocity.x = m_playerConfig.SPEED;
+            pTransform.velocity.x = (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
             pTransform.scale = Vec2(1, 1);
@@ -361,6 +365,8 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
+        else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
+        else if (action.name() == "INTERACT") { sInteract(); }
         else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { startAttack(m_player);  m_player->getComponent<CInput>().attack = true; } }
         else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) { m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } } }
         else if (action.name() == "Zoom Map") 
@@ -378,6 +384,66 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = false; }
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = false; }
     }
+}
+
+void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
+{
+    if (entity->hasComponent<CInventory>())
+    {
+        auto& inventory = entity->getComponent<CInventory>();
+        if (inventory.item == "Empty")
+        {
+            return;
+        }
+        else if (inventory.item == "RedPotion")
+        {
+            inventory.item = "Empty";
+            auto& health = entity->getComponent<CHealth>();
+            health.current = health.max;
+        }
+        else if (inventory.item == "BluePotion")
+        {
+            inventory.item = "Empty";
+            auto& transform = entity->getComponent<CTransform>();
+            transform.tempSpeed = 2;
+            transform.duration = 600;
+        }
+        else if (inventory.item == "GreenPotion")
+        {
+            inventory.item = "Empty";
+            auto& damage = entity->getComponent<CDamage>();
+            damage.tempDamage = 2;
+            damage.duration = 600;
+        }
+        else if (inventory.item == "GoldPotion")
+        {
+            inventory.item = "Empty";
+            if (entity->hasComponent<CInvincibility>())
+            {
+                entity->getComponent<CInvincibility>().iframes = 420;
+            }
+            else
+            {
+                entity->addComponent<CInvincibility>(420);
+            }
+        }
+        else if (inventory.item == "PurplePotion")
+        {
+            inventory.item = "Empty";
+            auto& eTransform = entity->getComponent<CTransform>();
+            auto& potion = m_entityManager.addEntity("arrow");
+            potion->addComponent<CAnimation>(m_game->assets().getAnimation("PurplePotion"), true);
+            potion->addComponent<CBoundingBox>(m_game->assets().getAnimation("PurplePotion").getSize());
+            potion->addComponent<CTransform>(Vec2(eTransform.pos.x + eTransform.scale.x * 5, eTransform.pos.y), Vec2(8 * eTransform.scale.x, 0), eTransform.scale, 0);
+            potion->addComponent<CDamage>(10);
+            potion->addComponent<CLifeSpan>(180, m_currentFrame);
+        }
+    }
+}
+
+void Scene_MainGame::sInteract()
+{
+
 }
 
 void Scene_MainGame::sAI()
@@ -539,7 +605,8 @@ void Scene_MainGame::sCollision()
     sMeleeCollision();
     sArrowCollision();
     sHeartCollision();
-    sRupeeCollision();
+    sCoinCollision();
+    sItemCollision();
     sTeleportCollision();
 }
 
@@ -651,13 +718,15 @@ void Scene_MainGame::sPlayerCollision()
 void Scene_MainGame::sMeleeCollision()
 {
     //Melee collisions with NPC's are implemented here
+    
     if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 10)
     {
         auto& playerTransform = m_player->getComponent<CTransform>();
+        auto& playerDamage = m_player->getComponent<CDamage>();
         auto& axe = m_entityManager.addEntity("weapon");
         axe->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().animation.getSize());
         axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
-        axe->addComponent<CDamage>(5);
+        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage)*3);
         axe->addComponent<CLifeSpan>(0, m_currentFrame);
         for (auto& e : m_entityManager.getEntities("npc"))
         {
@@ -681,10 +750,11 @@ void Scene_MainGame::sMeleeCollision()
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 2 || m_frameSinceAttack == 9 || m_frameSinceAttack == 16))
     {
         auto& playerTransform = m_player->getComponent<CTransform>();
+        auto& playerDamage = m_player->getComponent<CDamage>();
         auto& axe = m_entityManager.addEntity("weapon");
         axe->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x*2/3, m_player->getComponent<CAnimation>().animation.getSize().y));
         axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
-        axe->addComponent<CDamage>(1);
+        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage));
         axe->addComponent<CLifeSpan>(0, m_currentFrame);
         for (auto& e : m_entityManager.getEntities("npc"))
         {
@@ -710,12 +780,13 @@ void Scene_MainGame::sArrowCollision()
 {
     if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10)
     {
+        auto& playerDamage = m_player->getComponent<CDamage>();
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& arrow = m_entityManager.addEntity("arrow");
         arrow->addComponent<CAnimation>(m_game->assets().getAnimation("Arrow"), true);
         arrow->addComponent<CBoundingBox>(m_game->assets().getAnimation("Arrow").getSize());
         arrow->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5,playerTransform.pos.y),Vec2(5 * playerTransform.scale.x,0),playerTransform.scale,0);
-        arrow->addComponent<CDamage>(1);
+        arrow->addComponent<CDamage>(playerDamage.damage + playerDamage.tempDamage);
         arrow->addComponent<CLifeSpan>(180, m_currentFrame);
     }
     //Arrow collisions with NPC's are implemented here
@@ -785,32 +856,45 @@ void Scene_MainGame::sHeartCollision()
         }
     }
 }
-void Scene_MainGame::sRupeeCollision()
+void Scene_MainGame::sCoinCollision()
 {
     //Rupee collisions with entities are implemented here
     auto& playerTransform = m_player->getComponent<CTransform>();
-    for (auto rupee : m_entityManager.getEntities("rupee"))
+    for (auto coin : m_entityManager.getEntities("coins"))
     {
-        auto& rupeeBoundingBox = rupee->getComponent<CBoundingBox>();
-        auto& rupeeAnim = rupee->getComponent<CAnimation>().animation;
+        auto& coinBoundingBox = coin->getComponent<CBoundingBox>();
+        auto& coinAnim = coin->getComponent<CAnimation>().animation;
 
         // Checking for player and rupee collision
-        auto playerHeartsOverlap = Physics::GetOverlap(rupee, m_player);
-        if (playerHeartsOverlap.x > rupeeBoundingBox.halfSize.x && playerHeartsOverlap.y > rupeeBoundingBox.halfSize.y)
+        auto playerCoinsOverlap = Physics::GetOverlap(coin, m_player);
+        if (playerCoinsOverlap.x > coinBoundingBox.halfSize.x && playerCoinsOverlap.y > coinBoundingBox.halfSize.y)
         {
             //m_game->playSound("GetItem");
-            if (rupeeAnim.getName() == "RupeeBlue")
+            m_player->getComponent<CInventory>().money++;
+            m_walletText.setString("    +1 coin\n   Coins: x" + std::to_string(m_player->getComponent<CInventory>().money));
+            coin->destroy();
+        }
+    }
+}
+void Scene_MainGame::sItemCollision()
+{
+    //Rupee collisions with entities are implemented here
+    auto& playerTransform = m_player->getComponent<CTransform>();
+    for (auto potion : m_entityManager.getEntities("potions"))
+    {
+        auto& potionBoundingBox = potion->getComponent<CBoundingBox>();
+        auto& potionAnim = potion->getComponent<CAnimation>().animation;
+
+        // Checking for player and rupee collision
+        auto playerPotionsOverlap = Physics::GetOverlap(potion, m_player);
+        if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
+        {
+            //m_game->playSound("GetItem");
+            if (m_player->getComponent<CInventory>().item == "Empty")
             {
-                m_wallet += 5;
-                m_walletText.setString("    +5 coins\n  Coins: x" + std::to_string(m_wallet));
+                m_player->getComponent<CInventory>().item = potionAnim.getName();
+                potion->destroy();
             }
-            else
-            {
-                m_wallet++;
-                m_walletText.setString("    +1 coin\n   Coins: x" + std::to_string(m_wallet));
-            }
-            m_walletClock.restart();
-            rupee->destroy();
         }
     }
 }
