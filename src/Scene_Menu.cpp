@@ -29,9 +29,9 @@ void Scene_Menu::init()
     m_menuStrings.push_back("Level  Editor");
     m_menuStrings.push_back("Load Level");
 
-    m_levelPaths.push_back("level1.txt");
-    m_levelPaths.push_back("level2.txt");
-    m_levelPaths.push_back("level3.txt");
+    m_levelPaths.push_back("levels/level1.txt");
+    m_levelPaths.push_back("levels/level2.txt");
+    m_levelPaths.push_back("levels/level3.txt");
 
     m_menuText.setFont(m_game->assets().getFont("Gypsy"));
     m_menuText.setCharacterSize(64);
