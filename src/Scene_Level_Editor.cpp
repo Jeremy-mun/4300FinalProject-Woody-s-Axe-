@@ -129,7 +129,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
         }
         spawnPlayer();
     }
-
+    editor();
 }
 
 void Scene_Level_Editor::placeTile(Animation animation)
@@ -167,10 +167,16 @@ void Scene_Level_Editor::spawnPlayer()
     m_player->addComponent<CDraggable>();
 }
 
+void Scene_Level_Editor::editor()
+{
+    m_editor = m_entityManager.addEntity("editor");
+    m_editor->addComponent<CInput>();
+}
+
 void Scene_Level_Editor::update()
 {
     m_entityManager.update();
-    sCamera();
+    sEditor();
     sDragAndDrop();
     m_currentFrame++;
 }
@@ -180,17 +186,6 @@ Vec2 Scene_Level_Editor::getPosition(int rx, int ry, int tx, int ty) const
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
     float y = ry * (int)m_game->window().getSize().y + (ty * 64) + 32;
     return Vec2(x, y);
-}
-
-bool Scene_Level_Editor::isInside(const Vec2& pos, std::shared_ptr<Entity> e)
-{
-    if (!e->hasComponent<CAnimation>()) { return false; }
-
-    auto& halfsize = e->getComponent<CAnimation>().animation.getSize() / 2;
-
-    Vec2 delta = (e->getComponent<CTransform>().pos - pos).abs();
-
-    return (delta.x <= halfsize.x) && (delta.y <= halfsize.y);
 }
 
 void Scene_Level_Editor::sDoAction(const Action& action)
@@ -203,28 +198,22 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_TEXTURE")   { m_drawTextures = !m_drawTextures; }
         else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision; }
         else if (action.name() == "TOGGLE_GRID")      { m_drawGrid = !m_drawGrid; }
-        else if (action.name() == "UP")               { }
-        else if (action.name() == "DOWN")             { }
-        else if (action.name() == "LEFT")             { }
-        else if (action.name() == "RIGHT")            { }
+        else if (action.name() == "UP")               { m_editor->getComponent<CInput>().up = true; }
+        else if (action.name() == "DOWN")             { m_editor->getComponent<CInput>().down = true; }
+        else if (action.name() == "LEFT")             { m_editor->getComponent<CInput>().left = true; }
+        else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = true; }
         else if (action.name() == "LEFT_CLICK")       { grab(); }
         else if (action.name() == "PLACE_BLOCK")      { }
     }
     else if (action.type() == "END")
     {
-             if (action.name() == "UP")    { }
-        else if (action.name() == "DOWN")  { }
-        else if (action.name() == "LEFT")  { }
-        else if (action.name() == "RIGHT") { }
+             if (action.name() == "UP")               { m_editor->getComponent<CInput>().up = false; }
+        else if (action.name() == "DOWN")             { m_editor->getComponent<CInput>().down = false; }
+        else if (action.name() == "LEFT")             { m_editor->getComponent<CInput>().left = false; }
+        else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = false; }
     }
 
-    if (action.name() == "MOUSE_MOVE")
-    {
-        auto xDiff = m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2;
-        auto yDiff = m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2;
-        m_mPos = Vec2(action.pos().x + xDiff, action.pos().y + yDiff);
-        //std::cout << m_mPos.x << ", " << m_mPos.y << std::endl;
-    }
+    if (action.name() == "MOUSE_MOVE")                { m_mPos = action.pos() + Vec2(m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2, m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2); }
 }
 
 void Scene_Level_Editor::grab()
@@ -232,34 +221,63 @@ void Scene_Level_Editor::grab()
     for (auto e : m_entityManager.getEntities())
     {
         if (e->hasComponent<CDraggable>() && 
-            isInside(m_mPos, e))
+            Physics::IsInside(m_mPos, e))
         {
             e->getComponent<CDraggable>().dragging = !e->getComponent<CDraggable>().dragging;
+            if (!e->getComponent<CDraggable>().dragging)
+            {
+                snap(e);
+            }
             std::cout << "Entity Clicked: " << e->tag() << std::endl;
             break;
         }
     }
 }
 
-void Scene_Level_Editor::sCamera()
+void Scene_Level_Editor::snap(std::shared_ptr<Entity> e)
 {
-    auto prevCenter = m_game->window().getView().getCenter();
+    auto& pos = e->getComponent<CTransform>().pos;
+    pos.x = (floor(pos.x / m_gridSize.x) * m_gridSize.x) + m_gridSize.x / 2;
+    pos.y = (floor(pos.y / m_gridSize.y) * m_gridSize.y) + m_gridSize.y / 2;
+}
+
+void Scene_Level_Editor::sEditor()
+{
+    auto center = m_game->window().getView().getCenter();
 
     sf::View view = m_game->window().getView();
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
-    sf::Vector2f newCamPos = prevCenter;
-    if (newCamPos.x < view.getSize().x / 2)
+
+    sf::Vector2f newView = sf::Vector2f(0.0, 0.0);
+
+    if (m_editor->getComponent<CInput>().up)
     {
-        newCamPos.x = view.getSize().x / 2;
+        newView.y -= 64.0f;
+        m_mPos.y  -= 64.0f;
+        m_editor->getComponent<CInput>().up = false;
     }
-    view.setCenter(newCamPos);
-    if (prevCenter != newCamPos)
+    if (m_editor->getComponent<CInput>().down)
     {
-        auto xDiff = m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2;
-        auto yDiff = m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2;
-        m_mPos = Vec2(m_mPos.x + xDiff, m_mPos.y + yDiff);
+        newView.y += 64.0f;
+        m_mPos.y  += 64.0f;
+        m_editor->getComponent<CInput>().down = false;
     }
-    //std::cout << m_mPos.x << ", " << m_mPos.y << std::endl;
+    if (m_editor->getComponent<CInput>().left)
+    {
+        newView.x -= 64.0f;
+        m_mPos.x  -= 64.0f;
+        m_editor->getComponent<CInput>().left = false;
+    }
+    if (m_editor->getComponent<CInput>().right)
+    {
+        newView.x += 64.0f;
+        m_mPos.x  += 64.0f;
+        m_editor->getComponent<CInput>().right = false;
+    }
+
+    view.setCenter(newView + center);
+
+    m_game->window().setView(view);
 }
 
 void Scene_Level_Editor::onEnd()

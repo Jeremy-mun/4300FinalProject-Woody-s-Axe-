@@ -38,6 +38,7 @@ protected:
     PlayerConfig            m_playerConfig;
     std::string             configRead;
     const Vec2              m_gridSize = { 64, 64 };
+    Vec2                    m_mPos = Vec2(0.0f, 0.0f);
     bool                    m_drawGrid = true;
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
@@ -87,7 +88,9 @@ protected:
     void sTeleportCollision();
     void sCamera();
     void drawMinimap();
-    
+    void sDragAndDrop();
+    void grab();
+    void snap(std::shared_ptr<Entity> e);
 
 public:
 
