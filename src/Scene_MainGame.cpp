@@ -894,13 +894,13 @@ void Scene_MainGame::sItemCollision()
         if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
         {
             //m_game->playSound("GetItem");
-            if (m_player->getComponent<CInventory>().item == "Empty")
+            /*if (m_player->getComponent<CInventory>().item == "Empty")
             {
-                m_player->getComponent<CInventory>().item = potionAnim.getName();
+                */m_player->getComponent<CInventory>().item = potionAnim.getName();
                 drawInventory();
                 sAddToInventory(m_player, potionAnim.getName());
                 potion->destroy();
-            }
+            //}
         }
     }
 }
@@ -1093,24 +1093,36 @@ void Scene_MainGame::sHUD()
     {
         InventoryPos.x = view.getSize().x / 2 - offSetX;
     }
+    
+
     // Setting inventory position relative to player
     for (auto& inventory : m_entityManager.getEntities("inventory"))
     {
         inventory->getComponent<CTransform>().pos = InventoryPos;
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        {
+            inventory->destroy();
+        }
     }
 
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
     for (auto& inventory : m_entityManager.getEntities("inventoryItems"))
     {
+
         inventory->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
         inventory->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        {
+            inventory->destroy();
+        }
     }
 }
 
 void Scene_MainGame::sAddToInventory(std::shared_ptr<Entity> entity, std::string Item)
 {
+    
     if (entity->hasComponent<CInventory>())
     {
         Vec2 gridPos(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y);
@@ -1133,6 +1145,7 @@ void Scene_MainGame::sAddToInventory(std::shared_ptr<Entity> entity, std::string
 
 void Scene_MainGame::drawInventory()
 {
+    m_InventoryClock.restart();
     float viewX = m_game->window().getView().getCenter().x - (m_game->window().getSize().x / 2);
     float viewY = m_game->window().getView().getCenter().y - (m_game->window().getSize().y / 2);
     //auto mpos = sf::Mouse::getPosition(m_game->window());
