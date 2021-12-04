@@ -94,6 +94,9 @@ protected:
     void sItemCollision();
     void sTeleportCollision();
     void sCamera();
+    void sHUD();
+    void sAddToInventory(std::shared_ptr<Entity> entity, std::string Item);
+    void drawInventory();
     void drawMinimap();
     void sInteract();
     void sUseItem(std::shared_ptr<Entity> entity);
