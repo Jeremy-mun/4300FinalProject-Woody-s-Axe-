@@ -25,7 +25,7 @@ void Scene_Level_Editor_Menu::init()
 	size_t num = 1;
 	for (auto& p : std::filesystem::directory_iterator("levels"))
 	{
-		std::string name = p.path().string();
+		std::string name = p.path().string().substr(7);
 
 		std::stringstream ss;
 		ss << ((num < 10) ? " " : "") << (num) << ") " << name;
@@ -36,12 +36,18 @@ void Scene_Level_Editor_Menu::init()
 	}
 
 	m_menuText.setFont(m_game->assets().getFont("Gypsy"));
-	m_menuText.setCharacterSize(16);
+	m_menuText.setCharacterSize(64);
+
+    m_game->playSound("MusicTitle");
+
+    m_backgroundSprite.setTexture(m_game->assets().getTexture("MainMenuBackground"));
+    m_backgroundSprite.setOrigin(m_game->window().getSize().x / 10, m_game->window().getSize().y / 6);
+    m_backgroundSprite.move(sf::Vector2f(130, 125));
 }
 
 void Scene_Level_Editor_Menu::update()
 {
-
+    m_entityManager.update();
 }
 
 void Scene_Level_Editor_Menu::sDoAction(const Action& action)
@@ -68,38 +74,44 @@ void Scene_Level_Editor_Menu::sDoAction(const Action& action)
     }
 }
 
+Vec2 Scene_Level_Editor_Menu::getPosition(int rx, int ry, int tx, int ty) const
+{
+    float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
+    float y = ry * (int)m_game->window().getSize().y + (ty * 64) + 32;
+    return Vec2(x, y);
+}
+
 void Scene_Level_Editor_Menu::sRender()
 {
+    
     // clear the window to a blue
     m_game->window().setView(m_game->window().getDefaultView());
     m_game->window().clear(sf::Color(0, 0, 0));
 
+    m_game->window().draw(m_backgroundSprite);
+
     // draw the game title in the top-left of the screen
-    m_menuText.setCharacterSize(32);
+    m_menuText.setCharacterSize(48);
     m_menuText.setString(m_title);
-    m_menuText.setFillColor(sf::Color::White);
-    m_menuText.setPosition(sf::Vector2f(12, 5));
+    m_menuText.setFillColor(sf::Color(5, 220, 250));
+    m_menuText.setPosition(sf::Vector2f(menuTextPos.x, menuTextPos.y));
     m_game->window().draw(m_menuText);
 
-    m_menuText.setCharacterSize(16);
-    const int filesPerLine = 38;
     // draw all of the menu options
     for (size_t i = 0; i < m_menuStrings.size(); i++)
     {
         m_menuText.setString(m_menuStrings[i]);
-        m_menuText.setFillColor(i == m_selectedMenuIndex ? sf::Color::Yellow : sf::Color(127, 127, 127));
-        m_menuText.setPosition(sf::Vector2f(32.0f + (float)(i / filesPerLine) * 450, 50.0f + (i % filesPerLine) * (float)m_menuText.getCharacterSize() + 2));
+        m_menuText.setFillColor(i == m_selectedMenuIndex ? sf::Color::White : sf::Color(5, 220, 250));
+        m_menuText.setPosition(sf::Vector2f(menuOptionsPos.x, menuOptionsPos.y + i * 72));
         m_game->window().draw(m_menuText);
     }
 
     // draw the controls in the bottom-left
-    m_menuText.setCharacterSize(20);
-    m_menuText.setFillColor(sf::Color::White);
-    m_menuText.setString("up: w   down: s   run: d   back: esc");
+    m_menuText.setCharacterSize(36);
+    m_menuText.setFillColor(sf::Color(100, 100, 100));
+    m_menuText.setString("up: w     down: s    play: d      back: esc");
     m_menuText.setPosition(sf::Vector2f(10, 690));
     m_game->window().draw(m_menuText);
-
-    m_game->window().display();
 }
 
 void Scene_Level_Editor_Menu::onEnd()
