@@ -5,6 +5,7 @@
 #include <string_view>
 #include <map>
 #include <deque>
+#include <memory>
 
 #include "Common.h"
 #include "Scene.h"
@@ -20,10 +21,10 @@ protected:
 	sf::Text				  m_menuText;
 	size_t                    m_selectedMenuIndex = 0;
 
-	void init(const std::string& menuConfig);
+	void init();
 	void update();
-	void sDoAction(const Action& action);
 	void onEnd();
+	void sDoAction(const Action& action);
 
 public:
 

@@ -264,10 +264,7 @@ void Scene_Level_Editor::sCamera()
 
 void Scene_Level_Editor::onEnd()
 {
-    
-    //m_game->stopSound("MusicLevel");
-    m_game->playSound("MusicTitle");
-    m_game->changeScene("MENU", nullptr, true);
+    m_game->changeScene("Level_Editor_Menu", nullptr, true);
 }
 
 void Scene_Level_Editor::drawLine(const Vec2& p1, const Vec2& p2)

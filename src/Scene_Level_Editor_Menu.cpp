@@ -10,10 +10,10 @@
 Scene_Level_Editor_Menu::Scene_Level_Editor_Menu(GameEngine* game)
 	:Scene(game)
 {
-	init("");
+	init();
 }
 
-void Scene_Level_Editor_Menu::init(const std::string& menuConfig)
+void Scene_Level_Editor_Menu::init()
 {
 	registerAction(sf::Keyboard::W, "UP");
 	registerAction(sf::Keyboard::S, "DOWN");
@@ -35,13 +35,13 @@ void Scene_Level_Editor_Menu::init(const std::string& menuConfig)
 		m_levelPaths.push_back(name);
 	}
 
-	m_menuText.setFont(Assets.getFont("Gypsy"));
+	m_menuText.setFont(m_game->assets().getFont("Gypsy"));
 	m_menuText.setCharacterSize(16);
 }
 
 void Scene_Level_Editor_Menu::update()
 {
-    m_entityManager.update();
+
 }
 
 void Scene_Level_Editor_Menu::sDoAction(const Action& action)
@@ -71,15 +71,15 @@ void Scene_Level_Editor_Menu::sDoAction(const Action& action)
 void Scene_Level_Editor_Menu::sRender()
 {
     // clear the window to a blue
-    m_game.window().setView(m_game.window().getDefaultView());
-    m_game.window().clear(sf::Color(0, 0, 0));
+    m_game->window().setView(m_game->window().getDefaultView());
+    m_game->window().clear(sf::Color(0, 0, 0));
 
     // draw the game title in the top-left of the screen
     m_menuText.setCharacterSize(32);
     m_menuText.setString(m_title);
     m_menuText.setFillColor(sf::Color::White);
     m_menuText.setPosition(sf::Vector2f(12, 5));
-    m_game.window().draw(m_menuText);
+    m_game->window().draw(m_menuText);
 
     m_menuText.setCharacterSize(16);
     const int filesPerLine = 38;
@@ -89,7 +89,7 @@ void Scene_Level_Editor_Menu::sRender()
         m_menuText.setString(m_menuStrings[i]);
         m_menuText.setFillColor(i == m_selectedMenuIndex ? sf::Color::Yellow : sf::Color(127, 127, 127));
         m_menuText.setPosition(sf::Vector2f(32.0f + (float)(i / filesPerLine) * 450, 50.0f + (i % filesPerLine) * (float)m_menuText.getCharacterSize() + 2));
-        m_game.window().draw(m_menuText);
+        m_game->window().draw(m_menuText);
     }
 
     // draw the controls in the bottom-left
@@ -97,9 +97,9 @@ void Scene_Level_Editor_Menu::sRender()
     m_menuText.setFillColor(sf::Color::White);
     m_menuText.setString("up: w   down: s   run: d   back: esc");
     m_menuText.setPosition(sf::Vector2f(10, 690));
-    m_game.window().draw(m_menuText);
+    m_game->window().draw(m_menuText);
 
-    m_game.window().display();
+    m_game->window().display();
 }
 
 void Scene_Level_Editor_Menu::onEnd()

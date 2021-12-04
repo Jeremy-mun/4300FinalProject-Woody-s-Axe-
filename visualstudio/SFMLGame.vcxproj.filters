@@ -14,6 +14,7 @@
     <ClCompile Include="..\src\Action.cpp" />
     <ClCompile Include="..\src\Scene_MainGame.cpp" />
     <ClCompile Include="..\src\Scene_Level_Editor.cpp" />
+    <ClCompile Include="..\src\Scene_Level_Editor_Menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Assets.h" />
@@ -30,5 +31,6 @@
     <ClInclude Include="..\src\Action.h" />
     <ClInclude Include="..\src\Scene_MainGame.h" />
     <ClInclude Include="..\src\Scene_Level_Editor.h" />
+    <ClInclude Include="..\src\Scene_Level_Editor_Menu.h" />
   </ItemGroup>
 </Project>

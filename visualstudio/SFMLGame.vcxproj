@@ -19,6 +19,7 @@
     <ClCompile Include="..\src\GameEngine.cpp" />
     <ClCompile Include="..\src\Scene.cpp" />
     <ClCompile Include="..\src\Scene_Level_Editor.cpp" />
+    <ClCompile Include="..\src\Scene_Level_Editor_Menu.cpp" />
     <ClCompile Include="..\src\Scene_MainGame.cpp" />
     <ClCompile Include="..\src\Scene_Menu.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="..\src\GameEngine.h" />
     <ClInclude Include="..\src\Scene.h" />
     <ClInclude Include="..\src\Scene_Level_Editor.h" />
+    <ClInclude Include="..\src\Scene_Level_Editor_Menu.h" />
     <ClInclude Include="..\src\Scene_MainGame.h" />
     <ClInclude Include="..\src\Scene_Menu.h" />
     <ClInclude Include="..\src\Physics.h" />
