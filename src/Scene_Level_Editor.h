@@ -70,10 +70,11 @@ protected:
     void drawLine(const Vec2& p1, const Vec2& p2);
     void placeTile(Animation animation);
     void sDragAndDrop();
-    void sCamera();
-    bool isInside(const Vec2& pos, std::shared_ptr<Entity> e);
+    void sEditor();
     void grab();
     void spawnPlayer();
+    void editor();
+    void snap(std::shared_ptr<Entity> e);
 
 public:
 

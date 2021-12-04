@@ -73,6 +73,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
                 tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
                 tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                tile->addComponent<CDraggable>();
                 continue;
             }
             if (configRead == "Item")
@@ -107,6 +108,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
             {
                 config >> m_npcConfig.Name >> m_npcConfig.RX >> m_npcConfig.RY >> m_npcConfig.TX >> m_npcConfig.TY >> m_npcConfig.BM >> m_npcConfig.BV >> m_npcConfig.H >> m_npcConfig.D >> m_npcConfig.AI >> m_npcConfig.S;
                 auto npc = m_entityManager.addEntity("npc");
+                npc->addComponent<CDraggable>();
                 if (m_npcConfig.AI == "Follow")
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
@@ -166,6 +168,7 @@ void Scene_MainGame::spawnPlayer()
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
+    m_player->addComponent<CDraggable>();
     m_player->addComponent<CDamage>(1);
     m_player->addComponent<CInventory>();
 }
@@ -216,6 +219,7 @@ void Scene_MainGame::update()
     }
     sAI();
     sMovement();
+    sDragAndDrop();
     sArrowMovement();
     sStatus();
     sCollision();
@@ -359,7 +363,8 @@ void Scene_MainGame::sDoAction(const Action& action)
 {                      
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {  m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);// m_game->playSound("MusicLevel");
+        if (action.name() == "PAUSE") {  m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);
+        // m_game->playSound("MusicLevel");
         sf::View view = m_game->window().getView();
         view.zoom(2.0f);
         m_game->window().setView(view);
@@ -373,6 +378,7 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
+        else if (action.name() == "LEFT_CLICK") { grab(); }
         else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
         else if (action.name() == "INTERACT") { sInteract(); }
         else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { startAttack(m_player);  m_player->getComponent<CInput>().attack = true; } }
@@ -393,6 +399,8 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = false; }
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = false; }
     }
+
+    if (action.name() == "MOUSE_MOVE") { m_mPos = action.pos() + Vec2(m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2, m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2); }
 }
 
 void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
@@ -1030,6 +1038,7 @@ void Scene_MainGame::sAnimation()
 
 void Scene_MainGame::sCamera()
 {
+    auto center = m_game->window().getView().getCenter();
     // get the current view, which we will modify in the if-statement below
    
     
@@ -1046,6 +1055,9 @@ void Scene_MainGame::sCamera()
     {
         newCamPos.x = view.getSize().x / 2;
     }
+
+    auto mDiff = center - newCamPos;
+    //m_mPos += Vec2(mDiff.x, mDiff.y);
     view.setCenter(newCamPos);
     
     
@@ -1207,17 +1219,56 @@ void Scene_MainGame::drawMinimap()
     }
 }
 
+void Scene_MainGame::sDragAndDrop()
+{
+    for (auto e : m_entityManager.getEntities())
+    {
+        if (e->hasComponent<CDraggable>() &&
+            e->getComponent<CDraggable>().dragging)
+        {
+            e->getComponent<CTransform>().pos = m_mPos;
+        }
+    }
+}
+
+void Scene_MainGame::grab()
+{
+    for (auto e : m_entityManager.getEntities())
+    {
+        if (e->hasComponent<CDraggable>() &&
+            Physics::IsInside(m_mPos, e))
+        {
+            e->getComponent<CDraggable>().dragging = !e->getComponent<CDraggable>().dragging;
+            if (!e->getComponent<CDraggable>().dragging)
+            {
+                snap(e);
+            }
+            std::cout << "Entity Clicked: " << e->tag() << std::endl;
+            break;
+        }
+    }
+}
+
+void Scene_MainGame::snap(std::shared_ptr<Entity> e)
+{
+    auto& pos = e->getComponent<CTransform>().pos;
+    pos.x = (floor(pos.x / m_gridSize.x) * m_gridSize.x) + m_gridSize.x / 2;
+    pos.y = (floor(pos.y / m_gridSize.y) * m_gridSize.y) + m_gridSize.y / 2;
+}
+
 void Scene_MainGame::onEnd()
 {
      //m_game->stopSound("MusicLevel");
      m_game->playSound("MusicTitle");
      m_game->changeScene("MENU", nullptr, true);
 }
+
 void Scene_MainGame::drawLine(const Vec2& p1, const Vec2& p2)
 {
     sf::Vertex line[] = { sf::Vector2f(p1.x, p1.y), sf::Vector2f(p2.x, p2.y) };
     m_game->window().draw(line, 2, sf::Lines);
 }
+
 void Scene_MainGame::sRender()
 {
     // RENDERING DONE FOR YOU
@@ -1368,4 +1419,3 @@ void Scene_MainGame::sRender()
 
     } 
 }
-                           

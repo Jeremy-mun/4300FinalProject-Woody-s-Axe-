@@ -2,6 +2,7 @@
 #include "Scene_Menu.h"
 #include "Scene_MainGame.h"
 #include "Scene_Level_Editor.h"
+#include "Scene_Level_Editor_Menu.h"
 #include "Common.h"
 #include "Assets.h"
 #include "GameEngine.h"
@@ -18,7 +19,7 @@ void Scene_Menu::init()
 {
     registerAction(sf::Keyboard::W,     "UP");
     registerAction(sf::Keyboard::S,     "DOWN");
-    registerAction(sf::Keyboard::D,     "MainGame");
+    registerAction(sf::Keyboard::D,     "ENTER");
     registerAction(sf::Keyboard::Escape, "QUIT");
 
     m_title = "Woody's AXE";
@@ -60,7 +61,7 @@ void Scene_Menu::sDoAction(const Action& action)
         {
             m_selectedMenuIndex = (m_selectedMenuIndex + 1) % m_menuStrings.size();
         }
-        else if (action.name() == "MainGame")
+        else if (action.name() == "ENTER")
         {
             if (m_selectedMenuIndex < 3)
             {
@@ -68,7 +69,7 @@ void Scene_Menu::sDoAction(const Action& action)
             }
             else
             {
-                m_game->changeScene("Level_Editor", std::make_shared<Scene_Level_Editor>(m_game, "Level1.txt"));
+                m_game->changeScene("Level_Editor_Menu", std::make_shared<Scene_Level_Editor_Menu>(m_game));
             }
             m_game->assets().getSound("MusicTitle").stop();
         }
