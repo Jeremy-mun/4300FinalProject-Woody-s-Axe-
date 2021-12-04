@@ -336,7 +336,13 @@ void Scene_MainGame::sMovement()
     {
         m_FrameSinceGrounded = 0;
     }
+
+    if (m_player->getComponent<CTransform>().pos.y > getPosition(0, 0, 0, 12).y)
+    {
+        m_player->destroy();
+    }
     pTransform.pos += pTransform.velocity;
+
 }
 
 void Scene_MainGame::sArrowMovement()
@@ -1025,12 +1031,17 @@ void Scene_MainGame::sAnimation()
 void Scene_MainGame::sCamera()
 {
     // get the current view, which we will modify in the if-statement below
+   
+    
     sf::View view = m_game->window().getView();
+    /*f*//*loat windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
+    view.setCenter(windowCenterX, m_game->window().getSize().y - view.getCenter().y);
+    m_game->window().setView(view);*/
 
     view.setSize(1280, 768);
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    sf::Vector2f newCamPos(playerPos.x,playerPos.y);
+    sf::Vector2f newCamPos(playerPos.x,m_game->window().getSize().y/2);
     if (newCamPos.x < view.getSize().x / 2)
     {
         newCamPos.x = view.getSize().x / 2;
@@ -1085,9 +1096,9 @@ void Scene_MainGame::sHUD()
     sf::View view = m_game->window().getView();
     //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    float offSetX = 360.0f;
-    float offSetY = 320.0f;
-    Vec2 InventoryPos = Vec2(playerPos.x - offSetX, playerPos.y + offSetY);
+    float offSetX = m_game->window().getSize().x / 2 - 250;
+    float offSetY = m_game->window().getSize().y/2 + 250;
+    Vec2 InventoryPos = Vec2(playerPos.x - offSetX, playerPos.y - offSetY);
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2- offSetX)
     {
