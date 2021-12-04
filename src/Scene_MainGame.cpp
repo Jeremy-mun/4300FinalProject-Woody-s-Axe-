@@ -1096,9 +1096,9 @@ void Scene_MainGame::sHUD()
     sf::View view = m_game->window().getView();
     //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    float offSetX = m_game->window().getSize().x / 2 - 250;
-    float offSetY = m_game->window().getSize().y/2 + 250;
-    Vec2 InventoryPos = Vec2(playerPos.x - offSetX, playerPos.y - offSetY);
+    float offSetX = m_game->window().getSize().x / 2 - m_gridSize.x*6;
+    float offSetY = m_gridSize.y/2;
+    Vec2 InventoryPos = Vec2(playerPos.x - offSetX, offSetY);
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2- offSetX)
     {
