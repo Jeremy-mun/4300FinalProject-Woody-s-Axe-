@@ -30,6 +30,12 @@ class Scene_MainGame : public Scene
         bool BM, BV;
         std::string Name, AI;
     };
+    struct ItemConfig
+    {
+        float RX, RY, TX, TY;
+        bool BM, BV;
+        std::string Name;
+    };
                            
 protected:
 
@@ -42,6 +48,7 @@ protected:
     bool                    m_drawGrid = true;
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
+    ItemConfig              m_itemConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = true;
@@ -60,7 +67,9 @@ protected:
     sf::Clock               m_weaponTextClock;
     sf::Clock               m_tutorialTextClock;
     sf::Clock               m_walletClock;
+    sf::Clock               m_InventoryClock;
     int                     m_frameSinceAttack;
+    
 
     
     void init(const std::string & levelPath);
@@ -84,13 +93,19 @@ protected:
     void sMeleeCollision();
     void sArrowCollision();
     void sHeartCollision();
-    void sRupeeCollision();
+    void sCoinCollision();
+    void sItemCollision();
     void sTeleportCollision();
     void sCamera();
+    void sHUD();
+    void sAddToInventory(std::shared_ptr<Entity> entity, std::string Item);
+    void drawInventory();
     void drawMinimap();
     void sDragAndDrop();
     void grab();
     void snap(std::shared_ptr<Entity> e);
+    void sInteract();
+    void sUseItem(std::shared_ptr<Entity> entity);
 
 public:
 
