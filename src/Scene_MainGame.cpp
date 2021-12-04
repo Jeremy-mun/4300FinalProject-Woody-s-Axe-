@@ -737,7 +737,7 @@ void Scene_MainGame::sMeleeCollision()
 {
     //Melee collisions with NPC's are implemented here
     
-    if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 10)
+    if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 24)
     {
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
