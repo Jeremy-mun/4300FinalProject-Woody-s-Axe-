@@ -66,7 +66,9 @@ protected:
     sf::Clock               m_weaponTextClock;
     sf::Clock               m_tutorialTextClock;
     sf::Clock               m_walletClock;
+    sf::Clock               m_InventoryClock;
     int                     m_frameSinceAttack;
+    
 
     
     void init(const std::string & levelPath);
@@ -94,6 +96,9 @@ protected:
     void sItemCollision();
     void sTeleportCollision();
     void sCamera();
+    void sHUD();
+    void sAddToInventory(std::shared_ptr<Entity> entity, std::string Item);
+    void drawInventory();
     void drawMinimap();
     void sInteract();
     void sUseItem(std::shared_ptr<Entity> entity);

@@ -34,6 +34,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
     registerAction(sf::Keyboard::O, "Zoom Map");
     registerAction(sf::Keyboard::M, "MiniMap");
+    registerAction(sf::Keyboard::I, "OPEN_INVENTORY");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -220,6 +221,7 @@ void Scene_MainGame::update()
     sCollision();
     sAnimation();
     sCamera();
+    sHUD();
     m_currentFrame++;
 }
 
@@ -334,7 +336,13 @@ void Scene_MainGame::sMovement()
     {
         m_FrameSinceGrounded = 0;
     }
+
+    if (m_player->getComponent<CTransform>().pos.y > getPosition(0, 0, 0, 12).y)
+    {
+        m_player->destroy();
+    }
     pTransform.pos += pTransform.velocity;
+
 }
 
 void Scene_MainGame::sArrowMovement()
@@ -376,6 +384,7 @@ void Scene_MainGame::sDoAction(const Action& action)
             m_game->window().setView(view);
         }
         else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
+        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; drawInventory(); }
     }
     else if (action.type() == "END")
     {
@@ -396,7 +405,8 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             return;
         }
         else if (inventory.item == "RedPotion")
-        {
+        {   
+            std::cout << "Red Potion";
             inventory.item = "Empty";
             auto& health = entity->getComponent<CHealth>();
             health.current = health.max;
@@ -890,11 +900,13 @@ void Scene_MainGame::sItemCollision()
         if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
         {
             //m_game->playSound("GetItem");
-            if (m_player->getComponent<CInventory>().item == "Empty")
+            /*if (m_player->getComponent<CInventory>().item == "Empty")
             {
-                m_player->getComponent<CInventory>().item = potionAnim.getName();
+                */m_player->getComponent<CInventory>().item = potionAnim.getName();
+                drawInventory();
+                sAddToInventory(m_player, potionAnim.getName());
                 potion->destroy();
-            }
+            //}
         }
     }
 }
@@ -1019,12 +1031,17 @@ void Scene_MainGame::sAnimation()
 void Scene_MainGame::sCamera()
 {
     // get the current view, which we will modify in the if-statement below
+   
+    
     sf::View view = m_game->window().getView();
+    /*f*//*loat windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
+    view.setCenter(windowCenterX, m_game->window().getSize().y - view.getCenter().y);
+    m_game->window().setView(view);*/
 
     view.setSize(1280, 768);
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    sf::Vector2f newCamPos(playerPos.x,playerPos.y);
+    sf::Vector2f newCamPos(playerPos.x,m_game->window().getSize().y/2);
     if (newCamPos.x < view.getSize().x / 2)
     {
         newCamPos.x = view.getSize().x / 2;
@@ -1036,7 +1053,9 @@ void Scene_MainGame::sCamera()
    
     m_levelText.setCharacterSize(12);
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
-    m_tutorialText.setString(" Move:W, A, S D Weapon Swap: TAB\n Zoom In: O   Zoom Out: P");
+    
+    
+    m_tutorialText.setString(" Move:W, A, S D Weapon Swap: TAB");
     if (m_weaponSwitch == 0)
     {
         m_levelText.setString("Dagger Activated");
@@ -1049,13 +1068,14 @@ void Scene_MainGame::sCamera()
     {
         m_levelText.setString("  Axe Activated");
     }
+
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
     {
         m_levelText.setString("");
     }
     if (m_tutorialTextClock.getElapsedTime().asSeconds() > 3)
     {
-        //m_tutorialText.setString("");
+        m_tutorialText.setString("");
     }
     if (m_walletClock.getElapsedTime().asSeconds() > 1)
     {
@@ -1071,6 +1091,83 @@ void Scene_MainGame::sCamera()
     m_game->window().setView(view);
 }
 
+void Scene_MainGame::sHUD()
+{
+    sf::View view = m_game->window().getView();
+    //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
+    Vec2 playerPos = m_player->getComponent<CTransform>().pos;
+    float offSetX = m_game->window().getSize().x / 2 - m_gridSize.x*6;
+    float offSetY = m_gridSize.y/2;
+    Vec2 InventoryPos = Vec2(playerPos.x - offSetX, offSetY);
+    //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
+    if (InventoryPos.x < view.getSize().x / 2- offSetX)
+    {
+        InventoryPos.x = view.getSize().x / 2 - offSetX;
+    }
+    
+
+    // Setting inventory position relative to player
+    for (auto& inventory : m_entityManager.getEntities("inventory"))
+    {
+        inventory->getComponent<CTransform>().pos = InventoryPos;
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        {
+            inventory->destroy();
+        }
+    }
+
+    int inventoryItemPositionOffset = 0;
+    // Setting inventory items positions
+    for (auto& inventory : m_entityManager.getEntities("inventoryItems"))
+    {
+
+        inventory->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
+        inventory->getComponent<CTransform>().pos.y = InventoryPos.y;
+        inventoryItemPositionOffset += 64;
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        {
+            inventory->destroy();
+        }
+    }
+}
+
+void Scene_MainGame::sAddToInventory(std::shared_ptr<Entity> entity, std::string Item)
+{
+    
+    if (entity->hasComponent<CInventory>())
+    {
+        Vec2 gridPos(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y);
+        auto& inventory = entity->getComponent<CInventory>();
+        if (Item == "Empty")
+        {
+            return;
+        }
+        else if (Item == "RedPotion")
+        {
+
+        }
+        auto anim = m_game->assets().getAnimation(Item);
+        auto& invItem = m_entityManager.addEntity("inventoryItems");
+        invItem->addComponent<CAnimation>(anim, false);
+        invItem->addComponent<CTransform>(gridPos);
+        invItem->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
+    }
+}
+
+void Scene_MainGame::drawInventory()
+{
+    m_InventoryClock.restart();
+    float viewX = m_game->window().getView().getCenter().x - (m_game->window().getSize().x / 2);
+    float viewY = m_game->window().getView().getCenter().y - (m_game->window().getSize().y / 2);
+    //auto mpos = sf::Mouse::getPosition(m_game->window());
+    Vec2 gridPos(m_player->getComponent<CTransform>().pos.x + viewX, m_player->getComponent<CTransform>().pos.y + viewY);
+
+    auto anim = m_game->assets().getAnimation("SmallInventory");
+    auto& invTile = m_entityManager.addEntity("inventory");
+    invTile->addComponent<CAnimation>(anim, false);
+    invTile->addComponent<CTransform>(gridPos);
+    invTile->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
+}
 void Scene_MainGame::drawMinimap()
 {
     sf::View minimapView = m_game->window().getView();

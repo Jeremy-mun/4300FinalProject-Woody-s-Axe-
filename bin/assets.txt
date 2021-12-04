@@ -21,6 +21,8 @@ Texture	  TexGreenPotion images/Items/GreenPotion.png
 Texture	  TexPurplePotion images/Items/PurplePotion.png
 Texture	  TexGoldPotion	images/Items/GoldPotion.png
 Texture	  TexBluePotion	images/Items/BluePotion.png
+Texture   TexSmallInventory images/Inventory/Hotbar64x64.png
+Texture   TexBowHUD images/Inventory/CurrentBow.png
 Animation Explosion     TexExplode     	48   2 
 Animation RunRight      TexRunRight     24   2    
 Animation Jump         	TexJump        	19   2
@@ -43,6 +45,8 @@ Animation GreenPotion	TexGreenPotion	 1   0
 Animation PurplePotion	TexPurplePotion	 1   0
 Animation GoldPotion	TexGoldPotion	 1   0
 Animation BluePotion	TexBluePotion	 1   0
+Animation SmallInventory TexSmallInventory 1  0
+Animation BowHUD	 TexBowHUD 1  0
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
 Font      Arial         fonts/arial.ttf
