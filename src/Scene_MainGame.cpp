@@ -188,8 +188,6 @@ void Scene_MainGame::drawParallaxBackground()
 
     m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
     m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
-
-    
 }
 
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
@@ -1426,7 +1424,7 @@ void Scene_MainGame::sRender()
                            
     m_game->window().clear(sf::Color(0, 0, 0));
     sf::RectangleShape tick({ 1.0f, 6.0f });
-    drawParallaxBackground();
+    //drawParallaxBackground();
 
     // draw all Entity textures / animations
     if (m_drawTextures)
