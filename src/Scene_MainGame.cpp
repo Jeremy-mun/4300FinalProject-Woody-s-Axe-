@@ -16,6 +16,7 @@ Scene_MainGame::Scene_MainGame(GameEngine* game, const std::string& levelPath)
 void Scene_MainGame::init(const std::string& levelPath)
 {
     loadLevel(levelPath);
+    loadParallaxBackground();
     //m_game->playSound("MusicLevel");
 
     registerAction(sf::Keyboard::Escape, "QUIT");
@@ -114,11 +115,20 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 if (m_npcConfig.AI == "Follow")
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
-                    npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                    if (m_npcConfig.Name == "DemonIdle")
+                    {
+                        npc->addComponent<CState>("DemonIdle");
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
+                    }
+                    else
+                    {
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                    }
                     npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
+
                     if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
                     {
                         npc->addComponent<CState>(m_npcConfig.Name);
@@ -149,12 +159,10 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 }
             }
         }
-    }
-                           
+    }                     
     spawnPlayer();
     drawWeaponHolder();
 }
-
 
 void Scene_MainGame::loadParallaxBackground()
 {
@@ -188,8 +196,9 @@ void Scene_MainGame::drawParallaxBackground()
 
     m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
     m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
-}
 
+    
+}
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
@@ -421,36 +430,33 @@ void Scene_MainGame::sArrowMovement()
 }
 
 void Scene_MainGame::sDoAction(const Action& action)
-{
+{                      
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {
-            m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);
-            // m_game->playSound("MusicLevel");
-            sf::View view = m_game->window().getView();
-            view.zoom(2.0f);
-            m_game->window().setView(view);
+        if (action.name() == "PAUSE") {  m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);
+        // m_game->playSound("MusicLevel");
+        sf::View view = m_game->window().getView();
+        view.zoom(2.0f);
+        m_game->window().setView(view);
         }
         else if (action.name() == "QUIT") { onEnd(); }
         else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
         else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
-        else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision; }
+        else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision;}
         else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
         else if (action.name() == "UP") { m_player->getComponent<CInput>().up = true; m_playerOnGround = false; }
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
-        else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true; }
+        else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
         else if (action.name() == "LEFT_CLICK") { grab(); }
         else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
         else if (action.name() == "INTERACT") { sInteract(); }
         else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { startAttack(m_player);  m_player->getComponent<CInput>().attack = true; } }
-        else if (action.name() == "WEAPON_SWITCH") 
-            {
-            if (!m_player->getComponent<CInput>().attack) { m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } drawWeaponHolder(); }
-            }
+        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) {  m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } drawWeaponHolder();
+        } }
         else if (action.name() == "SELECT_RIGHT") { select("Right"); }
         else if (action.name() == "SELECT_LEFT") { select("Left"); }
-        else if (action.name() == "Zoom Map")
+        else if (action.name() == "Zoom Map") 
         {
             sf::View view = m_game->window().getView();
             view.zoom(0.5f);
@@ -465,9 +471,9 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = false; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = false; }
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = false; }
-
-        if (action.name() == "MOUSE_MOVE") { m_mPos = action.pos() + Vec2(m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2, m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2); }
     }
+
+    if (action.name() == "MOUSE_MOVE") { m_mPos = action.pos() + Vec2(m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2, m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2); }
 }
 
 void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
@@ -475,9 +481,9 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
     if (entity->hasComponent<CInventory>())
     {
         auto& inventory = entity->getComponent<CInventory>();
-        
+
         if (inventory.items[m_select] == "RedPotion")
-        {   
+        {
             std::cout << "Red Potion";
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& health = entity->getComponent<CHealth>();
@@ -520,7 +526,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             potion->addComponent<CDamage>(10);
             potion->addComponent<CLifeSpan>(180, m_currentFrame);
         }
-        
+
     }
     select("None");
     drawInventory();
@@ -595,6 +601,7 @@ void Scene_MainGame::sAI()
             
             if (!Visionblocked)
             {
+                
                 // Performing Steering
                 Vec2 target = m_player->getComponent<CTransform>().pos;
                 Vec2 desired = target - e->getComponent<CTransform>().pos;
@@ -613,10 +620,20 @@ void Scene_MainGame::sAI()
                     {
                         e->getComponent<CTransform>().scale.x = 1;
                     }
-                    e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
-                    e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                    if (e->getComponent<CAnimation>().animation.getName() == "DemonAttack")
+                    {
+                        if (e->getComponent<CAnimation>().animation.hasEnded())
+                        {
+                            e->getComponent<CState>().state = "DemonIdle";
+                        }
+                    }
+                    else
+                    {
+                        e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
+                        e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                    }
                 }
-               
+              
             }
             else if (e->getComponent<CTransform>().pos != e->getComponent<CFollowPlayer>().home && Visionblocked)
             {
@@ -730,6 +747,7 @@ void Scene_MainGame::sCollision()
     sCoinCollision();
     sItemCollision();
     sTeleportCollision();
+    sEnemyCollision();
 }
 
 void Scene_MainGame::sTileCollision()
@@ -1052,7 +1070,29 @@ void Scene_MainGame::sTeleportCollision()
     }
 
 }
+void Scene_MainGame::sEnemyCollision() {
+    auto& playerHealth = m_player->getComponent<CHealth>();
+    for (auto npc : m_entityManager.getEntities("npc"))
+    {
+        if (npc->getComponent<CAnimation>().animation.getName() == "DemonIdle")
+        {
+            //npc->getComponent<CAnimation>().animation.get
+            auto& npcState = npc->getComponent<CState>();
+            auto& npcDamage = npc->getComponent<CDamage>();
+            auto& npcTransform = npc->getComponent<CTransform>();
 
+            auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
+            if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
+            {
+                //auto frame = m_currentFrame;
+                npcState.state = "DemonAttack";
+                auto& npcTransform = npc->getComponent<CTransform>();
+            }
+            
+        }
+        
+    }
+}
 void Scene_MainGame::sAnimation()
 {
 
@@ -1154,7 +1194,7 @@ void Scene_MainGame::sCamera()
     {
         newCamPos.x = view.getSize().x / 2;
     }
-
+    
     auto mDiff = center - newCamPos;
     //m_mPos += Vec2(mDiff.x, mDiff.y);
     view.setCenter(newCamPos);
@@ -1328,6 +1368,7 @@ void Scene_MainGame::drawInventory()
     invTile->addComponent<CTransform>(gridPos);
     invTile->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
     sDrawInventoryItems();
+    
 }
 void Scene_MainGame::drawMinimap()
 {
@@ -1418,13 +1459,16 @@ void Scene_MainGame::drawLine(const Vec2& p1, const Vec2& p2)
     m_game->window().draw(line, 2, sf::Lines);
 }
 
+
 void Scene_MainGame::sRender()
 {
     // RENDERING DONE FOR YOU
                            
     m_game->window().clear(sf::Color(0, 0, 0));
     sf::RectangleShape tick({ 1.0f, 6.0f });
-    //drawParallaxBackground();
+    //tick.setFillColor(sf::Color::Black);
+    //m_game->window().draw(spriteBG);
+    drawParallaxBackground();
 
     // draw all Entity textures / animations
     if (m_drawTextures)

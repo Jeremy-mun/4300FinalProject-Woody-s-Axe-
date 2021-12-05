@@ -71,13 +71,13 @@ protected:
     sf::Clock               m_InventoryClock;
     int                     m_frameSinceAttack;
 
-    sf::Sprite              parallax1, parallax2, parallax3, parallax4, parallax5, parallax6
-                            , parallax7, parallax8, parallax9, parallax10;
-    std::vector<sf::String>     m_parallaxBackgroundTextures = {"TexParallax1","TexParallax2","TexParallax3","TexParallax4",
-                                                                    "TexParallax5" ,"TexParallax6" ,"TexParallax7" ,"TexParallax8" 
-                                                                ,"TexParallax9" ,"TexParallax10" };
-    std::vector<sf::Sprite>     m_parallaxBackgroundSprites = { parallax1,parallax2,parallax3,parallax4,
-                                                                parallax5,parallax6,parallax7,parallax8, parallax9, parallax10};
+    sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10;
+    std::vector<sf::String> m_parallaxBackgroundTextures = { "TexParallax1" , "TexParallax2" ,"TexParallax3" ,"TexParallax4" 
+                                                    ,"TexParallax5" ,"TexParallax6" ,"TexParallax7" 
+                                                    ,"TexParallax8" ,"TexParallax9" ,"TexParallax10" };
+    std::vector<sf::Sprite> m_parallaxBackgroundSprites = { parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10 };
+     
+    
 
     
     void init(const std::string & levelPath);
@@ -105,6 +105,7 @@ protected:
     void sCoinCollision();
     void sItemCollision();
     void sTeleportCollision();
+    void sEnemyCollision();
     void sCamera();
     void drawWeaponHolder();
     void sHUD();
@@ -117,7 +118,7 @@ protected:
     void sInteract();
     void sUseItem(std::shared_ptr<Entity> entity);
     void select(std::string direction);
-
+    
 public:
 
     Scene_MainGame(GameEngine* gameEngine, const std::string& levelPath);
