@@ -361,7 +361,7 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = false; }
     }
 
-    if (action.name() == "MOUSE_MOVE")                { m_mPos = action.pos() + Vec2(m_game->window().getView().getCenter().x - m_game->window().getSize().x / 2, m_game->window().getView().getCenter().y - m_game->window().getSize().y / 2); }
+    if (action.name() == "MOUSE_MOVE")                { m_mPos = action.pos() + Vec2(m_game->window().getView().getCenter().x - m_game->window().getView().getSize().x / 2, m_game->window().getView().getCenter().y - m_game->window().getView().getSize().y / 2); }
 }
 
 void Scene_Level_Editor::grab()
@@ -402,7 +402,7 @@ void Scene_Level_Editor::sEditor()
     auto center = m_game->window().getView().getCenter();
 
     sf::View view = m_game->window().getView();
-    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+    view.setViewport(sf::FloatRect(0.0f, 0.0f, 1.0f, 1.0f));
 
     sf::Vector2f newView = sf::Vector2f(0.0, 0.0);
 
