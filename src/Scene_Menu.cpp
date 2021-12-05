@@ -96,7 +96,7 @@ void Scene_Menu::sRender()
     // draw the game title in the top-left of the screen
     m_menuText.setCharacterSize(48);
     m_menuText.setString(m_title);
-    m_menuText.setFillColor(sf::Color(5, 220, 250));
+    m_menuText.setFillColor(sf::Color(137, 3, 6));
     m_menuText.setPosition(sf::Vector2f(menuTextPos.x, menuTextPos.y));
     m_game->window().draw(m_menuText);
     
@@ -104,7 +104,7 @@ void Scene_Menu::sRender()
     for (size_t i = 0; i < m_menuStrings.size(); i++)
     {
         m_menuText.setString(m_menuStrings[i]);
-        m_menuText.setFillColor(i == m_selectedMenuIndex ? sf::Color::White : sf::Color(5, 220, 250));
+        m_menuText.setFillColor(i == m_selectedMenuIndex ? sf::Color::White : sf::Color(137, 3, 6));
         m_menuText.setPosition(sf::Vector2f(menuOptionsPos.x, menuOptionsPos.y + i * 72));
         m_game->window().draw(m_menuText);
     }

@@ -54,6 +54,7 @@ protected:
     bool                    m_follow = true;
     bool                    m_teleported = false;
     int                     m_weaponSwitch = 0;
+    int                     m_select = 0;
     bool                    m_playerOnGround = false;
     bool                    m_minimap = true;
     int                     m_roomX = 0;
@@ -69,21 +70,13 @@ protected:
     sf::Clock               m_walletClock;
     sf::Clock               m_InventoryClock;
     int                     m_frameSinceAttack;
-
-    sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10;
-    std::vector<sf::String> m_parallaxBackgroundTextures = { "TexParallax1" , "TexParallax2" ,"TexParallax3" ,"TexParallax4" 
-                                                    ,"TexParallax5" ,"TexParallax6" ,"TexParallax7" 
-                                                    ,"TexParallax8" ,"TexParallax9" ,"TexParallax10" };
-    std::vector<sf::Sprite> m_parallaxBackgroundSprites = { parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10 };
-     
     
 
     
     void init(const std::string & levelPath);
 
     void loadLevel(const std::string & filename);
-    void loadParallaxBackground();
-    void drawParallaxBackground();
+
     void onEnd();
     void update();
     void spawnPlayer();
@@ -104,11 +97,10 @@ protected:
     void sCoinCollision();
     void sItemCollision();
     void sTeleportCollision();
-    void sEnemyCollision();
     void sCamera();
     void drawWeaponHolder();
     void sHUD();
-    void sAddToInventory(std::shared_ptr<Entity> entity, std::string Item);
+    void sDrawInventoryItems();
     void drawInventory();
     void drawMinimap();
     void sDragAndDrop();
@@ -116,7 +108,8 @@ protected:
     void snap(std::shared_ptr<Entity> e);
     void sInteract();
     void sUseItem(std::shared_ptr<Entity> entity);
-    
+    void select(std::string direction);
+
 public:
 
     Scene_MainGame(GameEngine* gameEngine, const std::string& levelPath);
