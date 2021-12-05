@@ -170,7 +170,7 @@ void Scene_MainGame::loadParallaxBackground()
         tex.loadFromFile(m_parallaxBackgroundTextures[i]);
         tex.setRepeated(true);
         tex.setSmooth(false);
-        m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]));
+        m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),true);
         m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(100, 100, 10000, 10000));
         m_parallaxBackgroundSprites[i].setPosition(-400, 0);
     }
@@ -179,19 +179,19 @@ void Scene_MainGame::loadParallaxBackground()
 void Scene_MainGame::drawParallaxBackground()
 {
 
-    m_game->window().draw(m_parallaxBackgroundSprites[9]);
+    m_game->window().draw(m_parallaxBackgroundSprites[9]);// Sky;
   
-    m_game->window().draw(m_parallaxBackgroundSprites[8]);
-    m_game->window().draw(m_parallaxBackgroundSprites[7]);
-    m_game->window().draw(m_parallaxBackgroundSprites[6]);
+    m_game->window().draw(m_parallaxBackgroundSprites[8]);// Forest
+    m_game->window().draw(m_parallaxBackgroundSprites[7]);// Forest
+    m_game->window().draw(m_parallaxBackgroundSprites[6]);// Forest
     
     
-    m_game->window().draw(m_parallaxBackgroundSprites[5]);
-    m_game->window().draw(m_parallaxBackgroundSprites[4]);
-    m_game->window().draw(m_parallaxBackgroundSprites[3]);
-    m_game->window().draw(m_parallaxBackgroundSprites[2]);
-    m_game->window().draw(m_parallaxBackgroundSprites[1]);
-    m_game->window().draw(m_parallaxBackgroundSprites[0]);
+    m_game->window().draw(m_parallaxBackgroundSprites[5]);// Forest
+    m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
+    m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
+    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
+    m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
+    m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
 }
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
@@ -311,7 +311,7 @@ void Scene_MainGame::sMovement()
             ///
             m_parallaxBackgroundSprites[2].move(sf::Vector2f(2.6f, 0.f));
             m_parallaxBackgroundSprites[1].move(sf::Vector2f(2.7f, 0.f));
-            m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
         }
         else if (!pInput.left && pInput.right)
         {
@@ -329,7 +329,7 @@ void Scene_MainGame::sMovement()
             ///
             m_parallaxBackgroundSprites[2].move(sf::Vector2f(-2.6f, 0.f));
             m_parallaxBackgroundSprites[1].move(sf::Vector2f(-2.7f, 0.f));
-            m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
         }
         else if (!pInput.left && pInput.right)
         {
