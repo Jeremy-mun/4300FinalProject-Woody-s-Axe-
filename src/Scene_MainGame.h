@@ -34,7 +34,7 @@ class Scene_MainGame : public Scene
     {
         float RX, RY, TX, TY;
         bool BM, BV;
-        std::string Name;
+        std::string Name, PositionInGrid;
     };
                            
 protected:
@@ -61,6 +61,7 @@ protected:
     int                     m_roomY = 0;
     int                     m_wallet = 0;
     int                     m_FrameSinceGrounded = 0;
+    int                     m_MaxYSpeed = 30;
     sf::Text                m_gridText;
     sf::Text                m_tutorialText;
     sf::Text                m_levelText;
@@ -100,6 +101,7 @@ protected:
     void sTileCollision();
     void sPlayerCollision();
     void sMeleeCollision();
+    void sBreakableCollision();
     void sArrowCollision();
     void sHeartCollision();
     void sCoinCollision();
