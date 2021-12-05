@@ -155,6 +155,43 @@ void Scene_MainGame::loadLevel(const std::string& filename)
     drawWeaponHolder();
 }
 
+
+void Scene_MainGame::loadParallaxBackground()
+{
+    for (auto i = 0; i < m_parallaxBackgroundTextures.size(); i++)
+    {
+        
+        m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),false);
+        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 10000, 10000));
+        m_parallaxBackgroundSprites[i].setPosition(-400, 0);
+    }
+}
+
+void Scene_MainGame::drawParallaxBackground()
+{
+
+    m_game->window().draw(m_parallaxBackgroundSprites[9]);// Sky;
+  
+    m_game->window().draw(m_parallaxBackgroundSprites[8]);// Forest
+    m_game->window().draw(m_parallaxBackgroundSprites[7]);// Forest
+    m_game->window().draw(m_parallaxBackgroundSprites[6]);// Forest
+    
+    
+    m_game->window().draw(m_parallaxBackgroundSprites[5]);// Forest
+    m_parallaxBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
+    m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
+    m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
+
+    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
+    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
+    m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
+
+    m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
+    m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+
+    
+}
+
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
@@ -262,6 +299,18 @@ void Scene_MainGame::sMovement()
             pTransform.facing = Vec2(-1, 0);
             pState.state = "RunRight";
             pTransform.scale = Vec2(-1, 1);
+
+            m_parallaxBackgroundSprites[8].move(sf::Vector2f(1.1f, 0.f));
+            m_parallaxBackgroundSprites[7].move(sf::Vector2f(1.2f, 0.f));
+            m_parallaxBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[5].move(sf::Vector2f(2.f, 0.f));
+            m_parallaxBackgroundSprites[4].move(sf::Vector2f(2.2f, 0.f));
+            m_parallaxBackgroundSprites[3].move(sf::Vector2f(2.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[2].move(sf::Vector2f(2.6f, 0.f));
+            m_parallaxBackgroundSprites[1].move(sf::Vector2f(2.7f, 0.f));
+            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
         }
         else if (!pInput.left && pInput.right)
         {
@@ -269,6 +318,17 @@ void Scene_MainGame::sMovement()
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
             pTransform.scale = Vec2(1, 1);
+            m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
+            m_parallaxBackgroundSprites[7].move(sf::Vector2f(-1.2f, 0.f));
+            m_parallaxBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[5].move(sf::Vector2f(-2.f, 0.f));
+            m_parallaxBackgroundSprites[4].move(sf::Vector2f(-2.2f, 0.f));
+            m_parallaxBackgroundSprites[3].move(sf::Vector2f(-2.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[2].move(sf::Vector2f(-2.6f, 0.f));
+            m_parallaxBackgroundSprites[1].move(sf::Vector2f(-2.7f, 0.f));
+            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
         }
         else if (!pInput.left && pInput.right)
         {
@@ -1366,9 +1426,8 @@ void Scene_MainGame::sRender()
                            
     m_game->window().clear(sf::Color(0, 0, 0));
     sf::RectangleShape tick({ 1.0f, 6.0f });
-    tick.setFillColor(sf::Color::Black);
-    
-    
+    drawParallaxBackground();
+
     // draw all Entity textures / animations
     if (m_drawTextures)
     {
