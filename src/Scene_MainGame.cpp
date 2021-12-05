@@ -150,6 +150,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
     }
                            
     spawnPlayer();
+    drawWeaponHolder();
 }
 
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
@@ -382,7 +383,8 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
         else if (action.name() == "INTERACT") { sInteract(); }
         else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { startAttack(m_player);  m_player->getComponent<CInput>().attack = true; } }
-        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) { m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } } }
+        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) {  m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } drawWeaponHolder();
+        } }
         else if (action.name() == "Zoom Map") 
         {
             sf::View view = m_game->window().getView();
@@ -765,7 +767,7 @@ void Scene_MainGame::sMeleeCollision()
             }
         }
     }
-    if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 2 || m_frameSinceAttack == 9 || m_frameSinceAttack == 16))
+    if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
@@ -1103,20 +1105,65 @@ void Scene_MainGame::sCamera()
     m_game->window().setView(view);
 }
 
+void Scene_MainGame::drawWeaponHolder()
+{
+    for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
+    {
+        weaponHolder->destroy();
+    }
+
+    std::string currentWeaponHUD = "";
+    
+    if (m_weaponSwitch == 0)
+    {
+        currentWeaponHUD = "DaggerHUD";
+    }
+
+    // use Bow Animation
+    else if (m_weaponSwitch == 1)
+    {
+        currentWeaponHUD = "BowHUD";
+    }
+    else
+    {
+        currentWeaponHUD = "AxeHUD";
+    }
+    auto anim = m_game->assets().getAnimation(currentWeaponHUD);
+    Vec2 weaponHolderPos = Vec2(0, 0);
+    
+    auto& weaponHolder = m_entityManager.addEntity("weaponHolder");
+    weaponHolder->addComponent<CAnimation>(anim, false);
+    weaponHolder->addComponent<CTransform>(weaponHolderPos);
+    weaponHolder->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
+}
+
 void Scene_MainGame::sHUD()
 {
     sf::View view = m_game->window().getView();
     //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    float offSetX = m_game->window().getSize().x / 2 - m_gridSize.x*6;
-    float offSetY = m_gridSize.y/2;
-    Vec2 InventoryPos = Vec2(playerPos.x - offSetX, offSetY);
+    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - m_gridSize.x * 5, m_gridSize.y / 2);
+    Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
+    Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 5 + m_gridSize.x / 2, 32);
+    Vec2 weaponHolderPos = Vec2(InventoryPos.x - weaponHolderOffset.x, weaponHolderOffset.y);
+
+
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
-    if (InventoryPos.x < view.getSize().x / 2- offSetX)
+    if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
     {
-        InventoryPos.x = view.getSize().x / 2 - offSetX;
+        InventoryPos.x = view.getSize().x / 2 - InventoryPosOffset.x;
     }
-    
+
+    if (weaponHolderPos.x < view.getSize().x / 2)
+    {
+        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 5 + m_gridSize.x/2;
+    }
+
+    for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
+    {
+        weaponHolder->getComponent<CTransform>().pos = weaponHolderPos;
+    }
+
 
     // Setting inventory position relative to player
     for (auto& inventory : m_entityManager.getEntities("inventory"))
@@ -1130,15 +1177,15 @@ void Scene_MainGame::sHUD()
 
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
-    for (auto& inventory : m_entityManager.getEntities("inventoryItems"))
+    for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
     {
 
-        inventory->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
-        inventory->getComponent<CTransform>().pos.y = InventoryPos.y;
+        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
+        inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
-            inventory->destroy();
+            inventoryItems->destroy();
         }
     }
 }
@@ -1179,6 +1226,8 @@ void Scene_MainGame::drawInventory()
     invTile->addComponent<CAnimation>(anim, false);
     invTile->addComponent<CTransform>(gridPos);
     invTile->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
+
+    
 }
 void Scene_MainGame::drawMinimap()
 {
