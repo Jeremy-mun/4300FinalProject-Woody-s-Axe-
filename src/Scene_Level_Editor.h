@@ -30,6 +30,12 @@ class Scene_Level_Editor : public Scene
         bool BM, BV;
         std::string Name, AI;
     };
+    struct ItemConfig
+    {
+        float RX, RY, TX, TY;
+        bool BM, BV;
+        std::string Name;
+    };
 
 protected:
     std::shared_ptr<Entity> m_editor;
@@ -43,6 +49,7 @@ protected:
     std::string TilesPresent[3] = { "Bush", "BowRight", "AtkUp" };
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
+    ItemConfig              m_itemConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = false;
@@ -63,6 +70,7 @@ protected:
     void init(const std::string& levelPath);
 
     void loadLevel(const std::string& filename);
+    void saveLevel(const std::string& filename);
 
     void onEnd();
     void update();

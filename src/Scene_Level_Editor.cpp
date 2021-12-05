@@ -27,6 +27,7 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     registerAction(sf::Keyboard::A, "LEFT");
     registerAction(sf::Keyboard::D, "RIGHT");
     registerAction(sf::Keyboard::Q, "PLACE_BLOCK");
+    registerAction(sf::Keyboard::V, "SAVE");
 
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
@@ -47,47 +48,52 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
 
             if (configRead == "Player")
             {
-                config >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH;
+                config >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH >> m_playerConfig.GRAVITY;
                 continue;
             }
             if (configRead == "Tile")
             {
                 config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
-                if (m_tileConfig.Name == "Heart")
-                {
-                    auto heart = m_entityManager.addEntity("hearts");
-                    heart->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                }
-                else if (m_tileConfig.Name == "Black")
-                {
-                    auto teleport = m_entityManager.addEntity("teleport");
-                    teleport->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    teleport->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    teleport->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                }
-                else if (m_tileConfig.Name == "Rupee" || m_tileConfig.Name == "RupeeBlue")
-                {
-                    auto rupee = m_entityManager.addEntity("rupee");
-                    rupee->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    rupee->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    rupee->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                }
-                else if (m_tileConfig.Name != "Heart" || m_tileConfig.Name != "Black")
-                {
-                    auto tile = m_entityManager.addEntity("tile");
-                    tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                    tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                    tile->addComponent<CDraggable>();
-                }
+
+                auto tile = m_entityManager.addEntity("Tile");
+                tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
+                tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                tile->addComponent<CDraggable>();
                 continue;
+            }
+            if (configRead == "Item")
+            {
+                config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;
+                if (m_itemConfig.Name == "Coin")
+                {
+                    auto coin = m_entityManager.addEntity("Coin");
+                    coin->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "Heart")
+                {
+                    auto heart = m_entityManager.addEntity("Heart");
+                    heart->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
+                {
+                    auto potion = m_entityManager.addEntity("Potion");
+                    potion->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
             }
             if (configRead == "NPC")
             {
                 config >> m_npcConfig.Name >> m_npcConfig.RX >> m_npcConfig.RY >> m_npcConfig.TX >> m_npcConfig.TY >> m_npcConfig.BM >> m_npcConfig.BV >> m_npcConfig.H >> m_npcConfig.D >> m_npcConfig.AI >> m_npcConfig.S;
-                auto npc = m_entityManager.addEntity("npc");
+                auto npc = m_entityManager.addEntity("NPC");
                 npc->addComponent<CDraggable>();
                 if (m_npcConfig.AI == "Follow")
                 {
@@ -127,9 +133,137 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 }
             }
         }
-        spawnPlayer();
     }
+    spawnPlayer();
     editor();
+}
+
+void Scene_Level_Editor::saveLevel(const std::string& filename)
+{
+    std::ofstream config(filename);
+    if (config.is_open())
+    {
+        std::cout << "File is open" << std::endl;
+        for (auto e : m_entityManager.getEntities())
+        {
+            if (e->tag() == "editor") continue;
+
+            if (e->tag() == "Tile")
+            {
+                m_tileConfig.Name = e->getComponent<CAnimation>().animation.getName();
+                auto pos = e->getComponent<CTransform>().pos;
+                m_tileConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
+                m_tileConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
+                m_tileConfig.TX = ((pos.x - 32) - (m_tileConfig.RX * m_game->window().getSize().x)) / 64.0;
+                m_tileConfig.TY = ((pos.y - 32) - (m_tileConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_tileConfig.BM = e->getComponent<CBoundingBox>().blockMove;
+                m_tileConfig.BV = e->getComponent<CBoundingBox>().blockVision;
+
+                config << e->tag() << " ";
+                config << m_tileConfig.Name << "    ";
+                config << m_tileConfig.RX << "  ";
+                config << m_tileConfig.RY << "  ";
+                config << m_tileConfig.TX << "  ";
+                config << m_tileConfig.TY << "  ";
+                config << m_tileConfig.BM << "  ";
+                config << m_tileConfig.BV << "  ";
+                config << std::endl;
+                continue;
+            }
+            else if (e->tag() == "Coin" ||
+                     e->tag() == "Heart" ||
+                     e->tag() == "Potion")
+            {
+                if (e->tag() == "Potion")
+                {
+                    m_itemConfig.Name = e->getComponent<CAnimation>().animation.getName();
+                }
+                else
+                {
+                    m_itemConfig.Name = e->tag();
+                }
+                auto pos = e->getComponent<CTransform>().pos;
+                m_itemConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
+                m_itemConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
+                m_itemConfig.TX = ((pos.x - 32) - (m_itemConfig.RX * m_game->window().getSize().x)) / 64.0;
+                m_itemConfig.TY = ((pos.y - 32) - (m_itemConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_itemConfig.BM = e->getComponent<CBoundingBox>().blockMove;
+                m_itemConfig.BV = e->getComponent<CBoundingBox>().blockVision;
+
+                config << "Item ";
+                config << m_itemConfig.Name << "    ";
+                config << m_itemConfig.RX << "  ";
+                config << m_itemConfig.RY << "  ";
+                config << m_itemConfig.TX << "  ";
+                config << m_itemConfig.TY << "  ";
+                config << m_itemConfig.BM << "  ";
+                config << m_itemConfig.BV << "  ";
+                config << std::endl;
+                continue;
+            }
+            else if (e->tag() == "NPC")
+            {
+                m_npcConfig.Name = e->getComponent<CAnimation>().animation.getName();
+                auto pos = e->getComponent<CTransform>().pos;
+                m_npcConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
+                m_npcConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
+                m_npcConfig.TX = ((pos.x - 32) - (m_npcConfig.RX * m_game->window().getSize().x)) / 64.0;
+                m_npcConfig.TY = ((pos.y - 32) - (m_npcConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_npcConfig.BM = e->getComponent<CBoundingBox>().blockMove;
+                m_npcConfig.BV = e->getComponent<CBoundingBox>().blockVision;
+                m_npcConfig.H = e->getComponent<CHealth>().max;
+                m_npcConfig.D = e->getComponent<CDamage>().damage;
+                if (e->hasComponent<CFollowPlayer>())
+                {
+                    m_npcConfig.AI = "Follow";
+                    m_npcConfig.S = e->getComponent<CFollowPlayer>().speed;
+                }
+                else if (e->hasComponent<CPatrol>())
+                {
+                    m_npcConfig.AI = "Patrol";
+                    m_npcConfig.S = e->getComponent<CPatrol>().speed;
+                    m_npcConfig.N = e->getComponent<CPatrol>().positions.size();
+                }
+
+                config << e->tag() << " ";
+                config << m_npcConfig.Name << "     ";
+                config << m_npcConfig.RX << "  ";
+                config << m_npcConfig.RY << "  ";
+                config << m_npcConfig.TX << "  ";
+                config << m_npcConfig.TY << "  ";
+                config << m_npcConfig.BM << "  ";
+                config << m_npcConfig.BV << "  ";
+                config << m_npcConfig.H  << "  ";
+                config << m_npcConfig.D  << "  ";
+                config << m_npcConfig.AI << "  ";
+                config << m_npcConfig.S << "  ";
+                if (e->hasComponent<CPatrol>())
+                {
+                    config << m_npcConfig.N << "  ";
+                    for (auto v : e->getComponent<CPatrol>().positions)
+                    {
+                        config << v.x << "  ";
+                        config << v.y << "  ";
+                    }
+                }
+                config << std::endl;
+                continue;
+            }
+            else if (e->tag() == "Player")
+            {
+                config << e->tag() << " ";
+                config << m_playerConfig.X << " ";
+                config << m_playerConfig.Y << " ";
+                config << m_playerConfig.CX << " ";
+                config << m_playerConfig.CY << " ";
+                config << m_playerConfig.SPEED << " ";
+                config << m_playerConfig.HEALTH << " ";
+                config << m_playerConfig.GRAVITY << " ";
+                config << std::endl;
+                continue;
+            }
+        }
+    }
 }
 
 void Scene_Level_Editor::placeTile(Animation animation)
@@ -157,7 +291,7 @@ void Scene_Level_Editor::placeTile(Animation animation)
 
 void Scene_Level_Editor::spawnPlayer()
 {
-    m_player = m_entityManager.addEntity("player");
+    m_player = m_entityManager.addEntity("Player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
     m_player->addComponent<CState>("StandDown");
     m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandDown"), true);
@@ -165,6 +299,8 @@ void Scene_Level_Editor::spawnPlayer()
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
     m_player->addComponent<CDraggable>();
+    m_player->addComponent<CDamage>(1);
+    m_player->addComponent<CInventory>();
 }
 
 void Scene_Level_Editor::editor()
@@ -204,6 +340,7 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = true; }
         else if (action.name() == "LEFT_CLICK")       { grab(); }
         else if (action.name() == "PLACE_BLOCK")      { }
+        else if (action.name() == "SAVE")             { saveLevel(m_levelPath); }
     }
     else if (action.type() == "END")
     {
@@ -449,4 +586,3 @@ void Scene_Level_Editor::sDragAndDrop()
         }
     }
 }
-
