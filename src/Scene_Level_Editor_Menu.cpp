@@ -25,10 +25,10 @@ void Scene_Level_Editor_Menu::init()
 	size_t num = 1;
 	for (auto& p : std::filesystem::directory_iterator("levels"))
 	{
-		std::string name = p.path().string().substr(7);
+		std::string name = p.path().string();
 
 		std::stringstream ss;
-		ss << ((num < 10) ? " " : "") << (num) << ") " << name;
+		ss << ((num < 10) ? " " : "") << (num) << ") " << name.substr(7);
 		num++;
 
 		m_menuStrings.push_back(ss.str());
