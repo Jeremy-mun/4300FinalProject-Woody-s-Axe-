@@ -23,6 +23,10 @@ Texture	  TexGreenPotion images/Items/GreenPotion.png
 Texture	  TexPurplePotion images/Items/PurplePotion.png
 Texture	  TexGoldPotion	images/Items/GoldPotion.png
 Texture	  TexBluePotion	images/Items/BluePotion.png
+Texture	  TexChest	images/Items/Chest.png
+Texture	  TexJarBig	images/Items/JarBig.png
+Texture	  TexJarSmall	images/Items/JarSmall.png
+Texture	  TexBarrel	images/Items/Barrel.png
 Texture   TexSmallInventory images/Inventory/Hotbar64x64.png
 Texture   TexBowHUD images/Inventory/CurrentBow.png
 Texture   TexAxeHUD images/Inventory/CurrentAxe.png
@@ -65,6 +69,10 @@ Animation GreenPotion	TexGreenPotion	 1   0
 Animation PurplePotion	TexPurplePotion	 1   0
 Animation GoldPotion	TexGoldPotion	 1   0
 Animation BluePotion	TexBluePotion	 1   0
+Animation Chest		TexChest	 1   0
+Animation JarBig	TexJarBig	 1   0
+Animation JarSmall	TexJarSmall	 1   0
+Animation Barrel	TexBarrel	 1   0
 Animation SmallInventory TexSmallInventory 1  0
 Animation BowHUD	 TexBowHUD 	1  0
 Animation AxeHUD	 TexAxeHUD 	1  0
