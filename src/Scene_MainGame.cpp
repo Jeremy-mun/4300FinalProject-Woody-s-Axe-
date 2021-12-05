@@ -171,6 +171,8 @@ void Scene_MainGame::loadParallaxBackground()
         tex.setRepeated(true);
         tex.setSmooth(false);
         m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]));
+        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(100, 100, 10000, 10000));
+        m_parallaxBackgroundSprites[i].setPosition(-400, 0);
     }
 }
 
@@ -178,9 +180,12 @@ void Scene_MainGame::drawParallaxBackground()
 {
 
     m_game->window().draw(m_parallaxBackgroundSprites[9]);
+  
     m_game->window().draw(m_parallaxBackgroundSprites[8]);
     m_game->window().draw(m_parallaxBackgroundSprites[7]);
     m_game->window().draw(m_parallaxBackgroundSprites[6]);
+    
+    
     m_game->window().draw(m_parallaxBackgroundSprites[5]);
     m_game->window().draw(m_parallaxBackgroundSprites[4]);
     m_game->window().draw(m_parallaxBackgroundSprites[3]);
@@ -295,6 +300,18 @@ void Scene_MainGame::sMovement()
             pTransform.facing = Vec2(-1, 0);
             pState.state = "RunRight";
             pTransform.scale = Vec2(-1, 1);
+
+            m_parallaxBackgroundSprites[8].move(sf::Vector2f(1.1f, 0.f));
+            m_parallaxBackgroundSprites[7].move(sf::Vector2f(1.2f, 0.f));
+            m_parallaxBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[5].move(sf::Vector2f(2.f, 0.f));
+            m_parallaxBackgroundSprites[4].move(sf::Vector2f(2.2f, 0.f));
+            m_parallaxBackgroundSprites[3].move(sf::Vector2f(2.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[2].move(sf::Vector2f(2.6f, 0.f));
+            m_parallaxBackgroundSprites[1].move(sf::Vector2f(2.7f, 0.f));
+            m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
         }
         else if (!pInput.left && pInput.right)
         {
@@ -302,6 +319,17 @@ void Scene_MainGame::sMovement()
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
             pTransform.scale = Vec2(1, 1);
+            m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
+            m_parallaxBackgroundSprites[7].move(sf::Vector2f(-1.2f, 0.f));
+            m_parallaxBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[5].move(sf::Vector2f(-2.f, 0.f));
+            m_parallaxBackgroundSprites[4].move(sf::Vector2f(-2.2f, 0.f));
+            m_parallaxBackgroundSprites[3].move(sf::Vector2f(-2.3f, 0.f));
+            ///
+            m_parallaxBackgroundSprites[2].move(sf::Vector2f(-2.6f, 0.f));
+            m_parallaxBackgroundSprites[1].move(sf::Vector2f(-2.7f, 0.f));
+            m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
         }
         else if (!pInput.left && pInput.right)
         {
