@@ -164,16 +164,29 @@ void Scene_MainGame::loadLevel(const std::string& filename)
 
 void Scene_MainGame::loadParallaxBackground()
 {
-   
-
-    //spriteBG.setTexture(m_game->assets().getTexture(m_parallaxBackground[m_parallaxBackground.size()-1]));
-
     for (auto i = 0; i < m_parallaxBackgroundTextures.size(); i++)
     {
+        sf::Texture tex;
+        tex.loadFromFile(m_parallaxBackgroundTextures[i]);
+        tex.setRepeated(true);
+        tex.setSmooth(false);
         m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]));
     }
-    spriteBG.setPosition(0, 0);
-    
+}
+
+void Scene_MainGame::drawParallaxBackground()
+{
+
+    m_game->window().draw(m_parallaxBackgroundSprites[9]);
+    m_game->window().draw(m_parallaxBackgroundSprites[8]);
+    m_game->window().draw(m_parallaxBackgroundSprites[7]);
+    m_game->window().draw(m_parallaxBackgroundSprites[6]);
+    m_game->window().draw(m_parallaxBackgroundSprites[5]);
+    m_game->window().draw(m_parallaxBackgroundSprites[4]);
+    m_game->window().draw(m_parallaxBackgroundSprites[3]);
+    m_game->window().draw(m_parallaxBackgroundSprites[2]);
+    m_game->window().draw(m_parallaxBackgroundSprites[1]);
+    m_game->window().draw(m_parallaxBackgroundSprites[0]);
 }
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
@@ -1374,6 +1387,7 @@ void Scene_MainGame::drawLine(const Vec2& p1, const Vec2& p2)
     m_game->window().draw(line, 2, sf::Lines);
 }
 
+
 void Scene_MainGame::sRender()
 {
     // RENDERING DONE FOR YOU
@@ -1382,17 +1396,7 @@ void Scene_MainGame::sRender()
     sf::RectangleShape tick({ 1.0f, 6.0f });
     //tick.setFillColor(sf::Color::Black);
     //m_game->window().draw(spriteBG);
-   
-        m_game->window().draw(m_parallaxBackgroundSprites[9]);
-        m_game->window().draw(m_parallaxBackgroundSprites[8]);
-        m_game->window().draw(m_parallaxBackgroundSprites[7]);
-        m_game->window().draw(m_parallaxBackgroundSprites[6]);
-        m_game->window().draw(m_parallaxBackgroundSprites[5]);
-        m_game->window().draw(m_parallaxBackgroundSprites[4]);
-        m_game->window().draw(m_parallaxBackgroundSprites[3]);
-        m_game->window().draw(m_parallaxBackgroundSprites[2]);
-        m_game->window().draw(m_parallaxBackgroundSprites[1]);
-        m_game->window().draw(m_parallaxBackgroundSprites[0]);
+    drawParallaxBackground();
     // draw all Entity textures / animations
     if (m_drawTextures)
     {
