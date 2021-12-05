@@ -155,10 +155,8 @@ class CInventory : public Component
 {
 public:
     int money = 0;
-    std::vector<sf::String> items = { "Empty" };
+    std::vector<std::string> items = {};
     CInventory() {}
     CInventory(int m)
         : money(m) {}
-    CInventory(int m, std::vector<sf::String> i)
-        : money(m), items(i) {}
 };
