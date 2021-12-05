@@ -147,8 +147,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 }
             }
         }
-    }
-                           
+    }                     
     spawnPlayer();
 }
 
