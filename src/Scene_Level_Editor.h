@@ -38,6 +38,8 @@ class Scene_Level_Editor : public Scene
     };
 
 protected:
+    EntityManager           m_editorManager;
+    std::shared_ptr<Entity> m_selected;
     std::shared_ptr<Entity> m_editor;
     std::shared_ptr<Entity> m_player;
     std::string             m_levelPath;
@@ -83,6 +85,8 @@ protected:
     void spawnPlayer();
     void editor();
     void snap(std::shared_ptr<Entity> e);
+    void draggable();
+    void remove();
 
 public:
 
