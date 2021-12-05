@@ -112,11 +112,20 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 if (m_npcConfig.AI == "Follow")
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
-                    npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                    if (m_npcConfig.Name == "DemonIdle")
+                    {
+                        npc->addComponent<CState>("DemonIdle");
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
+                    }
+                    else
+                    {
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                    }
                     npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
+
                     if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
                     {
                         npc->addComponent<CState>(m_npcConfig.Name);
@@ -492,6 +501,7 @@ void Scene_MainGame::sAI()
             
             if (!Visionblocked)
             {
+                
                 // Performing Steering
                 Vec2 target = m_player->getComponent<CTransform>().pos;
                 Vec2 desired = target - e->getComponent<CTransform>().pos;
@@ -510,10 +520,20 @@ void Scene_MainGame::sAI()
                     {
                         e->getComponent<CTransform>().scale.x = 1;
                     }
-                    e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
-                    e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                    if (e->getComponent<CAnimation>().animation.getName() == "DemonAttack")
+                    {
+                        if (e->getComponent<CAnimation>().animation.hasEnded())
+                        {
+                            e->getComponent<CState>().state = "DemonIdle";
+                        }
+                    }
+                    else
+                    {
+                        e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
+                        e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                    }
                 }
-               
+              
             }
             else if (e->getComponent<CTransform>().pos != e->getComponent<CFollowPlayer>().home && Visionblocked)
             {
@@ -627,6 +647,7 @@ void Scene_MainGame::sCollision()
     sCoinCollision();
     sItemCollision();
     sTeleportCollision();
+    sEnemyCollision();
 }
 
 void Scene_MainGame::sTileCollision()
@@ -954,7 +975,29 @@ void Scene_MainGame::sTeleportCollision()
     }
 
 }
+void Scene_MainGame::sEnemyCollision() {
+    auto& playerHealth = m_player->getComponent<CHealth>();
+    for (auto npc : m_entityManager.getEntities("npc"))
+    {
+        if (npc->getComponent<CAnimation>().animation.getName() == "DemonIdle")
+        {
+            //npc->getComponent<CAnimation>().animation.get
+            auto& npcState = npc->getComponent<CState>();
+            auto& npcDamage = npc->getComponent<CDamage>();
+            auto& npcTransform = npc->getComponent<CTransform>();
 
+            auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
+            if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
+            {
+                //auto frame = m_currentFrame;
+                npcState.state = "DemonAttack";
+                auto& npcTransform = npc->getComponent<CTransform>();
+            }
+            
+        }
+        
+    }
+}
 void Scene_MainGame::sAnimation()
 {
 
@@ -1056,7 +1099,7 @@ void Scene_MainGame::sCamera()
     {
         newCamPos.x = view.getSize().x / 2;
     }
-
+    
     auto mDiff = center - newCamPos;
     //m_mPos += Vec2(mDiff.x, mDiff.y);
     view.setCenter(newCamPos);

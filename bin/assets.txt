@@ -14,6 +14,8 @@ Texture   TexGround     images/gothic/tile.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/gothic/ghost-shriek.png
 Texture   TexHellHound  images/gothic/hell-hound-run.png
+Texture   TexDemonIdle  images/gothic/demon-idle.png
+Texture   TexDemonAttack  images/gothic/demon-attack.png
 Texture	  TexCoin	images/Items/Coin.png
 Texture	  TexHeart	images/Items/Heart.png
 Texture	  TexRedPotion	images/Items/RedPotion.png
@@ -41,6 +43,8 @@ Animation Ground        TexGround        1   0
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
 Animation HellHound   	TexHellHound  	 5   5
+Animation DemonIdle	TexDemonIdle	 6   6
+Animation DemonAttack	TexDemonAttack	 11  6
 Animation Coin		TexCoin		 1   0
 Animation Heart		TexHeart	 1   0
 Animation RedPotion	TexRedPotion	 1   0

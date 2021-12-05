@@ -96,6 +96,7 @@ protected:
     void sCoinCollision();
     void sItemCollision();
     void sTeleportCollision();
+    void sEnemyCollision();
     void sCamera();
     void drawWeaponHolder();
     void sHUD();
