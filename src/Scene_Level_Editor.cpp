@@ -15,7 +15,6 @@ Scene_Level_Editor::Scene_Level_Editor(GameEngine* game, const std::string& leve
 void Scene_Level_Editor::init(const std::string& levelPath)
 {
     loadLevel(levelPath);
-
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");       // Toggle follow camera
@@ -28,6 +27,7 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     registerAction(sf::Keyboard::D, "RIGHT");
     registerAction(sf::Keyboard::Q, "PLACE_BLOCK");
     registerAction(sf::Keyboard::V, "SAVE");
+    registerAction(sf::Keyboard::B, "REMOVE");
 
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
@@ -59,7 +59,6 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
                 tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
                 tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
-                tile->addComponent<CDraggable>();
                 continue;
             }
             if (configRead == "Item")
@@ -94,7 +93,6 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
             {
                 config >> m_npcConfig.Name >> m_npcConfig.RX >> m_npcConfig.RY >> m_npcConfig.TX >> m_npcConfig.TY >> m_npcConfig.BM >> m_npcConfig.BV >> m_npcConfig.H >> m_npcConfig.D >> m_npcConfig.AI >> m_npcConfig.S;
                 auto npc = m_entityManager.addEntity("NPC");
-                npc->addComponent<CDraggable>();
                 if (m_npcConfig.AI == "Follow")
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
@@ -136,6 +134,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
     }
     spawnPlayer();
     editor();
+    draggable();
 }
 
 void Scene_Level_Editor::saveLevel(const std::string& filename)
@@ -300,7 +299,6 @@ void Scene_Level_Editor::spawnPlayer()
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
-    m_player->addComponent<CDraggable>();
     m_player->addComponent<CDamage>(1);
     m_player->addComponent<CInventory>();
 }
@@ -309,6 +307,16 @@ void Scene_Level_Editor::editor()
 {
     m_editor = m_entityManager.addEntity("editor");
     m_editor->addComponent<CInput>();
+}
+
+void Scene_Level_Editor::draggable()
+{
+    m_entityManager.update();
+    for (auto& e : m_entityManager.getEntities())
+    {
+        std::cout << e->tag() << std::endl;
+        e->addComponent<CDraggable>();
+    }
 }
 
 void Scene_Level_Editor::update()
@@ -343,6 +351,7 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "LEFT_CLICK")       { grab(); }
         else if (action.name() == "PLACE_BLOCK")      { }
         else if (action.name() == "SAVE")             { saveLevel(m_levelPath); }
+        else if (action.name() == "REMOVE")           { remove(); }
     }
     else if (action.type() == "END")
     {
@@ -362,13 +371,21 @@ void Scene_Level_Editor::grab()
         if (e->hasComponent<CDraggable>() && 
             Physics::IsInside(m_mPos, e))
         {
-            e->getComponent<CDraggable>().dragging = !e->getComponent<CDraggable>().dragging;
-            if (!e->getComponent<CDraggable>().dragging)
+            if (!m_editor->getComponent<CDraggable>().dragging)
             {
-                snap(e);
+                m_editor->getComponent<CDraggable>().dragging = !m_editor->getComponent<CDraggable>().dragging;
+                e->getComponent<CDraggable>().dragging = !e->getComponent<CDraggable>().dragging;
+                m_selected = e;
+                break;
             }
-            std::cout << "Entity Clicked: " << e->tag() << std::endl;
-            break;
+            else if (e->getComponent<CDraggable>().dragging)
+            {
+                m_editor->getComponent<CDraggable>().dragging = !m_editor->getComponent<CDraggable>().dragging;
+                e->getComponent<CDraggable>().dragging = !e->getComponent<CDraggable>().dragging;
+                m_selected = nullptr;
+                snap(e);
+                break;
+            }
         }
     }
 }
@@ -586,5 +603,14 @@ void Scene_Level_Editor::sDragAndDrop()
         {
             e->getComponent<CTransform>().pos = m_mPos;
         }
+    }
+}
+
+void Scene_Level_Editor::remove()
+{
+    if (m_selected != nullptr)
+    {
+        m_selected->destroy();
+        m_editor->getComponent<CDraggable>().dragging = !m_editor->getComponent<CDraggable>().dragging;
     }
 }
