@@ -106,6 +106,35 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
+                else if (m_itemConfig.Name == "Chest")
+                {
+                    auto interact = m_entityManager.addEntity("interactable");
+                    interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
+                {
+                    auto breakable = m_entityManager.addEntity("breakable");
+                    breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    config >> m_itemConfig.PositionInGrid;
+                    if (m_itemConfig.PositionInGrid == "Left")
+                    {
+                        breakable->getComponent<CTransform>().pos.x -= 21;
+                    }
+                    else if (m_itemConfig.PositionInGrid == "Right")
+                    {
+                        breakable->getComponent<CTransform>().pos.x += 21;
+                    }
+                    else if(m_itemConfig.PositionInGrid == "Mid")
+                    {
+
+                    }
+                    continue;
+                }
             }
             if (configRead == "NPC")
             {
@@ -289,7 +318,7 @@ void Scene_MainGame::sMovement()
    
         if (pInput.up)
         {
-            pTransform.velocity.y = -7 * (m_playerConfig.SPEED + pTransform.tempSpeed);
+            pTransform.velocity.y = -7 * (m_playerConfig.SPEED) - 3 * pTransform.tempSpeed;
             pTransform.facing = Vec2(0, -1);
             pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
@@ -415,6 +444,14 @@ void Scene_MainGame::sMovement()
     {
         m_player->destroy();
     }
+    if (pTransform.velocity.y > m_MaxYSpeed)
+    {
+        pTransform.velocity.y = m_MaxYSpeed;
+    }
+    else if(pTransform.velocity.y < -1 * m_MaxYSpeed)
+    {
+        pTransform.velocity.y = -1 * m_MaxYSpeed;
+    }
     pTransform.pos += pTransform.velocity;
 
 }
@@ -444,7 +481,17 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
         else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision;}
         else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
-        else if (action.name() == "UP") { m_player->getComponent<CInput>().up = true; m_playerOnGround = false; }
+        else if (action.name() == "UP") 
+        {
+            std::cout << m_player->getComponent<CInput>().canJump << ":" << m_playerOnGround << '\n';
+            if (m_player->getComponent<CInput>().canJump || !m_playerOnGround) 
+            {
+                m_player->getComponent<CInput>().up = true;
+                m_player->getComponent<CInput>().canJump = false;
+                m_playerOnGround = false; 
+            } 
+            else{ m_player->getComponent<CInput>().up = false; }
+        }
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
@@ -467,7 +514,7 @@ void Scene_MainGame::sDoAction(const Action& action)
     }
     else if (action.type() == "END")
     {
-        if (action.name() == "UP") { m_player->getComponent<CInput>().up = false; }
+        if (action.name() == "UP") { m_player->getComponent<CInput>().up = false; m_player->getComponent<CInput>().canJump = true;}
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = false; }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = false; }
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = false; }
@@ -534,7 +581,45 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
 
 void Scene_MainGame::sInteract()
 {
+    for (auto interactable : m_entityManager.getEntities("interactable"))
+    {
+        auto overlap = Physics::GetOverlap(interactable, m_player);
+        if (overlap.x > 2 && overlap.y > 2)
+        {
+            if (interactable->getComponent<CAnimation>().animation.getName() == "Chest")
+            {
+                std::srand(time(0));
+                int coinAmount = std::rand() % 17 + 3;
+                m_player->getComponent<CInventory>().money += coinAmount;
+                int itemID = std::rand() % 6;
+                if (itemID == 0)
+                {
+                    m_player->getComponent<CInventory>().items.push_back("RedPotion");
+                }
+                if (itemID == 1)
+                {
+                    m_player->getComponent<CInventory>().items.push_back("BluePotion");
+                }
+                if (itemID == 2)
+                {
+                    m_player->getComponent<CInventory>().items.push_back("GoldPotion");
+                }
+                if (itemID == 3)
+                {
+                    m_player->getComponent<CInventory>().items.push_back("GreenPotion");
+                }
+                if (itemID == 4)
+                {
+                    m_player->getComponent<CInventory>().items.push_back("PurplePotion");
+                }
+                if (itemID == 5)
+                {
 
+                }
+                interactable->destroy();
+            }
+        }
+    }
 }
 
 void Scene_MainGame::select(std::string direction)
@@ -743,6 +828,7 @@ void Scene_MainGame::sCollision()
     sPlayerCollision();
     sMeleeCollision();
     sArrowCollision();
+    sBreakableCollision();
     sHeartCollision();
     sCoinCollision();
     sItemCollision();
@@ -754,6 +840,7 @@ void Scene_MainGame::sTileCollision()
 {
     // Tile collisions with entities are implemented here
     auto& playerTransform = m_player->getComponent<CTransform>();
+    auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
     for (auto tile : m_entityManager.getEntities("tile"))
     {
@@ -776,6 +863,11 @@ void Scene_MainGame::sTileCollision()
                         playerTransform.pos.y -= playerTileOverlap.y;
                         m_playerOnGround = true;
                     }
+                }
+                else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y-2)
+                {
+                    playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
+                    m_playerOnGround = true;
                 }
                 else
                 {
@@ -886,6 +978,7 @@ void Scene_MainGame::sMeleeCollision()
                 }
             }
         }
+
     }
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
@@ -911,6 +1004,38 @@ void Scene_MainGame::sMeleeCollision()
                     ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                     e->destroy();
                     break;
+                }
+            }
+        }
+    }
+}
+void Scene_MainGame::sBreakableCollision()
+{
+    for (auto& weapon : m_entityManager.getEntities("weapon"))
+    {
+        for (auto& e : m_entityManager.getEntities("breakable"))
+        {
+            auto breakableWeaponOverlap = Physics::GetOverlap(weapon, e);
+            if (breakableWeaponOverlap.x > 0 && breakableWeaponOverlap.y > 0)
+            {
+                //m_game->playSound("EnemyDie");
+                auto ex = m_entityManager.addEntity("explosion");
+                ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
+                e->destroy();
+                break;
+                srand(time(0));
+                if (e->getComponent<CAnimation>().animation.getName() == "Barrel")
+                {
+                    m_player->getComponent<CInventory>().money += rand() % 10 + 2;
+                }
+                if (e->getComponent<CAnimation>().animation.getName() == "JarBig")
+                {
+                    m_player->getComponent<CInventory>().money += rand() % 5 + 1;
+                }
+                if (e->getComponent<CAnimation>().animation.getName() == "JarSmall")
+                {
+                    m_player->getComponent<CInventory>().money += rand() % 3;
                 }
             }
         }
@@ -1319,7 +1444,6 @@ void Scene_MainGame::sHUD()
     select->addComponent<CAnimation>(m_game->assets().getAnimation("Select"), true);
     select->addComponent<CTransform>(InventoryPos);
     select->getComponent<CTransform>().pos.x += 63 * m_select - 218;
-    std::cout << select->getComponent<CTransform>().pos.x << '\n';
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))

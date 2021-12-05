@@ -87,6 +87,7 @@ public:
     bool left = false;
     bool right = false;
     bool attack = false;
+    bool canJump = true;
 
     CInput() {}
 };
