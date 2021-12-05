@@ -48,7 +48,7 @@ void Assets::loadFromFile(const std::string & path)
     }
 }
 
-void Assets::addTexture(const std::string & textureName, const std::string & path, bool smooth)
+void Assets::addTexture(const std::string& textureName, const std::string& path, bool smooth, bool repeat)
 {
     m_textureMap[textureName] = sf::Texture();
 
@@ -60,6 +60,7 @@ void Assets::addTexture(const std::string & textureName, const std::string & pat
     else
     {
         m_textureMap[textureName].setSmooth(smooth);
+        m_textureMap[textureName].setRepeated(repeat);
         std::cout << "Loaded Texture: " << path << std::endl;
     }
 }

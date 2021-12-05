@@ -166,12 +166,9 @@ void Scene_MainGame::loadParallaxBackground()
 {
     for (auto i = 0; i < m_parallaxBackgroundTextures.size(); i++)
     {
-        sf::Texture tex;
-        tex.loadFromFile(m_parallaxBackgroundTextures[i]);
-        tex.setRepeated(true);
-        tex.setSmooth(false);
-        m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),true);
-        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(100, 100, 10000, 10000));
+        
+        m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),false);
+        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 10000, 10000));
         m_parallaxBackgroundSprites[i].setPosition(-400, 0);
     }
 }
@@ -187,11 +184,18 @@ void Scene_MainGame::drawParallaxBackground()
     
     
     m_game->window().draw(m_parallaxBackgroundSprites[5]);// Forest
+    m_parallaxBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
     m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
     m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
+
+    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
     m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
     m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
+
+    m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
     m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+
+    
 }
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
@@ -1425,6 +1429,7 @@ void Scene_MainGame::sRender()
     //tick.setFillColor(sf::Color::Black);
     //m_game->window().draw(spriteBG);
     drawParallaxBackground();
+
     // draw all Entity textures / animations
     if (m_drawTextures)
     {
