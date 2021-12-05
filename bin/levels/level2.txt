@@ -55,5 +55,5 @@ Tile Ground    0  1  9  11  1  1
 Tile Ground    0  1  10  11  1  1  
 Tile Ground    0  1  11  11  1  1  
 NPC GhostShriek     0  0  1  4  0  0  2  1  Follow  1  
-NPC HellHound     0  0  3  9  0  0  2  1  Follow  1  
-Player 320 360 40 64 4 3 2 
+NPC HellHound     0  0  8  7  0  0  2  1  Follow  1  
+Player 544 224 40 64 4 3 2 

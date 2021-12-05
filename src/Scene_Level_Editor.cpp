@@ -251,6 +251,8 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
             }
             else if (e->tag() == "Player")
             {
+                m_playerConfig.X = m_player->getComponent<CTransform>().pos.x;
+                m_playerConfig.Y = m_player->getComponent<CTransform>().pos.y;
                 config << e->tag() << " ";
                 config << m_playerConfig.X << " ";
                 config << m_playerConfig.Y << " ";
