@@ -71,6 +71,17 @@ Animation AxeHUD	 TexAxeHUD 	1  0
 Animation DaggerHUD	 TexDaggerHUD 	1  0
 Animation Select	 TexSelect 	1  0
 
+Animation Parallax1	 TexParallax1 	1  0
+Animation Parallax2	 TexParallax2 	1  0
+Animation Parallax3	 TexParallax3 	1  0
+Animation Parallax4	 TexParallax4 	1  0
+Animation Parallax5	 TexParallax5 	1  0
+Animation Parallax6	 TexParallax6 	1  0
+Animation Parallax7	 TexParallax7 	1  0
+Animation Parallax8	 TexParallax8 	1  0
+Animation Parallax9	 TexParallax9 	1  0
+Animation Parallax10 TexParallax10 	1  0
+
 
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
