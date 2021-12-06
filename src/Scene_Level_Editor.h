@@ -87,6 +87,7 @@ protected:
     void snap(std::shared_ptr<Entity> e);
     void draggable();
     void remove();
+    void copy();
 
 public:
 

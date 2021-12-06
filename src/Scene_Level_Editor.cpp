@@ -28,6 +28,7 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Q, "PLACE_BLOCK");
     registerAction(sf::Keyboard::V, "SAVE");
     registerAction(sf::Keyboard::B, "REMOVE");
+    registerAction(sf::Keyboard::Z, "COPY");
 
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
@@ -352,6 +353,8 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "PLACE_BLOCK")      { }
         else if (action.name() == "SAVE")             { saveLevel(m_levelPath); }
         else if (action.name() == "REMOVE")           { remove(); }
+        else if (action.name() == "SCROLL")           { std::cout << action.pos().x << std::endl; }
+        else if (action.name() == "COPY")             { copy(); }
     }
     else if (action.type() == "END")
     {
@@ -536,29 +539,29 @@ void Scene_Level_Editor::sRender()
                 m_game->window().draw(rect);
             }
 
-            if (e->hasComponent<CPatrol>())
-            {
-                auto& patrol = e->getComponent<CPatrol>().positions;
-                for (size_t p = 0; p < patrol.size(); p++)
-                {
-                    dot.setPosition(patrol[p].x, patrol[p].y);
-                    m_game->window().draw(dot);
-                }
-            }
+if (e->hasComponent<CPatrol>())
+{
+    auto& patrol = e->getComponent<CPatrol>().positions;
+    for (size_t p = 0; p < patrol.size(); p++)
+    {
+        dot.setPosition(patrol[p].x, patrol[p].y);
+        m_game->window().draw(dot);
+    }
+}
 
-            if (e->hasComponent<CFollowPlayer>())
-            {
-                sf::VertexArray lines(sf::LinesStrip, 2);
-                lines[0].position.x = e->getComponent<CTransform>().pos.x;
-                lines[0].position.y = e->getComponent<CTransform>().pos.y;
-                lines[0].color = sf::Color::Black;
-                lines[1].position.x = m_player->getComponent<CTransform>().pos.x;
-                lines[1].position.y = m_player->getComponent<CTransform>().pos.y;
-                lines[1].color = sf::Color::Black;
-                m_game->window().draw(lines);
-                dot.setPosition(e->getComponent<CFollowPlayer>().home.x, e->getComponent<CFollowPlayer>().home.y);
-                m_game->window().draw(dot);
-            }
+if (e->hasComponent<CFollowPlayer>())
+{
+    sf::VertexArray lines(sf::LinesStrip, 2);
+    lines[0].position.x = e->getComponent<CTransform>().pos.x;
+    lines[0].position.y = e->getComponent<CTransform>().pos.y;
+    lines[0].color = sf::Color::Black;
+    lines[1].position.x = m_player->getComponent<CTransform>().pos.x;
+    lines[1].position.y = m_player->getComponent<CTransform>().pos.y;
+    lines[1].color = sf::Color::Black;
+    m_game->window().draw(lines);
+    dot.setPosition(e->getComponent<CFollowPlayer>().home.x, e->getComponent<CFollowPlayer>().home.y);
+    m_game->window().draw(dot);
+}
         }
     }
 
@@ -612,5 +615,67 @@ void Scene_Level_Editor::remove()
     {
         m_selected->destroy();
         m_editor->getComponent<CDraggable>().dragging = !m_editor->getComponent<CDraggable>().dragging;
+    }
+}
+
+void Scene_Level_Editor::copy()
+{
+    if (m_selected != nullptr)
+    {
+        auto copy = m_entityManager.addEntity(m_selected->tag());
+        if (m_selected->hasComponent<CAnimation>())
+        {
+            copy->addComponent<CAnimation>(m_selected->getComponent<CAnimation>().animation, m_selected->getComponent<CAnimation>().repeat);
+        }
+        if (m_selected->hasComponent<CTransform>())
+        {
+            copy->addComponent<CTransform>(m_selected->getComponent<CTransform>().pos);
+        }
+        if (m_selected->hasComponent<CBoundingBox>())
+        {
+            copy->addComponent<CBoundingBox>(m_selected->getComponent<CBoundingBox>().size, m_selected->getComponent<CBoundingBox>().blockMove, m_selected->getComponent<CBoundingBox>().blockVision);
+        }
+        if (m_selected->hasComponent<CLifeSpan>())
+        {
+            copy->addComponent<CLifeSpan>(m_selected->getComponent<CLifeSpan>().lifespan, m_selected->getComponent<CLifeSpan>().frameCreated);
+        }
+        if (m_selected->hasComponent<CDamage>())
+        {
+            copy->addComponent<CDamage>(m_selected->getComponent<CDamage>().damage);
+        }
+        if (m_selected->hasComponent<CInvincibility>())
+        {
+            copy->addComponent<CInvincibility>(m_selected->getComponent<CInvincibility>().iframes);
+        }
+        if (m_selected->hasComponent<CHealth>())
+        {
+            copy->addComponent<CHealth>(m_selected->getComponent<CHealth>().max, m_selected->getComponent<CHealth>().current);
+        }
+        if (m_selected->hasComponent<CGravity>())
+        {
+            copy->addComponent<CGravity>(m_selected->getComponent<CGravity>().gravity);
+        }
+        if (m_selected->hasComponent<CInput>())
+        {
+            copy->addComponent<CInput>();
+        }
+        if (m_selected->hasComponent<CState>())
+        {
+            copy->addComponent<CState>(m_selected->getComponent<CState>().state);
+        }
+        if (m_selected->hasComponent<CInventory>())
+        {
+            copy->addComponent<CInventory>(m_selected->getComponent<CInventory>().money);
+        }
+        if (m_selected->hasComponent<CFollowPlayer>())
+        {
+            copy->addComponent<CFollowPlayer>(m_selected->getComponent<CFollowPlayer>().home, m_selected->getComponent<CFollowPlayer>().speed);
+        }
+        if (m_selected->hasComponent<CPatrol>())
+        {
+            copy->addComponent<CPatrol>(m_selected->getComponent<CPatrol>().positions, m_selected->getComponent<CPatrol>().speed);
+        }
+        copy->addComponent<CDraggable>();
+        snap(copy);
     }
 }
