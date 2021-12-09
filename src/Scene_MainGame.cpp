@@ -73,9 +73,18 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
 
                 auto tile = m_entityManager.addEntity("tile");
+
+                if (m_tileConfig.Name == "Ground")
+                {
+                    tile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_tileConfig.Name).getSize().x, m_game->assets().getAnimation(m_tileConfig.Name).getSize().y - 20), m_tileConfig.BM, m_tileConfig.BV);
+                }
+                else
+                {
+                    tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                }
                 tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
                 tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                
                 tile->addComponent<CDraggable>();
                 continue;
             }
@@ -153,12 +162,14 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("DemonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
                     else
                     {
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     }
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    //npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -688,7 +699,13 @@ void Scene_MainGame::sAI()
                     }
                 }
             }
-            
+            if (e->getComponent<CAnimation>().animation.getName() == "DemonAttack")
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->getComponent<CState>().state = "DemonIdle";
+                }
+            }
             if (!Visionblocked)
             {
                 

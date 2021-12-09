@@ -10,7 +10,7 @@ Texture   TexAxe    	images/gothic/AxeAttack.png
 Texture   TexBow    	images/gothic/BowAttack.png 
 Texture   TexArrow	images/gothic/Arrow.png
 Texture   TexBush    	images/tloz/brown/tile_bush.png
-Texture   TexGround     images/gothic/tile.png
+Texture   TexGround     images/gothic/tileGround2.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/gothic/ghost-shriek.png
 Texture   TexHellHound  images/gothic/hell-hound-run.png
