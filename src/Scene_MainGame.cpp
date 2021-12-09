@@ -85,6 +85,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 if (m_itemConfig.Name == "Coin")
                 {
                     auto coin = m_entityManager.addEntity("coins");
+                    coin->addComponent<CDraggable>();
                     coin->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -93,6 +94,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Heart")
                 {
                     auto heart = m_entityManager.addEntity("hearts");
+                    heart->addComponent<CDraggable>();
                     heart->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -101,6 +103,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
                 {
                     auto potion = m_entityManager.addEntity("potions");
+                    potion->addComponent<CDraggable>();
                     potion->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -109,6 +112,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Chest")
                 {
                     auto interact = m_entityManager.addEntity("interactable");
+                    interact->addComponent<CDraggable>();
                     interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -117,6 +121,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
                 {
                     auto breakable = m_entityManager.addEntity("breakable");
+                    breakable->addComponent<CDraggable>();
                     breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -1431,10 +1436,10 @@ void Scene_MainGame::sHUD()
     for (auto& inventory : m_entityManager.getEntities("inventory"))
     {
         inventory->getComponent<CTransform>().pos = InventoryPos;
-        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+       /* if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventory->destroy();
-        }
+        }*/
     }
     for (auto select : m_entityManager.getEntities("select"))
     {
@@ -1451,10 +1456,10 @@ void Scene_MainGame::sHUD()
         inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
         inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
-        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        /*if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventoryItems->destroy();
-        }
+        }*/
     }
 }
 
@@ -1718,7 +1723,7 @@ void Scene_MainGame::sRender()
             for (float x = nextGridX; x < rightX; x += m_gridSize.x)
             {
                 std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
-                std::string yCell = std::to_string((int)y / (int)m_gridSize.y);
+                std::string yCell = std::to_string(11 - (int)y / (int)m_gridSize.y);
                 m_gridText.setString("(" + xCell + "," + yCell + ")");
                 m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
                 m_game->window().draw(m_gridText);
