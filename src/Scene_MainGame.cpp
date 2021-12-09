@@ -215,8 +215,8 @@ void Scene_MainGame::loadParallaxBackground()
     {
         
         m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),false);
-        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 10000, 10000));
-        m_parallaxBackgroundSprites[i].setPosition(-400, 0);
+        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+        m_parallaxBackgroundSprites[i].setPosition(-6500, -256);
     }
 }
 
@@ -235,12 +235,11 @@ void Scene_MainGame::drawParallaxBackground()
     m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
     m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
 
-    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
+    
     m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
 
-    m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+    //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
+    //m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
 
     
 }
@@ -339,19 +338,29 @@ void Scene_MainGame::sMovement()
             pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
         }
+
         else
         {
             pTransform.velocity.y = 0;
         }
-   
+        
+        if (pInput.right && pInput.up)
+        {
+            pState.state = "Jump";
+        }
         // if only one x directional key is pressed move in that direction otherwise stop.
         if (pInput.left && !pInput.right)
         {
             pTransform.velocity.x = -1 * (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(-1, 0);
             pState.state = "RunRight";
+            if (pInput.up == true)
+            {
+                pState.state = "Jump";
+            }
             pTransform.scale = Vec2(-1, 1);
-
+            
+          
             m_parallaxBackgroundSprites[8].move(sf::Vector2f(1.1f, 0.f));
             m_parallaxBackgroundSprites[7].move(sf::Vector2f(1.2f, 0.f));
             m_parallaxBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
@@ -369,6 +378,10 @@ void Scene_MainGame::sMovement()
             pTransform.velocity.x = (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
+            if (pInput.up == true)
+            {
+                pState.state = "Jump";
+            }
             pTransform.scale = Vec2(1, 1);
             m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
             m_parallaxBackgroundSprites[7].move(sf::Vector2f(-1.2f, 0.f));
@@ -390,7 +403,7 @@ void Scene_MainGame::sMovement()
         {
             pTransform.velocity.x = 0;
         }
-   
+    
   
 #pragma endregion
 
@@ -445,11 +458,7 @@ void Scene_MainGame::sMovement()
     {
         m_FrameSinceGrounded++;
         pTransform.velocity.y += m_FrameSinceGrounded * m_player->getComponent<CGravity>().gravity;
-
-        //if (pInput.up == false)
-        //{
-        //    //m_playerHitTile = true;
-        //}
+        
     }
     else
     {
@@ -505,6 +514,7 @@ void Scene_MainGame::sDoAction(const Action& action)
                 m_player->getComponent<CInput>().up = true;
                 m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
+
             } 
             else{ m_player->getComponent<CInput>().up = false; }
         }
@@ -864,6 +874,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerTransform = m_player->getComponent<CTransform>();
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
+    
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -1747,10 +1758,15 @@ void Scene_MainGame::sRender()
             }
         }
     }
-    
+
+    // Particles on the front
+    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
+    m_parallaxBackgroundSprites[2].setPosition(m_parallaxBackgroundSprites[2].getPosition().x, -50);
+    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
+
     if (m_minimap)
     {
         drawMinimap();
