@@ -1396,7 +1396,7 @@ void Scene_MainGame::drawWeaponHolder()
     auto& weaponHolder = m_entityManager.addEntity("weaponHolder");
     weaponHolder->addComponent<CAnimation>(anim, false);
     weaponHolder->addComponent<CTransform>(weaponHolderPos);
-    weaponHolder->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
+    //weaponHolder->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
 }
 
 void Scene_MainGame::sHUD()
@@ -1406,7 +1406,7 @@ void Scene_MainGame::sHUD()
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
     Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - m_gridSize.x * 5, m_gridSize.y / 2);
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
-    Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 5 + m_gridSize.x / 2, 32);
+    Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - weaponHolderOffset.x, weaponHolderOffset.y);
 
 
@@ -1443,7 +1443,7 @@ void Scene_MainGame::sHUD()
     auto& select = m_entityManager.addEntity("select");
     select->addComponent<CAnimation>(m_game->assets().getAnimation("Select"), true);
     select->addComponent<CTransform>(InventoryPos);
-    select->getComponent<CTransform>().pos.x += 63 * m_select - 218;
+    select->getComponent<CTransform>().pos.x += 64 * m_select - 220;
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
