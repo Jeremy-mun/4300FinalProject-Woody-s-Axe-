@@ -92,7 +92,6 @@ void GameEngine::sUserInput()
         {
             currentScene()->doAction(Action("MOUSE_MOVE", Vec2(event.mouseMove.x, event.mouseMove.y)));
         }
-
         if (event.type == sf::Event::MouseWheelScrolled)
         {
             switch (event.mouseWheelScroll.wheel)
@@ -102,6 +101,7 @@ void GameEngine::sUserInput()
             }
         }
     }
+    
 }
                            
 void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene, bool endCurrentScene)

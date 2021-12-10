@@ -162,6 +162,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>(m_npcConfig.Name);
                     }
+                    npc->addComponent<CShader>();
                     continue;
                 }
                 else if (m_npcConfig.AI == "Patrol")
@@ -188,7 +189,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 }
             }
         }
-    }                     
+    }           
     spawnPlayer();
     drawWeaponHolder();
 }
@@ -247,6 +248,7 @@ void Scene_MainGame::spawnPlayer()
     m_player->addComponent<CDraggable>();
     m_player->addComponent<CDamage>(1);
     m_player->addComponent<CInventory>();
+    m_player->addComponent<CShader>();
 }
 
 void Scene_MainGame::startAttack(std::shared_ptr<Entity> entity)
@@ -553,6 +555,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         else if (inventory.items[m_select] == "GoldPotion")
         {
             inventory.items.erase(inventory.items.begin() + m_select);
+            
             if (entity->hasComponent<CInvincibility>())
             {
                 entity->getComponent<CInvincibility>().iframes = 420;
@@ -560,6 +563,11 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             else
             {
                 entity->addComponent<CInvincibility>(420);
+            }
+            if (entity->hasComponent<CShader>())
+            {
+                entity->getComponent<CShader>().duration = 420;
+                entity->getComponent<CShader>().ourShader = m_shaders[1];
             }
         }
         else if (inventory.items[m_select] == "PurplePotion")
@@ -611,10 +619,6 @@ void Scene_MainGame::sInteract()
                 if (itemID == 4)
                 {
                     m_player->getComponent<CInventory>().items.push_back("PurplePotion");
-                }
-                if (itemID == 5)
-                {
-
                 }
                 interactable->destroy();
             }
@@ -932,7 +936,10 @@ void Scene_MainGame::sPlayerCollision()
             //m_game->playSound("LinkHurt");
             if (!m_player->hasComponent<CInvincibility>())
             {
-                m_player->addComponent<CInvincibility>(30);
+                auto& pShader = m_player->getComponent<CShader>();
+                pShader.duration = 60;
+                pShader.ourShader = m_shaders[0];
+                m_player->addComponent<CInvincibility>(60);
                 playerHealth.current -= npcDamage.damage;
 
                 if (playerHealth.current <= 0)
@@ -1594,6 +1601,7 @@ void Scene_MainGame::sRender()
     //m_game->window().draw(spriteBG);
     drawParallaxBackground();
 
+    
     // draw all Entity textures / animations
     if (m_drawTextures)
     {
@@ -1601,11 +1609,6 @@ void Scene_MainGame::sRender()
         for (auto e : m_entityManager.getEntities())
         {
             auto& transform = e->getComponent<CTransform>();
-            sf::Color c = sf::Color::White;
-            if (e->hasComponent<CInvincibility>())
-            {
-                c = sf::Color(255, 255, 255, 128);
-            }
                            
             if (e->hasComponent<CAnimation>())
             {
@@ -1613,8 +1616,36 @@ void Scene_MainGame::sRender()
                 animation.getSprite().setRotation(transform.angle);
                 animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
                 animation.getSprite().setScale(transform.scale.x, transform.scale.y);
-                animation.getSprite().setColor(c);
-                m_game->window().draw(animation.getSprite());
+                if (e->hasComponent<CShader>())
+                {
+                    if (e->getComponent<CShader>().ourShader != "None")
+                    {
+                        e->getComponent<CShader>().duration--;
+                        sf::Shader shader;
+                        if (!shader.loadFromFile(e->getComponent<CShader>().ourShader, sf::Shader::Fragment))
+                        {
+                            std::cerr << "Error while shaders" << std::endl;
+                            m_game->window().draw(animation.getSprite());
+                        }
+                        else
+                        {
+                            shader.setUniform("time", m_time.getElapsedTime().asSeconds());
+                            m_game->window().draw(animation.getSprite(), &shader);
+                        }
+                        if (e->getComponent<CShader>().duration <= 0)
+                        {
+                            e->getComponent<CShader>().ourShader = "None";
+                        }
+                    }
+                    else
+                    {
+                        m_game->window().draw(animation.getSprite());
+                    }
+                }
+                else
+                {
+                    m_game->window().draw(animation.getSprite());
+                }
             }
         }
 

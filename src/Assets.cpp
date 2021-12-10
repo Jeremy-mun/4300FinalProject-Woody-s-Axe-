@@ -125,5 +125,3 @@ sf::Sound& Assets::getSound(const std::string& soundName)
     assert(m_soundMap.find(soundName) != m_soundMap.end());
     return m_soundMap.at(soundName);
 }
-                           
-
