@@ -23,6 +23,7 @@ class Scene_Level_Editor : public Scene
         bool BM, BV;
         std::string Name;
     };
+
     struct NPCConfig
     {
         float RX, RY, TX, TY, H, D, S, N;
@@ -30,6 +31,7 @@ class Scene_Level_Editor : public Scene
         bool BM, BV;
         std::string Name, AI;
     };
+
     struct ItemConfig
     {
         float RX, RY, TX, TY;
@@ -43,6 +45,9 @@ protected:
     std::shared_ptr<Entity> m_editor;
     std::shared_ptr<Entity> m_player;
     std::string             m_levelPath;
+    sf::Text                m_entityText;
+    int                     m_select = 0;
+    int                     m_max = 1;
     PlayerConfig            m_playerConfig;
     std::string             configRead;
     const Vec2              m_gridSize = { 64, 64 };
@@ -52,6 +57,7 @@ protected:
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
     ItemConfig              m_itemConfig;
+    bool                    m_adding = false;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = false;
@@ -73,12 +79,12 @@ protected:
 
     void loadLevel(const std::string& filename);
     void saveLevel(const std::string& filename);
+    void templateEntities(const std::string& filename);
 
     void onEnd();
     void update();
     Vec2 getPosition(int sx, int sy, int tx, int ty) const;
     void drawLine(const Vec2& p1, const Vec2& p2);
-    void placeTile(Animation animation);
     void sDragAndDrop();
     void sEditor();
     void grab();
@@ -87,6 +93,9 @@ protected:
     void snap(std::shared_ptr<Entity> e);
     void draggable();
     void remove();
+    void copy();
+    void select(float s);
+    void text();
 
 public:
 
