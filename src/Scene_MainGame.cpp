@@ -1464,10 +1464,10 @@ void Scene_MainGame::sHUD()
     for (auto& inventory : m_entityManager.getEntities("inventory"))
     {
         inventory->getComponent<CTransform>().pos = InventoryPos;
-       /* if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventory->destroy();
-        }*/
+        }
     }
     for (auto select : m_entityManager.getEntities("select"))
     {
@@ -1484,10 +1484,14 @@ void Scene_MainGame::sHUD()
         inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
         inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
-        /*if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        if (inventoryItemPositionOffset > m_gridSize.x * 8)
+        {
+            inventoryItemPositionOffset = 0;
+        }
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventoryItems->destroy();
-        }*/
+        }
     }
 }
 
