@@ -70,6 +70,7 @@ protected:
     sf::Clock               m_tutorialTextClock;
     sf::Clock               m_walletClock;
     sf::Clock               m_InventoryClock;
+    sf::Clock               m_time;
     int                     m_frameSinceAttack;
 
     sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10;
@@ -77,6 +78,12 @@ protected:
                                                     ,"TexParallax5" ,"TexParallax6" ,"TexParallax7" 
                                                     ,"TexParallax8" ,"TexParallax9" ,"TexParallax10" };
     std::vector<sf::Sprite> m_parallaxBackgroundSprites = { parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10 };
+
+    std::vector<sf::String> m_shaders =
+    {
+        "shaders/shaderFade.frag",
+        "shaders/shaderInvincibility.frag"
+    };
      
     
 

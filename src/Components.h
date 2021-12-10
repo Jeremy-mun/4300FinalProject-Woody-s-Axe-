@@ -161,3 +161,14 @@ public:
     CInventory(int m)
         : money(m) {}
 };
+
+
+class CShader : public Component
+{
+public:
+    sf::String ourShader = "None";
+    int duration = 0;
+    CShader() {}
+    CShader(sf::String s, int d)
+        : ourShader(s), duration(d) {}
+};

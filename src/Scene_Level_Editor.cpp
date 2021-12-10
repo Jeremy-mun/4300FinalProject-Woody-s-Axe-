@@ -15,6 +15,7 @@ Scene_Level_Editor::Scene_Level_Editor(GameEngine* game, const std::string& leve
 void Scene_Level_Editor::init(const std::string& levelPath)
 {
     loadLevel(levelPath);
+    templateEntities("entities.txt");
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");       // Toggle follow camera
@@ -28,9 +29,12 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Q, "PLACE_BLOCK");
     registerAction(sf::Keyboard::V, "SAVE");
     registerAction(sf::Keyboard::B, "REMOVE");
+    registerAction(sf::Keyboard::Z, "COPY");
 
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
+    m_entityText.setCharacterSize(16);
+    m_entityText.setFont(m_game->assets().getFont("Arial"));
 }
 
 void Scene_Level_Editor::loadLevel(const std::string& filename)
@@ -142,7 +146,6 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
     std::ofstream config(filename);
     if (config.is_open())
     {
-        std::cout << "File is open" << std::endl;
         for (auto e : m_entityManager.getEntities())
         {
             if (e->tag() == "editor") continue;
@@ -264,30 +267,105 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 continue;
             }
         }
+        std::cout << "Level is saved" << std::endl;
     }
 }
 
-void Scene_Level_Editor::placeTile(Animation animation)
+void Scene_Level_Editor::templateEntities(const std::string& filename)
 {
-    float viewX = m_game->window().getView().getCenter().x - (m_game->window().getSize().x / 2);
-    float viewY = m_game->window().getView().getCenter().y - (m_game->window().getSize().y / 2);
-    auto mpos = sf::Mouse::getPosition(m_game->window());
-    Vec2 gridPos( mpos.x + viewX, mpos.y + viewY);
-    
-    auto& fakeTile = m_entityManager.addEntity("tile");
-    fakeTile->addComponent<CAnimation>(animation, false);
-    fakeTile->addComponent<CTransform>(gridPos);
-    fakeTile->addComponent<CBoundingBox>(Vec2(animation.getSize().x, animation.getSize().y));
-    
-    for (auto& e : m_entityManager.getEntities())
+    m_editorManager = EntityManager();
+
+    std::ifstream config(filename);
+    if (config.is_open())
     {
-        auto overlap = Physics::GetOverlap(fakeTile, e);
-        if (overlap.x > 0 && overlap.y > 0)
+        while (config.good())
         {
-            fakeTile->destroy();
+            config >> configRead;
+
+            if (configRead == "None")
+            {
+                auto blank = m_editorManager.addEntity("None");
+            }
+            if (configRead == "Tile")
+            {
+                config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
+
+                auto tile = m_editorManager.addEntity("Tile");
+                tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
+                tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                tile->addComponent<CDraggable>();
+                continue;
+            }
+            if (configRead == "Item")
+            {
+                config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;
+                if (m_itemConfig.Name == "Coin")
+                {
+                    auto coin = m_editorManager.addEntity("Coin");
+                    coin->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    coin->addComponent<CDraggable>();
+                    continue;
+                }
+                else if (m_itemConfig.Name == "Heart")
+                {
+                    auto heart = m_editorManager.addEntity("Heart");
+                    heart->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    heart->addComponent<CDraggable>();
+                    continue;
+                }
+                else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
+                {
+                    auto potion = m_editorManager.addEntity("Potion");
+                    potion->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    potion->addComponent<CDraggable>();
+                    continue;
+                }
+            }
+            if (configRead == "NPC")
+            {
+                config >> m_npcConfig.Name >> m_npcConfig.RX >> m_npcConfig.RY >> m_npcConfig.TX >> m_npcConfig.TY >> m_npcConfig.BM >> m_npcConfig.BV >> m_npcConfig.H >> m_npcConfig.D >> m_npcConfig.AI >> m_npcConfig.S;
+                auto npc = m_editorManager.addEntity("NPC");
+                npc->addComponent<CDraggable>();
+                if (m_npcConfig.AI == "Follow")
+                {
+                    npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
+                    npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
+                    npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
+                    npc->addComponent<CDamage>(m_npcConfig.D);
+                    continue;
+                }
+                else if (m_npcConfig.AI == "Patrol")
+                {
+                    std::vector<Vec2> initialPatrolPos;
+                    npc->addComponent<CPatrol>(initialPatrolPos, m_npcConfig.S);
+                    config >> m_npcConfig.N;
+                    for (int i = 0; i < m_npcConfig.N; i++)
+                    {
+                        float x, y;
+                        config >> x >> y;
+                        npc->getComponent<CPatrol>().positions.push_back(getPosition(m_npcConfig.RX, m_npcConfig.RY, x, y));
+                    }
+                    npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
+                    npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
+                    npc->addComponent<CDamage>(m_npcConfig.D);
+                    continue;
+                }
+            }
         }
     }
-
+    m_editorManager.update();
+    m_max = m_editorManager.getEntities().size();
 }
 
 void Scene_Level_Editor::spawnPlayer()
@@ -314,7 +392,6 @@ void Scene_Level_Editor::draggable()
     m_entityManager.update();
     for (auto& e : m_entityManager.getEntities())
     {
-        std::cout << e->tag() << std::endl;
         e->addComponent<CDraggable>();
     }
 }
@@ -322,6 +399,7 @@ void Scene_Level_Editor::draggable()
 void Scene_Level_Editor::update()
 {
     m_entityManager.update();
+    m_editorManager.update();
     sEditor();
     sDragAndDrop();
     m_currentFrame++;
@@ -348,10 +426,12 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "DOWN")             { m_editor->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT")             { m_editor->getComponent<CInput>().left = true; }
         else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = true; }
-        else if (action.name() == "LEFT_CLICK")       { grab(); }
+        else if (action.name() == "LEFT_CLICK")       { if (!m_adding) { grab(); } else { copy(); } }
         else if (action.name() == "PLACE_BLOCK")      { }
         else if (action.name() == "SAVE")             { saveLevel(m_levelPath); }
         else if (action.name() == "REMOVE")           { remove(); }
+        else if (action.name() == "SCROLL")           { select(action.pos().x); }
+        else if (action.name() == "COPY")             { copy(); }
     }
     else if (action.type() == "END")
     {
@@ -479,6 +559,11 @@ void Scene_Level_Editor::sRender()
                 m_game->window().draw(animation.getSprite());
             }
         }
+        if (m_selected != nullptr && m_adding)
+        {
+            m_selected->getComponent<CAnimation>().animation.getSprite().setPosition(m_selected->getComponent<CTransform>().pos.x, m_selected->getComponent<CTransform>().pos.y);
+            m_game->window().draw(m_selected->getComponent<CAnimation>().animation.getSprite());
+        }
 
         // draw entity health bars
         for (auto e : m_entityManager.getEntities())
@@ -515,7 +600,7 @@ void Scene_Level_Editor::sRender()
     if (m_drawCollision)
     {
         sf::CircleShape dot(4);
-        dot.setFillColor(sf::Color::Black);
+        dot.setFillColor(sf::Color::Yellow);
         for (auto e : m_entityManager.getEntities())
         {
             if (e->hasComponent<CBoundingBox>())
@@ -536,29 +621,29 @@ void Scene_Level_Editor::sRender()
                 m_game->window().draw(rect);
             }
 
-            if (e->hasComponent<CPatrol>())
-            {
-                auto& patrol = e->getComponent<CPatrol>().positions;
-                for (size_t p = 0; p < patrol.size(); p++)
-                {
-                    dot.setPosition(patrol[p].x, patrol[p].y);
-                    m_game->window().draw(dot);
-                }
-            }
+if (e->hasComponent<CPatrol>())
+{
+    auto& patrol = e->getComponent<CPatrol>().positions;
+    for (size_t p = 0; p < patrol.size(); p++)
+    {
+        dot.setPosition(patrol[p].x, patrol[p].y);
+        m_game->window().draw(dot);
+    }
+}
 
-            if (e->hasComponent<CFollowPlayer>())
-            {
-                sf::VertexArray lines(sf::LinesStrip, 2);
-                lines[0].position.x = e->getComponent<CTransform>().pos.x;
-                lines[0].position.y = e->getComponent<CTransform>().pos.y;
-                lines[0].color = sf::Color::Black;
-                lines[1].position.x = m_player->getComponent<CTransform>().pos.x;
-                lines[1].position.y = m_player->getComponent<CTransform>().pos.y;
-                lines[1].color = sf::Color::Black;
-                m_game->window().draw(lines);
-                dot.setPosition(e->getComponent<CFollowPlayer>().home.x, e->getComponent<CFollowPlayer>().home.y);
-                m_game->window().draw(dot);
-            }
+if (e->hasComponent<CFollowPlayer>())
+{
+    sf::VertexArray lines(sf::LinesStrip, 2);
+    lines[0].position.x = e->getComponent<CTransform>().pos.x;
+    lines[0].position.y = e->getComponent<CTransform>().pos.y;
+    lines[0].color = sf::Color::Green;
+    lines[1].position.x = m_player->getComponent<CTransform>().pos.x;
+    lines[1].position.y = m_player->getComponent<CTransform>().pos.y;
+    lines[1].color = sf::Color::Green;
+    m_game->window().draw(lines);
+    dot.setPosition(e->getComponent<CFollowPlayer>().home.x, e->getComponent<CFollowPlayer>().home.y);
+    m_game->window().draw(dot);
+}
         }
     }
 
@@ -588,29 +673,195 @@ void Scene_Level_Editor::sRender()
         }
     }
 
+    text();
+
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
-
+    m_game->window().draw(m_entityText);
 }
 
 void Scene_Level_Editor::sDragAndDrop()
 {
-    for (auto e : m_entityManager.getEntities())
+    if (m_selected != nullptr)
     {
-        if (e->hasComponent<CDraggable>() &&
-            e->getComponent<CDraggable>().dragging)
+        if (m_selected->hasComponent<CDraggable>() && 
+            m_selected->getComponent<CDraggable>().dragging)
         {
-            e->getComponent<CTransform>().pos = m_mPos;
+            m_selected->getComponent<CTransform>().pos = m_mPos;
         }
     }
 }
 
 void Scene_Level_Editor::remove()
 {
-    if (m_selected != nullptr)
+    if (m_selected != nullptr && !m_adding)
     {
         m_selected->destroy();
-        m_editor->getComponent<CDraggable>().dragging = !m_editor->getComponent<CDraggable>().dragging;
+        m_editor->getComponent<CDraggable>().dragging = false;
+    }
+}
+
+void Scene_Level_Editor::copy()
+{
+    if (m_selected != nullptr)
+    {
+        auto copy = m_entityManager.addEntity(m_selected->tag());
+        if (m_selected->hasComponent<CAnimation>())
+        {
+            copy->addComponent<CAnimation>(m_selected->getComponent<CAnimation>().animation, m_selected->getComponent<CAnimation>().repeat);
+        }
+        if (m_selected->hasComponent<CTransform>())
+        {
+            copy->addComponent<CTransform>(m_selected->getComponent<CTransform>().pos);
+        }
+        if (m_selected->hasComponent<CBoundingBox>())
+        {
+            copy->addComponent<CBoundingBox>(m_selected->getComponent<CBoundingBox>().size, m_selected->getComponent<CBoundingBox>().blockMove, m_selected->getComponent<CBoundingBox>().blockVision);
+        }
+        if (m_selected->hasComponent<CLifeSpan>())
+        {
+            copy->addComponent<CLifeSpan>(m_selected->getComponent<CLifeSpan>().lifespan, m_selected->getComponent<CLifeSpan>().frameCreated);
+        }
+        if (m_selected->hasComponent<CDamage>())
+        {
+            copy->addComponent<CDamage>(m_selected->getComponent<CDamage>().damage);
+        }
+        if (m_selected->hasComponent<CInvincibility>())
+        {
+            copy->addComponent<CInvincibility>(m_selected->getComponent<CInvincibility>().iframes);
+        }
+        if (m_selected->hasComponent<CHealth>())
+        {
+            copy->addComponent<CHealth>(m_selected->getComponent<CHealth>().max, m_selected->getComponent<CHealth>().current);
+        }
+        if (m_selected->hasComponent<CGravity>())
+        {
+            copy->addComponent<CGravity>(m_selected->getComponent<CGravity>().gravity);
+        }
+        if (m_selected->hasComponent<CInput>())
+        {
+            copy->addComponent<CInput>();
+        }
+        if (m_selected->hasComponent<CState>())
+        {
+            copy->addComponent<CState>(m_selected->getComponent<CState>().state);
+        }
+        if (m_selected->hasComponent<CInventory>())
+        {
+            copy->addComponent<CInventory>(m_selected->getComponent<CInventory>().money);
+        }
+        if (m_selected->hasComponent<CFollowPlayer>())
+        {
+            copy->addComponent<CFollowPlayer>(m_selected->getComponent<CFollowPlayer>().home, m_selected->getComponent<CFollowPlayer>().speed);
+        }
+        if (m_selected->hasComponent<CPatrol>())
+        {
+            copy->addComponent<CPatrol>(m_selected->getComponent<CPatrol>().positions, m_selected->getComponent<CPatrol>().speed);
+        }
+        copy->addComponent<CDraggable>();
+        snap(copy);
+    }
+}
+
+void Scene_Level_Editor::select(float s)
+{
+    if (s > 0)
+    {
+        if (m_selected == nullptr)
+        {
+            m_select = (m_select + 1) % m_max;
+            if (m_select == 0)
+            {
+                m_adding = false;
+                m_editor->getComponent<CDraggable>().dragging = false;
+            }
+            else
+            {
+                m_adding = true;
+                m_editor->getComponent<CDraggable>().dragging = true;
+                m_selected = m_editorManager.getEntities().at(m_select);
+                m_selected->getComponent<CDraggable>().dragging = true;
+            }
+        }
+        else if (m_adding == true)
+        {
+            m_select = (m_select + 1) % m_max;
+            m_selected->getComponent<CDraggable>().dragging = false;
+            if (m_select == 0)
+            {
+                m_adding = false;
+                m_editor->getComponent<CDraggable>().dragging = false;
+                m_selected = nullptr;
+            }
+            else
+            {
+                m_selected = m_editorManager.getEntities().at(m_select);
+                m_selected->getComponent<CDraggable>().dragging = true;
+            }
+        }
+    }
+    else if (s < 0)
+    {
+        if (m_selected == nullptr)
+        {
+            m_select = m_max - 1;
+
+            if (m_select == 0)
+            {
+                m_adding = false;
+            }
+            else
+            {
+                m_adding = true;
+                m_editor->getComponent<CDraggable>().dragging = true;
+                m_selected = m_editorManager.getEntities().at(m_select);
+                m_selected->getComponent<CDraggable>().dragging = true;
+            }
+        }
+        else if (m_adding == true)
+        {
+            if (m_select > 0) { m_select--; }
+            else { m_select = m_max - 1; }
+
+            m_selected->getComponent<CDraggable>().dragging = false;
+            if (m_select == 0)
+            {
+                m_adding = false;
+                m_editor->getComponent<CDraggable>().dragging = false;
+                m_selected = nullptr;
+            }
+            else
+            {
+                m_selected = m_editorManager.getEntities().at(m_select);
+                m_selected->getComponent<CDraggable>().dragging = true;
+            }
+        }
+    }
+}
+
+void Scene_Level_Editor::text()
+{
+    if (m_selected != nullptr && m_adding)
+    {
+        std::string name = "";
+        name.append(m_selected->getComponent<CAnimation>().animation.getName());
+        if (m_selected->tag() == "NPC")
+        {
+            if (m_selected->hasComponent<CPatrol>())
+            {
+                name.append(" Patrol");
+            }
+            else if (m_selected->hasComponent<CFollowPlayer>())
+            {
+                name.append(" Follow");
+            }
+        }
+        m_entityText.setPosition(m_mPos.x + m_selected->getComponent<CBoundingBox>().halfSize.x + 16, m_mPos.y);
+        m_entityText.setString(name);
+    }
+    else
+    {
+        m_entityText.setString("");
     }
 }
