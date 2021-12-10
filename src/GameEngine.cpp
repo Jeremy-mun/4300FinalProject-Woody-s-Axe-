@@ -92,15 +92,6 @@ void GameEngine::sUserInput()
         {
             currentScene()->doAction(Action("MOUSE_MOVE", Vec2(event.mouseMove.x, event.mouseMove.y)));
         }
-
-        if (event.type == sf::Event::MouseWheelScrolled)
-        {
-            switch (event.mouseWheelScroll.wheel)
-            {
-                case sf::Mouse::VerticalWheel: {currentScene()->doAction(Action("SCROLL", "START", Vec2(event.mouseWheel.x, 0))); break; }
-                default: break;
-            }
-        }
     }
 }
                            

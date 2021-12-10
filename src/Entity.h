@@ -21,7 +21,8 @@ typedef std::tuple<
     CInvincibility,
     CGravity,
     CDraggable,
-    CInventory
+    CInventory,
+    CShader
 > ComponentTuple;
                            
 class Entity
