@@ -201,10 +201,49 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
 
                 auto tile = m_entityManager.addEntity("tile");
+
+                if (m_tileConfig.Name == "Ground" || m_tileConfig.Name == "FloatTileSmall" || m_tileConfig.Name == "FloatTileBig" || m_tileConfig.Name == "PlatformMiddle" || m_tileConfig.Name == "Ground2")
+                {
+                    tile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_tileConfig.Name).getSize().x, m_game->assets().getAnimation(m_tileConfig.Name).getSize().y - 20), m_tileConfig.BM, m_tileConfig.BV);
+                }
+                else
+                {
+                    tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                }
                 tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
                 tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                
                 tile->addComponent<CDraggable>();
+                continue;
+            }
+            if (configRead == "MovingTile")
+            {
+                config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
+                auto mTile = m_entityManager.addEntity("tile");
+                mTile->addComponent<CDraggable>();
+                if (m_movingTileConfig.AI == "Patrol")
+                {
+                    std::vector<Vec2> initialPatrolPos;
+                    mTile->addComponent<CPatrol>(initialPatrolPos, m_movingTileConfig.S);
+                    config >> m_movingTileConfig.N;
+                    for (int i = 0; i < m_movingTileConfig.N; i++)
+                    {
+                        float x, y;
+                        config >> x >> y;
+                        mTile->getComponent<CPatrol>().positions.push_back(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, x, y));
+                    }
+                }
+                mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
+                mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+
+                if (m_movingTileConfig.Name == "FloatTileSmall" || m_movingTileConfig.Name == "FloatTileBig")
+                {
+                    mTile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().x, m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().y - 15), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                else
+                {
+                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
                 continue;
             }
             if (configRead == "Item")
@@ -213,6 +252,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 if (m_itemConfig.Name == "Coin")
                 {
                     auto coin = m_entityManager.addEntity("coins");
+                    coin->addComponent<CDraggable>();
                     coin->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -221,6 +261,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Heart")
                 {
                     auto heart = m_entityManager.addEntity("hearts");
+                    heart->addComponent<CDraggable>();
                     heart->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -229,6 +270,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
                 {
                     auto potion = m_entityManager.addEntity("potions");
+                    potion->addComponent<CDraggable>();
                     potion->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -237,6 +279,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Chest")
                 {
                     auto interact = m_entityManager.addEntity("interactable");
+                    interact->addComponent<CDraggable>();
                     interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -245,6 +288,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
                 {
                     auto breakable = m_entityManager.addEntity("breakable");
+                    breakable->addComponent<CDraggable>();
                     breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -276,12 +320,14 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("DemonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
                     else
                     {
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     }
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    //npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -328,8 +374,8 @@ void Scene_MainGame::loadParallaxBackground()
     {
         
         m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),false);
-        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 10000, 10000));
-        m_parallaxBackgroundSprites[i].setPosition(-400, 0);
+        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+        m_parallaxBackgroundSprites[i].setPosition(-6500, -256);
     }
 }
 
@@ -348,12 +394,11 @@ void Scene_MainGame::drawParallaxBackground()
     m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
     m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
 
-    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
+    
     m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
 
-    m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+    //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
+    //m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
 
     
 }
@@ -368,8 +413,8 @@ void Scene_MainGame::spawnPlayer()
 {
     m_player = m_entityManager.addEntity("player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
-    m_player->addComponent<CState>("StandDown");
-    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandDown"), true);
+    m_player->addComponent<CState>("StandRight");
+    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandRight"), true);
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
@@ -453,48 +498,83 @@ void Scene_MainGame::sMovement()
             pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
         }
+
         else
         {
             pTransform.velocity.y = 0;
         }
-   
+        
+        if (pInput.right && pInput.up)
+        {
+            pState.state = "Jump";
+        }
         // if only one x directional key is pressed move in that direction otherwise stop.
         if (pInput.left && !pInput.right)
         {
             pTransform.velocity.x = -1 * (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(-1, 0);
             pState.state = "RunRight";
+            if (pInput.up == true)
+            {
+                pState.state = "Jump";
+            }
+            m_player->getComponent<CBoundingBox>().size.y = m_playerConfig.CY;
+            if (pInput.down == true)
+            {
+                pState.state = "StandDown";
+                m_player->getComponent<CBoundingBox>().size.y = m_player->getComponent<CBoundingBox>().halfSize.y;
+            }
             pTransform.scale = Vec2(-1, 1);
-
-            m_parallaxBackgroundSprites[8].move(sf::Vector2f(1.1f, 0.f));
-            m_parallaxBackgroundSprites[7].move(sf::Vector2f(1.2f, 0.f));
-            m_parallaxBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[5].move(sf::Vector2f(2.f, 0.f));
-            m_parallaxBackgroundSprites[4].move(sf::Vector2f(2.2f, 0.f));
-            m_parallaxBackgroundSprites[3].move(sf::Vector2f(2.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[2].move(sf::Vector2f(2.6f, 0.f));
-            m_parallaxBackgroundSprites[1].move(sf::Vector2f(2.7f, 0.f));
-            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            
+            if (!m_collidingWithTile)
+            {
+                m_parallaxBackgroundSprites[8].move(sf::Vector2f(0.5f, 0.f));
+                m_parallaxBackgroundSprites[7].move(sf::Vector2f(0.6f, 0.f));
+                m_parallaxBackgroundSprites[6].move(sf::Vector2f(0.7f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[5].move(sf::Vector2f(1.f, 0.f));
+                m_parallaxBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
+                m_parallaxBackgroundSprites[3].move(sf::Vector2f(1.3f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[2].move(sf::Vector2f(1.8f, 0.f));
+                m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
+                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            }
+           
         }
         else if (!pInput.left && pInput.right)
         {
             pTransform.velocity.x = (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
+            if (pInput.up == true)
+            {
+                pState.state = "Jump";
+            }
+            
+            m_player->getComponent<CBoundingBox>().size.y = m_playerConfig.CY;
+            if (pInput.down == true)
+            {
+                pState.state = "StandDown";
+                m_player->getComponent<CBoundingBox>().size.y = 32;
+                //pTransform.scale = Vec2(-1, 1);
+            }
             pTransform.scale = Vec2(1, 1);
-            m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
-            m_parallaxBackgroundSprites[7].move(sf::Vector2f(-1.2f, 0.f));
-            m_parallaxBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[5].move(sf::Vector2f(-2.f, 0.f));
-            m_parallaxBackgroundSprites[4].move(sf::Vector2f(-2.2f, 0.f));
-            m_parallaxBackgroundSprites[3].move(sf::Vector2f(-2.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[2].move(sf::Vector2f(-2.6f, 0.f));
-            m_parallaxBackgroundSprites[1].move(sf::Vector2f(-2.7f, 0.f));
-            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            if (!m_collidingWithTile)
+            {
+                m_parallaxBackgroundSprites[8].move(sf::Vector2f(-0.5f, 0.f));
+                m_parallaxBackgroundSprites[7].move(sf::Vector2f(-0.6f, 0.f));
+                m_parallaxBackgroundSprites[6].move(sf::Vector2f(-0.7f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[5].move(sf::Vector2f(-1.f, 0.f));
+                m_parallaxBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
+                m_parallaxBackgroundSprites[3].move(sf::Vector2f(-1.3f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[2].move(sf::Vector2f(-1.8f, 0.f));
+                m_parallaxBackgroundSprites[1].move(sf::Vector2f(-1.9f, 0.f));
+                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            }
+            
         }
         else if (!pInput.left && pInput.right)
         {
@@ -504,7 +584,7 @@ void Scene_MainGame::sMovement()
         {
             pTransform.velocity.x = 0;
         }
-   
+    
   
 #pragma endregion
 
@@ -559,11 +639,7 @@ void Scene_MainGame::sMovement()
     {
         m_FrameSinceGrounded++;
         pTransform.velocity.y += m_FrameSinceGrounded * m_player->getComponent<CGravity>().gravity;
-
-        //if (pInput.up == false)
-        //{
-        //    //m_playerHitTile = true;
-        //}
+        
     }
     else
     {
@@ -619,6 +695,7 @@ void Scene_MainGame::sDoAction(const Action& action)
                 m_player->getComponent<CInput>().up = true;
                 m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
+
             } 
             else{ m_player->getComponent<CInput>().up = false; }
         }
@@ -815,7 +892,13 @@ void Scene_MainGame::sAI()
                     }
                 }
             }
-            
+            if (e->getComponent<CAnimation>().animation.getName() == "DemonAttack")
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->getComponent<CState>().state = "DemonIdle";
+                }
+            }
             if (!Visionblocked)
             {
                 
@@ -974,6 +1057,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerTransform = m_player->getComponent<CTransform>();
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
+    m_collidingWithTile = false;
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -1003,13 +1087,16 @@ void Scene_MainGame::sTileCollision()
                 }
                 else
                 {
+                    
                     if (playerTransform.pos.x > tileTransform.pos.x)
                     {
                         playerTransform.pos.x += playerTileOverlap.x;
+                        m_collidingWithTile = true;
                     }
                     else
                     {
                         playerTransform.pos.x -= playerTileOverlap.x;
+                        m_collidingWithTile = true;
                     }
                 }
             }
@@ -1586,6 +1673,10 @@ void Scene_MainGame::sHUD()
         inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
         inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
+        if (inventoryItemPositionOffset > m_gridSize.x * 8)
+        {
+            inventoryItemPositionOffset = 0;
+        }
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventoryItems->destroy();
@@ -1876,18 +1967,24 @@ void Scene_MainGame::sRender()
 
             for (float x = nextGridX; x < rightX; x += m_gridSize.x)
             {
+               
                 std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
-                std::string yCell = std::to_string((int)y / (int)m_gridSize.y);
+                std::string yCell = std::to_string(11 - ((int)y / (int)m_gridSize.y));
                 m_gridText.setString("(" + xCell + "," + yCell + ")");
                 m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
                 m_game->window().draw(m_gridText);
             }
         }
     }
-    
+
+    // Particles on the front
+    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
+    m_parallaxBackgroundSprites[2].setPosition(m_parallaxBackgroundSprites[2].getPosition().x, -50);
+    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
+
     if (m_minimap)
     {
         drawMinimap();
