@@ -677,11 +677,7 @@ void Scene_MainGame::sDoAction(const Action& action)
 {                      
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {  m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);
-        // m_game->playSound("MusicLevel");
-        sf::View view = m_game->window().getView();
-        view.zoom(2.0f);
-        m_game->window().setView(view);
+        if (action.name() == "PAUSE") {  setPaused(!m_paused);
         }
         else if (action.name() == "QUIT") { onEnd(); }
         else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
@@ -1685,33 +1681,30 @@ void Scene_MainGame::sHUD()
         inventory->getComponent<CTransform>().pos = InventoryPos;
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
-            inventory->destroy();
+            //inventory->destroy();
         }
     }
-    for (auto select : m_entityManager.getEntities("select"))
-    {
-        select->destroy();
-    }
-    auto& select = m_entityManager.addEntity("select");
-    select->addComponent<CAnimation>(m_game->assets().getAnimation("Select"), true);
-    select->addComponent<CTransform>(InventoryPos);
-    select->getComponent<CTransform>().pos.x += 64 * m_select - 220;
+    
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
     {
-        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
+        
+        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - (m_gridSize.x*3 + m_gridSize.x/2) + inventoryItemPositionOffset;
         inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
+        
         if (inventoryItemPositionOffset > m_gridSize.x * 8)
         {
             inventoryItemPositionOffset = 0;
         }
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
-            inventoryItems->destroy();
+            //inventoryItems->destroy();
         }
     }
+    inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 3 + m_gridSize.x / 2), InventoryPos.y);
+    
 }
 
 void Scene_MainGame::sDrawInventoryItems()
@@ -1928,6 +1921,7 @@ void Scene_MainGame::sRender()
             }
         }
     }
+    
 
     // draw all Entity collision bounding boxes with a rectangleshape
     if (m_drawCollision)
@@ -1979,7 +1973,22 @@ void Scene_MainGame::sRender()
             }
         }
     }
+
+
+    /*inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
+        inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
+        inventoryItemPositionOffset += 64;*/
+        
+        inventorySelect.setSize(sf::Vector2f(50, 50));
+        inventorySelect.setOrigin(sf::Vector2f(25, 25));
+        //inventorySelect.setPosition(getPosition(0,0,5,0).x, getPosition(0, 0, 5, 0).y);
+        inventorySelect.setFillColor(sf::Color(0, 0, 0,0));
+        inventorySelect.setOutlineColor(sf::Color(196, 70, 70, 255));
+        inventorySelect.setOutlineThickness(5);
+        m_game->window().draw(inventorySelect);
     
+   
+
     if (m_drawGrid)
     {
         float leftX = m_game->window().getView().getCenter().x - width() / 2;

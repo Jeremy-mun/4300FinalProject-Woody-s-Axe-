@@ -81,6 +81,7 @@ protected:
     sf::Clock               m_InventoryClock;
     sf::Clock               m_time;
     int                     m_frameSinceAttack;
+    sf::RectangleShape      inventorySelect;
 
     //options
     std::string                 ConfigRead;
