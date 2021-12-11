@@ -71,6 +71,7 @@ public:
     CHealth(int m, int c)
         : max(m), current(c) {}
 };
+
 class CGravity : public Component
 {
 public:
@@ -161,7 +162,6 @@ public:
     CInventory(int m)
         : money(m) {}
 };
-
 
 class CShader : public Component
 {

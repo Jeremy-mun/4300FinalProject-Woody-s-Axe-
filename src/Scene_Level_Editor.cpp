@@ -17,7 +17,6 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     loadLevel(levelPath);
     templateEntities("entities.txt");
     registerAction(sf::Keyboard::Escape, "QUIT");
-    registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");       // Toggle follow camera
     registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");      // Toggle drawing (T)extures
     registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");    // Toggle drawing (C)ollision Boxes
@@ -30,11 +29,16 @@ void Scene_Level_Editor::init(const std::string& levelPath)
     registerAction(sf::Keyboard::V, "SAVE");
     registerAction(sf::Keyboard::B, "REMOVE");
     registerAction(sf::Keyboard::Z, "COPY");
+    registerAction(sf::Keyboard::E, "EDIT");
+    registerAction(sf::Keyboard::Left, "DECREASE");
+    registerAction(sf::Keyboard::Right, "INCREASE");
 
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_entityText.setCharacterSize(16);
     m_entityText.setFont(m_game->assets().getFont("Arial"));
+    m_editText.setCharacterSize(16);
+    m_editText.setFont(m_game->assets().getFont("Arial"));
 }
 
 void Scene_Level_Editor::loadLevel(const std::string& filename)
@@ -106,10 +110,6 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
-                    if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
-                    {
-                        npc->addComponent<CState>(m_npcConfig.Name);
-                    }
                     continue;
                 }
                 else if (m_npcConfig.AI == "Patrol")
@@ -128,10 +128,6 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
-                    if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
-                    {
-                        npc->addComponent<CState>(m_npcConfig.Name);
-                    }
                     continue;
                 }
             }
@@ -210,8 +206,8 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 auto pos = e->getComponent<CTransform>().pos;
                 m_npcConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
                 m_npcConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
-                m_npcConfig.TX = ((pos.x - 32) - (m_npcConfig.RX * m_game->window().getSize().x)) / 64.0;
-                m_npcConfig.TY = ((pos.y - 32) - (m_npcConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_npcConfig.TX = ((int(pos.x) - 32) - (m_npcConfig.RX * m_game->window().getSize().x)) / 64;
+                m_npcConfig.TY = ((int(pos.y) - 32) - (m_npcConfig.RY * m_game->window().getSize().y)) / 64;
                 m_npcConfig.BM = e->getComponent<CBoundingBox>().blockMove;
                 m_npcConfig.BV = e->getComponent<CBoundingBox>().blockVision;
                 m_npcConfig.H = e->getComponent<CHealth>().max;
@@ -245,8 +241,8 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                     config << m_npcConfig.N << "  ";
                     for (auto v : e->getComponent<CPatrol>().positions)
                     {
-                        config << v.x << "  ";
-                        config << v.y << "  ";
+                        config << ((int(v.x) - 32) - (m_npcConfig.RX * m_game->window().getSize().x)) / 64 << "  ";
+                        config << ((int(v.y) - 32) - (m_npcConfig.RY * m_game->window().getSize().y)) / 64 << "  ";
                     }
                 }
                 config << std::endl;
@@ -268,6 +264,12 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 continue;
             }
         }
+        std::ifstream ifs(filename);
+        std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        str.erase(std::remove(str.end() - 3, str.end(), ' '), str.end());
+        str.erase(std::remove(str.end() - 1, str.end(), '\n'), str.end());
+        std::ofstream ofs(filename);
+        ofs << str;
         std::cout << "Level is saved" << std::endl;
     }
 }
@@ -417,8 +419,7 @@ void Scene_Level_Editor::sDoAction(const Action& action)
 {
     if (action.type() == "START")
     {
-             if (action.name() == "PAUSE")            { }
-        else if (action.name() == "QUIT")             { onEnd(); }
+             if (action.name() == "QUIT")             { onEnd(); }
         else if (action.name() == "TOGGLE_FOLLOW")    { m_follow = !m_follow; }
         else if (action.name() == "TOGGLE_TEXTURE")   { m_drawTextures = !m_drawTextures; }
         else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision; }
@@ -427,12 +428,14 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "DOWN")             { m_editor->getComponent<CInput>().down = true; }
         else if (action.name() == "LEFT")             { m_editor->getComponent<CInput>().left = true; }
         else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = true; }
-        else if (action.name() == "LEFT_CLICK")       { if (!m_adding) { grab(); } else { copy(); } }
-        else if (action.name() == "PLACE_BLOCK")      { }
+        else if (action.name() == "LEFT_CLICK")       { if (!m_adding && !m_editing) { grab(); } else if (m_adding) { copy(); } else if (m_editing) { mode(); if (m_addingPoint) { addPoint(m_mPos); } else if (m_editingPoint) { editPoint(m_mPos); } } }
         else if (action.name() == "SAVE")             { saveLevel(m_levelPath); }
-        else if (action.name() == "REMOVE")           { remove(); }
-        else if (action.name() == "SCROLL")           { select(action.pos().x); }
+        else if (action.name() == "REMOVE")           { mode(); if (m_removingPoint) { removePoint(); } else if (!m_adding && !m_editing) { remove(); } }
+        else if (action.name() == "SCROLL")           { if (m_editing) { if (action.pos().x < 0) { m_editIndex = (m_editIndex + 1) % m_editStrings.size(); } else if (action.pos().x > 0) { if (m_editIndex > 0) { m_editIndex--; } else { m_editIndex = m_editStrings.size() - 1; } } } else { select(action.pos().x); } }
         else if (action.name() == "COPY")             { copy(); }
+        else if (action.name() == "EDIT")             { if (!m_adding && m_selected != nullptr) { m_editing = !m_editing; if (m_editing) { m_editIndex = 0; edit(); } else { m_editStrings.clear(); } } }
+        else if (action.name() == "INCREASE")         { if (m_editing) { change(1); } }
+        else if (action.name() == "DECREASE")         { if (m_editing) { change(-1); } }
     }
     else if (action.type() == "END")
     {
@@ -476,6 +479,10 @@ void Scene_Level_Editor::snap(std::shared_ptr<Entity> e)
     auto& pos = e->getComponent<CTransform>().pos;
     pos.x = (floor(pos.x / m_gridSize.x) * m_gridSize.x) + m_gridSize.x / 2;
     pos.y = (floor(pos.y / m_gridSize.y) * m_gridSize.y) + m_gridSize.y / 2;
+    if (e->hasComponent<CPatrol>())
+    {
+        e->getComponent<CPatrol>().positions[0] = pos;
+    }
 }
 
 void Scene_Level_Editor::sEditor()
@@ -675,11 +682,7 @@ if (e->hasComponent<CFollowPlayer>())
     }
 
     text();
-
-    m_game->window().draw(m_tutorialText);
-    m_game->window().draw(m_walletText);
-    m_game->window().draw(m_levelText);
-    m_game->window().draw(m_entityText);
+    editText();
 }
 
 void Scene_Level_Editor::sDragAndDrop()
@@ -690,6 +693,10 @@ void Scene_Level_Editor::sDragAndDrop()
             m_selected->getComponent<CDraggable>().dragging)
         {
             m_selected->getComponent<CTransform>().pos = m_mPos;
+            if (m_selected->hasComponent<CPatrol>())
+            {
+                m_selected->getComponent<CPatrol>().positions[0] = m_mPos;
+            }
         }
     }
 }
@@ -700,6 +707,7 @@ void Scene_Level_Editor::remove()
     {
         m_selected->destroy();
         m_editor->getComponent<CDraggable>().dragging = false;
+        m_selected = nullptr;
     }
 }
 
@@ -864,5 +872,234 @@ void Scene_Level_Editor::text()
     else
     {
         m_entityText.setString("");
+    }
+    m_game->window().draw(m_entityText);
+}
+
+void Scene_Level_Editor::edit()
+{
+    m_editStrings.clear();
+    std::string line = "";
+    line = "BlockMove ";
+    line.append(m_selected->getComponent<CBoundingBox>().blockMove ? "true" : "false");
+    m_editStrings.push_back(line);
+    line = "BlockVision ";
+    line.append(m_selected->getComponent<CBoundingBox>().blockVision ? "true" : "false");
+    m_editStrings.push_back(line);
+    if (m_selected->hasComponent<CHealth>())
+    {
+        line = "Health " + std::to_string(m_selected->getComponent<CHealth>().max);
+        m_editStrings.push_back(line);
+    }
+    if (m_selected->hasComponent<CDamage>())
+    {
+        line = "Damage " + std::to_string(m_selected->getComponent<CDamage>().damage);
+        m_editStrings.push_back(line);
+    }
+    if (m_selected->hasComponent<CGravity>())
+    {
+        line = "Gravity " + std::to_string(m_selected->getComponent<CGravity>().gravity);
+        m_editStrings.push_back(line);
+    }
+    if (m_selected->hasComponent<CFollowPlayer>())
+    {
+        line = "Follow ";
+        m_editStrings.push_back(line);
+        line = "FollowSpeed " + std::to_string(m_selected->getComponent<CFollowPlayer>().speed);
+        m_editStrings.push_back(line);
+    }
+    if (m_selected->hasComponent<CPatrol>())
+    {
+        line = "Patrol ";
+        m_editStrings.push_back(line);
+        line = "PatrolSpeed " + std::to_string(m_selected->getComponent<CPatrol>().speed);
+        m_editStrings.push_back(line);
+        line = "PatrolPositions Add";
+        m_editStrings.push_back(line);
+        line = "PatrolPositions Remove";
+        m_editStrings.push_back(line);
+        for (int i = 0; i < int(m_selected->getComponent<CPatrol>().positions.size()); i++)
+        {
+            int rx = floor(int(m_selected->getComponent<CPatrol>().positions[i].x) / m_game->window().getView().getSize().x);
+            int ry = floor(int(m_selected->getComponent<CPatrol>().positions[i].y) / m_game->window().getView().getSize().y);;
+            int x = ((int(m_selected->getComponent<CPatrol>().positions[i].x) - 32) - (rx * m_game->window().getSize().x)) / 64;
+            int y = ((int(m_selected->getComponent<CPatrol>().positions[i].y) - 32) - (ry * m_game->window().getSize().y)) / 64;
+            line = "PatrolPositions Point " + std::to_string(i) + " (" + std::to_string(x) + ", " + std::to_string(y) + ")";
+            m_editStrings.push_back(line);
+        }
+    }
+}
+
+void Scene_Level_Editor::editText()
+{
+    if (m_editing)
+    {
+        m_editText.setString(m_editStrings[m_editIndex]);
+        m_editText.setPosition(m_mPos.x + m_selected->getComponent<CBoundingBox>().halfSize.x + 16, m_mPos.y);
+    }
+    else
+    {
+        m_editText.setString("");
+    }
+    m_game->window().draw(m_editText);
+}
+
+void Scene_Level_Editor::change(int d)
+{
+    std::stringstream ss;
+    std::string word;
+    ss << m_editStrings[m_editIndex];
+    ss >> word;
+
+    if (word == "BlockMove")
+    {
+        m_selected->getComponent<CBoundingBox>().blockMove = !m_selected->getComponent<CBoundingBox>().blockMove;
+    }
+    else if (word == "BlockVision")
+    {
+        m_selected->getComponent<CBoundingBox>().blockVision = !m_selected->getComponent<CBoundingBox>().blockVision;
+    }
+    else if (word == "Health")
+    {
+        if (d > 0)
+        {
+            m_selected->getComponent<CHealth>().max++;
+            m_selected->getComponent<CHealth>().current = m_selected->getComponent<CHealth>().max;
+        }
+        else if (d < 0)
+        {
+            if (m_selected->getComponent<CHealth>().max > 0)
+            {
+                m_selected->getComponent<CHealth>().max--;
+                m_selected->getComponent<CHealth>().current = m_selected->getComponent<CHealth>().max;
+            }
+        }
+    }
+    else if (word == "Damage")
+    {
+        if (d > 0)
+        {
+            m_selected->getComponent<CDamage>().damage++;
+        }
+        else if (d < 0)
+        {
+            if (m_selected->getComponent<CDamage>().damage > 0)
+            {
+                m_selected->getComponent<CDamage>().damage--;
+            }
+        }
+    }
+    else if (word == "Gravity")
+    {
+        if (d > 0)
+        {
+            m_selected->getComponent<CGravity>().gravity++;
+        }
+        else if (d < 0)
+        {
+            if (m_selected->getComponent<CGravity>().gravity > 0)
+            {
+                m_selected->getComponent<CGravity>().gravity--;
+            }
+        }
+    }
+    else if (word == "Follow")
+    {
+        std::vector<Vec2> home;
+        home.push_back(m_selected->getComponent<CFollowPlayer>().home);
+        m_selected->addComponent<CPatrol>(home, m_selected->getComponent<CFollowPlayer>().speed);
+        m_selected->removeComponent<CFollowPlayer>();
+    }
+    else if (word == "FollowSpeed")
+    {
+        if (d > 0)
+        {
+            m_selected->getComponent<CFollowPlayer>().speed++;
+        }
+        else if (d < 0)
+        {
+            if (m_selected->getComponent<CFollowPlayer>().speed > 0)
+            {
+                m_selected->getComponent<CFollowPlayer>().speed--;
+            }
+        }
+    }
+    else if (word == "Patrol")
+    {
+        m_selected->addComponent<CFollowPlayer>(m_selected->getComponent<CPatrol>().positions[0], m_selected->getComponent<CPatrol>().speed);
+        m_selected->removeComponent<CPatrol>();
+    }
+    else if (word == "PatrolSpeed")
+    {
+        if (d > 0)
+        {
+            m_selected->getComponent<CPatrol>().speed++;
+        }
+        else if (d < 0)
+        {
+            if (m_selected->getComponent<CPatrol>().speed > 0)
+            {
+                m_selected->getComponent<CPatrol>().speed--;
+            }
+        }
+    }
+    edit();
+}
+
+void Scene_Level_Editor::addPoint(Vec2& pos)
+{
+    snapPoint(pos);
+    m_selected->getComponent<CPatrol>().positions.push_back(pos);
+    edit();
+}
+
+void Scene_Level_Editor::removePoint()
+{
+    m_selected->getComponent<CPatrol>().positions.pop_back();
+    edit();
+}
+
+void Scene_Level_Editor::editPoint(Vec2& pos)
+{
+    snapPoint(pos);
+    m_selected->getComponent<CPatrol>().positions[m_selected->getComponent<CPatrol>().currentPosition] = pos;
+    edit();
+}
+
+void Scene_Level_Editor::snapPoint(Vec2& pos)
+{
+    pos.x = (floor(pos.x / m_gridSize.x) * m_gridSize.x) + m_gridSize.x / 2;
+    pos.y = (floor(pos.y / m_gridSize.y) * m_gridSize.y) + m_gridSize.y / 2;
+}
+
+void Scene_Level_Editor::mode()
+{
+    m_addingPoint = false;
+    m_removingPoint = false;
+    m_editingPoint = false;
+    std::stringstream ss;
+    std::string word;
+    ss << m_editStrings[m_editIndex];
+    ss >> word;
+
+    if (word == "PatrolPositions")
+    {
+        ss >> word;
+
+        if (word == "Add")
+        {
+            m_addingPoint = true;
+        }
+        else if (word == "Remove")
+        {
+            m_removingPoint = true;
+        }
+        else if (word == "Point")
+        {
+            m_editingPoint = true;
+            ss >> word;
+            int i = stoi(word);
+            m_selected->getComponent<CPatrol>().currentPosition = i;
+        }
     }
 }

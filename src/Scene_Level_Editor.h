@@ -46,41 +46,38 @@ class Scene_Level_Editor : public Scene
     };
 
 protected:
-    EntityManager           m_editorManager;
-    std::shared_ptr<Entity> m_selected;
-    std::shared_ptr<Entity> m_editor;
-    std::shared_ptr<Entity> m_player;
-    std::string             m_levelPath;
-    sf::Text                m_entityText;
-    int                     m_select = 0;
-    int                     m_max = 1;
-    PlayerConfig            m_playerConfig;
-    std::string             configRead;
-    const Vec2              m_gridSize = { 64, 64 };
-    Vec2                    m_mPos = Vec2(0.0f, 0.0f);
-    bool                    m_drawGrid = true;
-    std::string TilesPresent[3] = { "Bush", "BowRight", "AtkUp" };
-    TileConfig              m_tileConfig;
-    NPCConfig               m_npcConfig;
-    ItemConfig              m_itemConfig;
-    MovingTileConfig        m_movingTileConfig;
-    bool                    m_adding = false;
-    bool                    m_drawTextures = true;
-    bool                    m_drawCollision = false;
-    bool                    m_follow = false;
-    bool                    m_teleported = false;
-    bool                    m_weaponSwitch = false;
-    int                     m_roomX = 0;
-    int                     m_roomY = 0;
-    int                     m_wallet = 0;
-    int                     tileIndex = 0;
-    sf::Text                m_gridText;
-    sf::Text                m_tutorialText;
-    sf::Text                m_levelText;
-    sf::Text                m_walletText;
-    sf::Clock               m_weaponTextClock;
-    sf::Clock               m_tutorialTextClock;
-    sf::Clock               m_walletClock;
+    EntityManager            m_editorManager;
+    std::vector<std::string> m_editStrings;
+    std::shared_ptr<Entity>  m_selected;
+    std::shared_ptr<Entity>  m_editor;
+    std::shared_ptr<Entity>  m_player;
+    std::string              m_levelPath;
+    sf::Text                 m_entityText;
+    sf::Text                 m_editText;
+    int                      m_select = 0;
+    int                      m_max = 1;
+    int                      m_editIndex = 0;
+    PlayerConfig             m_playerConfig;
+    std::string              configRead;
+    const Vec2               m_gridSize = { 64, 64 };
+    Vec2                     m_mPos = Vec2(0.0f, 0.0f);
+    bool                     m_drawGrid = true;
+    TileConfig               m_tileConfig;
+    NPCConfig                m_npcConfig;
+    ItemConfig               m_itemConfig;
+    bool                     m_editing = false;
+    bool                     m_addingPoint = false;
+    bool                     m_removingPoint = false;
+    bool                     m_editingPoint = false;
+    bool                     m_adding = false;
+    bool                     m_drawTextures = true;
+    bool                     m_drawCollision = false;
+    bool                     m_follow = false;
+    bool                     m_teleported = false;
+    bool                     m_weaponSwitch = false;
+    int                      m_roomX = 0;
+    int                      m_roomY = 0;
+    sf::Text                 m_gridText;
 
     void init(const std::string& levelPath);
 
@@ -103,6 +100,14 @@ protected:
     void copy();
     void select(float s);
     void text();
+    void edit();
+    void editText();
+    void change(int d);
+    void addPoint(Vec2& pos);
+    void removePoint();
+    void editPoint(Vec2& pos);
+    void snapPoint(Vec2& pos);
+    void mode();
 
 public:
 
