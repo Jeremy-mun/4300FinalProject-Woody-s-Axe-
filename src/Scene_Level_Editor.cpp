@@ -65,6 +65,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
                 continue;
             }
+            
             if (configRead == "Item")
             {
                 config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;

@@ -11,7 +11,8 @@ Tile Ground    0  0  9  3  1  1
 Tile Ground2    0  0  8  11  1  1  
 Tile Ground    0  0  10  3  1  1  
 Tile Ground    1  0  18  1  1  1  
-Tile Ground    0  0  11  3  1  1  
+Tile Ground    0  0  11  3  1  1 
+MovingTile FloatTileSmall 0 0 1 7 1 1 Patrol 2 2 1 7 1 9
 Tile Ground    1  0  17  1  1  1  
 Tile Ground    0  0  7  3  1  1  
 Tile Ground    2  0  5  11  1  1  

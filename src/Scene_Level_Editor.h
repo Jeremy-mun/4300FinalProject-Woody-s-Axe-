@@ -16,7 +16,13 @@ class Scene_Level_Editor : public Scene
         float X, Y, CX, CY, SPEED, HEALTH, GRAVITY;
         std::string WEAPON;
     };
-
+    struct MovingTileConfig
+    {
+        float RX, RY, TX, TY, S, N;
+        std::vector<Vec2> XnY;
+        bool BM, BV;
+        std::string Name, AI;
+    };
     struct TileConfig
     {
         float RX, RY, TX, TY;
@@ -57,6 +63,7 @@ protected:
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
     ItemConfig              m_itemConfig;
+    MovingTileConfig        m_movingTileConfig;
     bool                    m_adding = false;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
