@@ -16,9 +16,9 @@ MovingTile FloatTileSmall 0 0 1 7 1 1 Patrol 2 2 1 7 1 9
 Tile Ground    1  0  17  1  1  1  
 Tile Ground    0  0  7  3  1  1  
 Tile Ground    2  0  5  11  1  1  
-Tile FloatTileBig    2  0  2  6  1  1  
+MovingTile FloatTileBig    2  0  2  6  1  1  Patrol 2 2 2 6 2 2
 Tile FloatTileSmall    2  0  6  9  1  1  
-Tile FloatTileSmall    2  0  11  7  1  1  
+MovingTile FloatTileSmall    2  0  9  7  1  1  Patrol 2 2 9 7 13 7
 Item RedPotion    1  0  6  7  0  0  
 Item RedPotion    1  0  6  7  0  0  
 Item RedPotion    1  0  6  7  0  0  
@@ -109,8 +109,8 @@ Tile Ground2    3  0  13  11  1  1
 Tile Ground2    3  0  14  11  1  1  
 Tile Ground2    3  0  15  11  1  1  
 Tile FloatTileBig    3  0  17  10  1  1  
-NPC GhostShriek     3  0  17  3  0  0  2  2  Follow  0  
-NPC GhostShriek     3  0  17  6  0  0  2  2  Follow  0  
+NPC GhostShriek     3  0  17  3  0  0  2  2  Patrol  2  2  17 3 20 3  
+NPC GhostShriek     3  0  17  6  0  0  2  2  Patrol  4  2  17 6 20 6      
 Tile FloatTileSmall    4  0  2  9  1  1  
 Tile FloatTileSmall    4  0  7  4  1  1  
 Tile FloatTileSmall    4  0  12  9  1  1  
