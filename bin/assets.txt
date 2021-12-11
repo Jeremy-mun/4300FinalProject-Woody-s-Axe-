@@ -10,7 +10,8 @@ Texture   TexAxe    	images/gothic/AxeAttack.png
 Texture   TexBow    	images/gothic/BowAttack.png 
 Texture   TexArrow	images/gothic/Arrow.png
 Texture   TexBush    	images/tloz/brown/tile_bush.png
-Texture   TexGround     images/gothic/tileGround2.png
+Texture   TexGroundGrass     images/gothic/tileGround1.png
+Texture   TexGroundDirt     images/gothic/tileGround2.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/gothic/ghost-shriek.png
 Texture   TexHellHound  images/gothic/hell-hound-run.png
@@ -34,7 +35,9 @@ Texture   TexDaggerHUD images/Inventory/CurrentDagger.png
 Texture   TexSelect    images/Inventory/Select.png
 Texture   TexFloatTileSmall    images/gothic/floatingTile1.png
 Texture   TexFloatTileBig      images/gothic/floatingTile2.png
-
+Texture   TexPlatformRight      images/gothic/platformRight.png
+Texture   TexPlatformMiddle      images/gothic/platformMiddle.png
+Texture   TexBrick      images/gothic/brick.png
 
 
 Texture   TexParallax1 images/BackGrounds/Parallax/01_Mist.png
@@ -60,7 +63,8 @@ Animation Axe	        TexAxe	        12   6
 Animation Bow	        TexBow	         9   2
 Animation Arrow		TexArrow   	 1   0
 Animation Bush    	TexBush		 1   0
-Animation Ground        TexGround        1   0
+Animation Ground        TexGroundGrass        1   0
+Animation Ground2        TexGroundDirt        1   0
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
 Animation HellHound   	TexHellHound  	 5   5
@@ -84,6 +88,9 @@ Animation DaggerHUD	 TexDaggerHUD 	1  0
 Animation Select	 TexSelect 	1  0
 Animation FloatTileSmall   TexFloatTileSmall 1 0
 Animation FloatTileBig  TexFloatTileBig 1 0
+Animation PlatformRight TexPlatformRight 1 0
+Animation PlatformMiddle TexPlatformMiddle 1 0
+Animation Brick         TexBrick 1 0
 
 Animation Parallax1	 TexParallax1 	1  0
 Animation Parallax2	 TexParallax2 	1  0

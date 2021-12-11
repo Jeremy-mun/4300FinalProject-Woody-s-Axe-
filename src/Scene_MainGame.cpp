@@ -74,7 +74,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
 
                 auto tile = m_entityManager.addEntity("tile");
 
-                if (m_tileConfig.Name == "Ground")
+                if (m_tileConfig.Name == "Ground" || m_tileConfig.Name == "FloatTileSmall" || m_tileConfig.Name == "FloatTileBig" || m_tileConfig.Name == "PlatformMiddle" || m_tileConfig.Name == "Ground2")
                 {
                     tile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_tileConfig.Name).getSize().x, m_game->assets().getAnimation(m_tileConfig.Name).getSize().y - 20), m_tileConfig.BM, m_tileConfig.BV);
                 }
@@ -1839,6 +1839,7 @@ void Scene_MainGame::sRender()
 
             for (float x = nextGridX; x < rightX; x += m_gridSize.x)
             {
+               
                 std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
                 std::string yCell = std::to_string(11 - ((int)y / (int)m_gridSize.y));
                 m_gridText.setString("(" + xCell + "," + yCell + ")");
