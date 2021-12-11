@@ -2,7 +2,7 @@ Texture   MainMenuBackground images/MainMenu_Background.png
 Texture   TexExplode    images/misc/explosion128.png        
 Texture   TexRunRight   images/gothic/run_right.png
 Texture   TexJump      	images/gothic/jump.png
-Texture   TexStandD     images/gothic/idle.png              
+Texture   TexStandD     images/gothic/crouch.png              
 Texture   TexStandR     images/gothic/idle.png
 Texture   TexStandU     images/gothic/idle.png
 Texture   TexDagger    	images/gothic/DaggerAttack.png 
@@ -32,6 +32,10 @@ Texture   TexBowHUD images/Inventory/CurrentBow.png
 Texture   TexAxeHUD images/Inventory/CurrentAxe.png
 Texture   TexDaggerHUD images/Inventory/CurrentDagger.png
 Texture   TexSelect    images/Inventory/Select.png
+Texture   TexFloatTileSmall    images/gothic/floatingTile1.png
+Texture   TexFloatTileBig      images/gothic/floatingTile2.png
+
+
 
 Texture   TexParallax1 images/BackGrounds/Parallax/01_Mist.png
 Texture   TexParallax2 images/BackGrounds/Parallax/02_Bushes.png
@@ -48,7 +52,7 @@ Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
 Animation Explosion     TexExplode     	48   2 
 Animation RunRight      TexRunRight     24   2    
 Animation Jump         	TexJump        	19   2
-Animation StandDown     TexStandD       18   6
+Animation StandDown     TexStandD       8    3
 Animation StandRight    TexStandR       18   6    
 Animation StandUp       TexStandU       18   6
 Animation Dagger        TexDagger       26   4 
@@ -78,6 +82,8 @@ Animation BowHUD	 TexBowHUD 	1  0
 Animation AxeHUD	 TexAxeHUD 	1  0
 Animation DaggerHUD	 TexDaggerHUD 	1  0
 Animation Select	 TexSelect 	1  0
+Animation FloatTileSmall   TexFloatTileSmall 1 0
+Animation FloatTileBig  TexFloatTileBig 1 0
 
 Animation Parallax1	 TexParallax1 	1  0
 Animation Parallax2	 TexParallax2 	1  0

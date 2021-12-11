@@ -109,7 +109,8 @@ Tile Ground    0  0  15  8  1  1
 Tile Ground    0  0  14  8  1  1  
 Tile Ground    0  0  16  8  1  1  
 NPC GhostShriek     0  0  13  6  0  0  2  2  Follow  2  
-MovingTile  Ground  0 0   0  4 1 1 Patrol 1 2  0 4  4 4
+MovingTile  FloatTileBig  0 0   0  4 1 1 Patrol 1 2  0 4  4 4
+MovingTile  FloatTileSmall  0 0   0  8 1 1 Patrol 1 2  0 8  4 8
 Item Coin    0  0  16  7  0  0  
 Item Coin    0  0  15  7  0  0  
 Item Coin    0  0  14  7  0  0  

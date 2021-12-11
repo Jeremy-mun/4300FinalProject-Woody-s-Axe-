@@ -104,11 +104,19 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                         config >> x >> y;
                         mTile->getComponent<CPatrol>().positions.push_back(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, x, y));
                     }
-                    mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
-                    mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
-                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
-                    continue;
                 }
+                mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
+                mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+
+                if (m_movingTileConfig.Name == "FloatTileSmall" || m_movingTileConfig.Name == "FloatTileBig")
+                {
+                    mTile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().x, m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().y - 15), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                else
+                {
+                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                continue;
             }
             if (configRead == "Item")
             {
@@ -277,8 +285,8 @@ void Scene_MainGame::spawnPlayer()
 {
     m_player = m_entityManager.addEntity("player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
-    m_player->addComponent<CState>("StandDown");
-    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandDown"), true);
+    m_player->addComponent<CState>("StandRight");
+    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandRight"), true);
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
@@ -382,6 +390,12 @@ void Scene_MainGame::sMovement()
             {
                 pState.state = "Jump";
             }
+            m_player->getComponent<CBoundingBox>().size.y = m_playerConfig.CY;
+            if (pInput.down == true)
+            {
+                pState.state = "StandDown";
+                m_player->getComponent<CBoundingBox>().size.y = m_player->getComponent<CBoundingBox>().halfSize.y;
+            }
             pTransform.scale = Vec2(-1, 1);
             
           
@@ -405,6 +419,14 @@ void Scene_MainGame::sMovement()
             if (pInput.up == true)
             {
                 pState.state = "Jump";
+            }
+            
+            m_player->getComponent<CBoundingBox>().size.y = m_playerConfig.CY;
+            if (pInput.down == true)
+            {
+                pState.state = "StandDown";
+                m_player->getComponent<CBoundingBox>().size.y = 32;
+                //pTransform.scale = Vec2(-1, 1);
             }
             pTransform.scale = Vec2(1, 1);
             m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
