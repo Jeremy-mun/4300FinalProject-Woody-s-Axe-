@@ -25,6 +25,8 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Physics.cpp" />
     <ClCompile Include="..\src\Vec2.cpp" />
+    <ClCompile Include="Scene_Credits.cpp" />
+    <ClCompile Include="Scene_GameOver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Action.h" />
@@ -42,6 +44,8 @@
     <ClInclude Include="..\src\Scene_Menu.h" />
     <ClInclude Include="..\src\Physics.h" />
     <ClInclude Include="..\src\Vec2.h" />
+    <ClInclude Include="Scene_Credits.h" />
+    <ClInclude Include="Scene_GameOver.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{08A10BC2-2DCF-4F95-A0B2-BA931971AEEA}</ProjectGuid>
