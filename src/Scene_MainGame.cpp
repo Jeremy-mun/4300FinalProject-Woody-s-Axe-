@@ -15,29 +15,29 @@ Scene_MainGame::Scene_MainGame(GameEngine* game, const std::string& levelPath)
 
 void Scene_MainGame::init(const std::string& levelPath)
 {
+    loadOptions();
     loadLevel(levelPath);
     loadParallaxBackground();
     //m_game->playSound("MusicLevel");
 
     registerAction(sf::Keyboard::Escape, "QUIT");
-    registerAction(sf::Keyboard::P, "PAUSE");
-    registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");       // Toggle follow camera
-    registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");      // Toggle drawing (T)extures
-    registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");    // Toggle drawing (C)ollision Boxes
-    registerAction(sf::Keyboard::G, "TOGGLE_GRID");         // Toggle drawing (G)rid Boxes
-    registerAction(sf::Keyboard::W, "UP");
-    registerAction(sf::Keyboard::S, "DOWN");
-    registerAction(sf::Keyboard::A, "LEFT");
-    registerAction(sf::Keyboard::D, "RIGHT");
-    registerAction(sf::Keyboard::F, "INTERACT");
-    registerAction(sf::Keyboard::E, "USE_ITEM");
-    registerAction(sf::Keyboard::Space, "ATTACK");
-    registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
-    registerAction(sf::Keyboard::O, "Zoom Map");
-    registerAction(sf::Keyboard::M, "MiniMap");
-    registerAction(sf::Keyboard::I, "OPEN_INVENTORY");
-    registerAction(sf::Keyboard::Right, "SELECT_RIGHT");
-    registerAction(sf::Keyboard::Left, "SELECT_LEFT");
+    registerAction(m_pauseKey, "PAUSE");
+    registerAction(m_toggleTextureKey, "TOGGLE_TEXTURE");      // Toggle drawing (T)extures
+    registerAction(m_toggleCollisionKey, "TOGGLE_COLLISION");    // Toggle drawing (C)ollision Boxes
+    registerAction(m_toggleGridKey, "TOGGLE_GRID");         // Toggle drawing (G)rid Boxes
+    registerAction(m_jumpKey, "UP");
+    registerAction(m_downKey, "DOWN");
+    registerAction(m_leftKey, "LEFT");
+    registerAction(m_rightKey, "RIGHT");
+    registerAction(m_interactKey, "INTERACT");
+    registerAction(m_useItemKey, "USE_ITEM");
+    registerAction(m_attackKey, "ATTACK");
+    registerAction(m_weaponSwitchKey, "WEAPON_SWITCH");
+    registerAction(m_zoomMapKey, "Zoom Map");
+    registerAction(m_miniMapKey, "MiniMap");
+    registerAction(m_inventoryKey, "OPEN_INVENTORY");
+    registerAction(m_selectRightKey, "SELECT_RIGHT");
+    registerAction(m_selectLeftKey, "SELECT_LEFT");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -48,6 +48,134 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setFont(m_game->assets().getFont("Arial"));
     m_walletText.setCharacterSize(12);
     m_walletText.setFillColor(sf::Color::White);
+}
+
+void Scene_MainGame::loadOptions()
+{
+    std::ifstream config("options.txt");
+    if (config.is_open())
+    {
+        while (config.good())
+        {
+            // Using the getPosition() function below to convert room-tile coords to game world coords
+            //set variables equal to their values from the config file.
+            config >> ConfigRead;
+            if (ConfigRead == "MusicVolume")
+            {
+                config >> m_musicVolume;
+            }
+            else if (ConfigRead == "SFXVolume")
+            {
+                config >> m_effectVolume;
+            }
+            else if (ConfigRead == "Difficulty")
+            {
+                config >> m_difficulty;
+            }
+            else if (ConfigRead == "Jump")
+            {
+                int keyval;
+                config >> keyval;
+                m_jumpKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Left")
+            {
+                int keyval;
+                config >> keyval;
+                m_leftKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Right")
+            {
+                int keyval;
+                config >> keyval;
+                m_rightKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Down")
+            {
+                int keyval;
+                config >> keyval;
+                m_downKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Pause")
+            {
+                int keyval;
+                config >> keyval;
+                m_pauseKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Interact")
+            {
+                int keyval;
+                config >> keyval;
+                m_interactKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Attack")
+            {
+                int keyval;
+                config >> keyval;
+                m_attackKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "WeaponSwitch")
+            {
+                int keyval;
+                config >> keyval;
+                m_weaponSwitchKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ZoomMap")
+            {
+                int keyval;
+                config >> keyval;
+                m_zoomMapKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "MiniMap")
+            {
+                int keyval;
+                config >> keyval;
+                m_miniMapKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Inventory")
+            {
+                int keyval;
+                config >> keyval;
+                m_inventoryKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "SelectRight")
+            {
+                int keyval;
+                config >> keyval;
+                m_selectRightKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "SelectLeft")
+            {
+                int keyval;
+                config >> keyval;
+                m_selectLeftKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "UseItem")
+            {
+                int keyval;
+                config >> keyval;
+                m_useItemKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ToggleTexture")
+            {
+                int keyval;
+                config >> keyval;
+                m_toggleTextureKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ToggleCollision")
+            {
+                int keyval;
+                config >> keyval;
+                m_toggleCollisionKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ToggleGrid")
+            {
+                int keyval;
+                config >> keyval;
+                m_toggleGridKey = sf::Keyboard::Key(keyval);
+            }
+        }
+    }
 }
 
 void Scene_MainGame::loadLevel(const std::string& filename)

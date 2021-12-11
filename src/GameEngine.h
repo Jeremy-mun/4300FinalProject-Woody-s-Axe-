@@ -20,6 +20,7 @@ protected:
     SceneMap            m_sceneMap;
     size_t              m_simulationSpeed = 1;
     bool                m_running = true;
+    bool                m_remap = false;
 
     void init(const std::string & path);
     void update();
@@ -37,6 +38,7 @@ public:
     void quit();
     void run();
                            
+    void setVolume(const std::string& soundName, int volume);
     void playSound(const std::string& soundName);
     void stopSound(const std::string& soundName);
     void pauseSound(const std::string& soundName);
@@ -44,5 +46,7 @@ public:
     sf::RenderWindow & window();
     Assets& assets();
     bool isRunning();
+    void remap();
+    std::string keyToString(sf::Keyboard::Key key);
 };
 
