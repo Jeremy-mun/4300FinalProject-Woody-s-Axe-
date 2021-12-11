@@ -20,6 +20,8 @@ Texture   TexHellHound  images/enemies/hell-hound-run.png
 Texture   TexDemonIdle  images/enemies/demon-idle.png
 Texture   TexDemonAttack  images/enemies/demon-attack.png
 Texture   TexFireSkull  images/enemies/fire-skull.png
+Texture   TexHellBeastIdle   images/enemies/hell-beast-idle.png
+Texture   TexHellBeastBurn   images/enemies/hell-beast-burn.png
 
 Texture	  TexCoin	images/Items/Coin.png
 Texture	  TexHeart	images/Items/Heart.png
@@ -76,6 +78,8 @@ Animation HellHound   	TexHellHound  	 5   5
 Animation DemonIdle	TexDemonIdle	 6   6
 Animation DemonAttack	TexDemonAttack	 11  6
 Animation FireSkull	    TexFireSkull	 8  6
+Animation HellBeastIdle	   TexHellBeastIdle	 6  4
+Animation HellBeastBurn	   TexHellBeastBurn	 6  4
 
 Animation Coin		TexCoin		 1   0
 Animation Heart		TexHeart	 1   0
