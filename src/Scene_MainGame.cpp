@@ -557,7 +557,8 @@ void Scene_MainGame::sMovement()
             if (pInput.down == true)
             {
                 pState.state = "StandDown";
-                m_player->getComponent<CBoundingBox>().size.y = 32;
+                //m_player->getComponent<CBoundingBox>().size.y = 32;
+                //m_player->getComponent<CTransform>().pos.y -= m_player->getComponent<CBoundingBox>().halfSize.y - m_playerConfig.CY;
                 //pTransform.scale = Vec2(-1, 1);
             }
             pTransform.scale = Vec2(1, 1);
@@ -732,7 +733,11 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
     if (entity->hasComponent<CInventory>())
     {
         auto& inventory = entity->getComponent<CInventory>();
-
+        
+        if (inventory.items.empty())
+        {
+            return;
+        }
         if (inventory.items[m_select] == "RedPotion")
         {
             std::cout << "Red Potion";
