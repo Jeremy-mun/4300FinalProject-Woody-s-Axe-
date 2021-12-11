@@ -153,8 +153,8 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 auto pos = e->getComponent<CTransform>().pos;
                 m_tileConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
                 m_tileConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
-                m_tileConfig.TX = ((pos.x - 32) - (m_tileConfig.RX * m_game->window().getSize().x)) / 64.0;
-                m_tileConfig.TY = ((pos.y - 32) - (m_tileConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_tileConfig.TX = ((int(pos.x) - 32) - (m_tileConfig.RX * m_game->window().getSize().x)) / 64.0;
+                m_tileConfig.TY = ((int(pos.y) - 32) - (m_tileConfig.RY * m_game->window().getSize().y)) / 64.0;
                 m_tileConfig.BM = e->getComponent<CBoundingBox>().blockMove;
                 m_tileConfig.BV = e->getComponent<CBoundingBox>().blockVision;
 
@@ -184,8 +184,8 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 auto pos = e->getComponent<CTransform>().pos;
                 m_itemConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
                 m_itemConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
-                m_itemConfig.TX = ((pos.x - 32) - (m_itemConfig.RX * m_game->window().getSize().x)) / 64.0;
-                m_itemConfig.TY = ((pos.y - 32) - (m_itemConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_itemConfig.TX = ((int(pos.x) - 32) - (m_itemConfig.RX * m_game->window().getSize().x)) / 64.0;
+                m_itemConfig.TY = ((int(pos.y) - 32) - (m_itemConfig.RY * m_game->window().getSize().y)) / 64.0;
                 m_itemConfig.BM = e->getComponent<CBoundingBox>().blockMove;
                 m_itemConfig.BV = e->getComponent<CBoundingBox>().blockVision;
 
@@ -252,6 +252,8 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
             {
                 m_playerConfig.X = m_player->getComponent<CTransform>().pos.x;
                 m_playerConfig.Y = m_player->getComponent<CTransform>().pos.y;
+                m_playerConfig.HEALTH = m_player->getComponent<CHealth>().max;
+                m_playerConfig.GRAVITY = m_player->getComponent<CGravity>().gravity;
                 config << e->tag() << " ";
                 config << m_playerConfig.X << " ";
                 config << m_playerConfig.Y << " ";
