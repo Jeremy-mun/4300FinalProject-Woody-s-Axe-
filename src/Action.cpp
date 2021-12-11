@@ -28,6 +28,13 @@ Action::Action(const std::string& name, const std::string& type, Vec2 pos)
 
 }
 
+Action::Action(const std::string& name, sf::Keyboard::Key key)
+    : m_name(name)
+    , m_key(key)
+{
+
+}
+
 const std::string & Action::name() const
 {
     return m_name;
@@ -50,4 +57,7 @@ std::string Action::toString() const
     return ss.str();
 }
                            
-
+sf::Keyboard::Key Action::key() const
+{
+    return m_key;
+}

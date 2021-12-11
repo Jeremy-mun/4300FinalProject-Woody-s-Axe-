@@ -30,6 +30,13 @@ class Scene_MainGame : public Scene
         bool BM, BV;
         std::string Name, AI;
     };
+    struct MovingTileConfig
+    {
+        float RX, RY, TX, TY, S, N;
+        std::vector<Vec2> XnY;
+        bool BM, BV;
+        std::string Name, AI;
+    };
     struct ItemConfig
     {
         float RX, RY, TX, TY;
@@ -49,14 +56,17 @@ protected:
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
     ItemConfig              m_itemConfig;
+    MovingTileConfig        m_movingTileConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = true;
     bool                    m_teleported = false;
+    bool                    inventoryOpened = false;
     int                     m_weaponSwitch = 0;
     int                     m_select = 0;
     bool                    m_playerOnGround = false;
     bool                    m_minimap = true;
+    bool                    m_collidingWithTile = false;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
@@ -72,6 +82,30 @@ protected:
     sf::Clock               m_InventoryClock;
     sf::Clock               m_time;
     int                     m_frameSinceAttack;
+    sf::CircleShape         inventorySelect;
+
+    //options
+    std::string                 ConfigRead;
+    int                         m_musicVolume = 100;
+    int                         m_effectVolume = 100;
+    std::string                 m_difficulty = "Normal";
+    sf::Keyboard::Key           m_jumpKey = sf::Keyboard::W;
+    sf::Keyboard::Key           m_leftKey = sf::Keyboard::A;
+    sf::Keyboard::Key           m_rightKey = sf::Keyboard::D;
+    sf::Keyboard::Key           m_downKey = sf::Keyboard::S;
+    sf::Keyboard::Key           m_pauseKey = sf::Keyboard::P;
+    sf::Keyboard::Key           m_interactKey = sf::Keyboard::F;
+    sf::Keyboard::Key           m_attackKey = sf::Keyboard::Space;
+    sf::Keyboard::Key           m_weaponSwitchKey = sf::Keyboard::Tab;
+    sf::Keyboard::Key           m_zoomMapKey = sf::Keyboard::O;
+    sf::Keyboard::Key           m_miniMapKey = sf::Keyboard::M;
+    sf::Keyboard::Key           m_inventoryKey = sf::Keyboard::I;
+    sf::Keyboard::Key           m_selectRightKey = sf::Keyboard::Right;
+    sf::Keyboard::Key           m_selectLeftKey = sf::Keyboard::Left;
+    sf::Keyboard::Key           m_useItemKey = sf::Keyboard::E;
+    sf::Keyboard::Key           m_toggleTextureKey = sf::Keyboard::T;
+    sf::Keyboard::Key           m_toggleGridKey = sf::Keyboard::G;
+    sf::Keyboard::Key           m_toggleCollisionKey = sf::Keyboard::C;
 
     sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10;
     std::vector<sf::String> m_parallaxBackgroundTextures = { "TexParallax1" , "TexParallax2" ,"TexParallax3" ,"TexParallax4" 
@@ -101,6 +135,7 @@ protected:
     void drawLine(const Vec2& p1, const Vec2& p2);
     void sMovement();
     void sAI();
+    void sTilesAI();
     void sArrowMovement();
     void sStatus();
     void sAnimation();
@@ -127,6 +162,7 @@ protected:
     void sInteract();
     void sUseItem(std::shared_ptr<Entity> entity);
     void select(std::string direction);
+    void loadOptions();
     
 public:
 
