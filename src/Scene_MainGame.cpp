@@ -398,18 +398,21 @@ void Scene_MainGame::sMovement()
             }
             pTransform.scale = Vec2(-1, 1);
             
-          
-            m_parallaxBackgroundSprites[8].move(sf::Vector2f(1.1f, 0.f));
-            m_parallaxBackgroundSprites[7].move(sf::Vector2f(1.2f, 0.f));
-            m_parallaxBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[5].move(sf::Vector2f(2.f, 0.f));
-            m_parallaxBackgroundSprites[4].move(sf::Vector2f(2.2f, 0.f));
-            m_parallaxBackgroundSprites[3].move(sf::Vector2f(2.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[2].move(sf::Vector2f(2.6f, 0.f));
-            m_parallaxBackgroundSprites[1].move(sf::Vector2f(2.7f, 0.f));
-            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            if (!m_collidingWithTile)
+            {
+                m_parallaxBackgroundSprites[8].move(sf::Vector2f(0.5f, 0.f));
+                m_parallaxBackgroundSprites[7].move(sf::Vector2f(0.6f, 0.f));
+                m_parallaxBackgroundSprites[6].move(sf::Vector2f(0.7f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[5].move(sf::Vector2f(1.f, 0.f));
+                m_parallaxBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
+                m_parallaxBackgroundSprites[3].move(sf::Vector2f(1.3f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[2].move(sf::Vector2f(1.8f, 0.f));
+                m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
+                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            }
+           
         }
         else if (!pInput.left && pInput.right)
         {
@@ -429,17 +432,21 @@ void Scene_MainGame::sMovement()
                 //pTransform.scale = Vec2(-1, 1);
             }
             pTransform.scale = Vec2(1, 1);
-            m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
-            m_parallaxBackgroundSprites[7].move(sf::Vector2f(-1.2f, 0.f));
-            m_parallaxBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[5].move(sf::Vector2f(-2.f, 0.f));
-            m_parallaxBackgroundSprites[4].move(sf::Vector2f(-2.2f, 0.f));
-            m_parallaxBackgroundSprites[3].move(sf::Vector2f(-2.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[2].move(sf::Vector2f(-2.6f, 0.f));
-            m_parallaxBackgroundSprites[1].move(sf::Vector2f(-2.7f, 0.f));
-            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            if (!m_collidingWithTile)
+            {
+                m_parallaxBackgroundSprites[8].move(sf::Vector2f(-0.5f, 0.f));
+                m_parallaxBackgroundSprites[7].move(sf::Vector2f(-0.6f, 0.f));
+                m_parallaxBackgroundSprites[6].move(sf::Vector2f(-0.7f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[5].move(sf::Vector2f(-1.f, 0.f));
+                m_parallaxBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
+                m_parallaxBackgroundSprites[3].move(sf::Vector2f(-1.3f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[2].move(sf::Vector2f(-1.8f, 0.f));
+                m_parallaxBackgroundSprites[1].move(sf::Vector2f(-1.9f, 0.f));
+                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            }
+            
         }
         else if (!pInput.left && pInput.right)
         {
@@ -922,7 +929,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerTransform = m_player->getComponent<CTransform>();
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
-    
+    m_collidingWithTile = false;
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -952,13 +959,16 @@ void Scene_MainGame::sTileCollision()
                 }
                 else
                 {
+                    
                     if (playerTransform.pos.x > tileTransform.pos.x)
                     {
                         playerTransform.pos.x += playerTileOverlap.x;
+                        m_collidingWithTile = true;
                     }
                     else
                     {
                         playerTransform.pos.x -= playerTileOverlap.x;
+                        m_collidingWithTile = true;
                     }
                 }
             }

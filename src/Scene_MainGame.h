@@ -65,6 +65,7 @@ protected:
     int                     m_select = 0;
     bool                    m_playerOnGround = false;
     bool                    m_minimap = true;
+    bool                    m_collidingWithTile = false;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
