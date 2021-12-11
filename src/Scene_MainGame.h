@@ -61,6 +61,7 @@ protected:
     bool                    m_drawCollision = false;
     bool                    m_follow = true;
     bool                    m_teleported = false;
+    bool                    inventoryOpened = false;
     int                     m_weaponSwitch = 0;
     int                     m_select = 0;
     bool                    m_playerOnGround = false;
@@ -81,6 +82,7 @@ protected:
     sf::Clock               m_InventoryClock;
     sf::Clock               m_time;
     int                     m_frameSinceAttack;
+    sf::CircleShape         inventorySelect;
 
     //options
     std::string                 ConfigRead;
