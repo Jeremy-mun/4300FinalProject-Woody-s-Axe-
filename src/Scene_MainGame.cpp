@@ -509,6 +509,8 @@ void Scene_MainGame::sMovement()
         {
             pState.state = "Jump";
         }
+        m_player->removeComponent<CBoundingBox>();
+        m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
         // if only one x directional key is pressed move in that direction otherwise stop.
         if (pInput.left && !pInput.right)
         {
@@ -519,11 +521,12 @@ void Scene_MainGame::sMovement()
             {
                 pState.state = "Jump";
             }
-            m_player->getComponent<CBoundingBox>().size.y = m_playerConfig.CY;
+            
             if (pInput.down == true)
             {
                 pState.state = "StandDown";
-                m_player->getComponent<CBoundingBox>().size.y = m_player->getComponent<CBoundingBox>().halfSize.y;
+                m_player->removeComponent<CBoundingBox>();
+                m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
             }
             pTransform.scale = Vec2(-1, 1);
             
@@ -552,14 +555,18 @@ void Scene_MainGame::sMovement()
             {
                 pState.state = "Jump";
             }
-            
-            m_player->getComponent<CBoundingBox>().size.y = m_playerConfig.CY;
+            m_player->removeComponent<CBoundingBox>();
+            m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
             if (pInput.down == true)
             {
                 pState.state = "StandDown";
-                m_player->getComponent<CBoundingBox>().size.y = 32;
+                //m_player->getComponent<CBoundingBox>().size.y = 32;
+                //m_player->getComponent<CTransform>().pos.y -= m_player->getComponent<CBoundingBox>().halfSize.y - m_playerConfig.CY;
                 //pTransform.scale = Vec2(-1, 1);
+                m_player->removeComponent<CBoundingBox>();
+                m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX,20),true, false);
             }
+
             pTransform.scale = Vec2(1, 1);
             if (!m_collidingWithTile)
             {
@@ -732,7 +739,11 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
     if (entity->hasComponent<CInventory>())
     {
         auto& inventory = entity->getComponent<CInventory>();
-
+        
+        if (inventory.items.empty())
+        {
+            return;
+        }
         if (inventory.items[m_select] == "RedPotion")
         {
             std::cout << "Red Potion";
@@ -1752,34 +1763,12 @@ void Scene_MainGame::drawMinimap()
 {
     sf::View minimapView = m_game->window().getView();
     minimapView.setViewport(sf::FloatRect(0.74f, 0.01f, 0.25f, 0.25f));
-    minimapView.zoom(2.0f);
+    minimapView.zoom(2.5f);
     m_game->window().setView(minimapView);
-
-    float leftX = m_game->window().getView().getCenter().x - width() / 2;
-    float rightX = leftX + width() + m_gridSize.x;
-    float nextGridX = leftX - ((int)leftX % (int)m_gridSize.x);
-
-    for (float x = nextGridX; x < rightX; x += m_gridSize.x)
-    {
-        drawLine(Vec2(x, 0), Vec2(x, height()));
-    }
-
-    for (float y = 0; y < height(); y += m_gridSize.y)
-    {
-        drawLine(Vec2(leftX, height() - y), Vec2(rightX, height() - y));
-
-        for (float x = nextGridX; x < rightX; x += m_gridSize.x)
-        {
-            std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
-            std::string yCell = std::to_string((int)y / (int)m_gridSize.y);
-            m_gridText.setString("(" + xCell + "," + yCell + ")");
-            m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
-            m_game->window().draw(m_gridText);
-        }
-    }
 
     for (auto e : m_entityManager.getEntities())
     {
+        
         if (e->hasComponent<CAnimation>())
         {
             m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
