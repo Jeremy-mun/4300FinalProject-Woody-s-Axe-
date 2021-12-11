@@ -714,7 +714,7 @@ void Scene_MainGame::sDoAction(const Action& action)
             m_game->window().setView(view);
         }
         else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
-        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; drawInventory(); }
+        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; inventoryOpened = true; drawInventory(); }
     }
     else if (action.type() == "END")
     {
@@ -830,6 +830,7 @@ void Scene_MainGame::sInteract()
 
 void Scene_MainGame::select(std::string direction)
 {
+    m_InventoryClock.restart();
     if (m_player->getComponent<CInventory>().items.size() == 0)
     {
         m_select = 0;
@@ -1652,10 +1653,10 @@ void Scene_MainGame::sHUD()
     sf::View view = m_game->window().getView();
     //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - m_gridSize.x * 5, m_gridSize.y / 2);
+    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - m_gridSize.x * 4, m_gridSize.y / 2);
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
-    Vec2 weaponHolderPos = Vec2(InventoryPos.x - weaponHolderOffset.x, weaponHolderOffset.y);
+    Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 4 + m_gridSize.x / 2, InventoryPos.y + m_gridSize.x + 10);
 
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
@@ -1666,7 +1667,8 @@ void Scene_MainGame::sHUD()
 
     if (weaponHolderPos.x < view.getSize().x / 2)
     {
-        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 5 + m_gridSize.x/2;
+        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 4 + m_gridSize.x/2;
+        weaponHolderPos.y = InventoryPos.y + m_gridSize.x + 10;
     }
 
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -1681,7 +1683,8 @@ void Scene_MainGame::sHUD()
         inventory->getComponent<CTransform>().pos = InventoryPos;
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
-            //inventory->destroy();
+            inventory->destroy();
+            inventoryOpened = false;
         }
     }
     
@@ -1700,7 +1703,8 @@ void Scene_MainGame::sHUD()
         }
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
-            //inventoryItems->destroy();
+            inventoryItems->destroy();
+            
         }
     }
     inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 3 + m_gridSize.x / 2), InventoryPos.y);
@@ -1709,6 +1713,7 @@ void Scene_MainGame::sHUD()
 
 void Scene_MainGame::sDrawInventoryItems()
 {
+    inventoryOpened = true;
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
     {
         inventoryItems->destroy();
@@ -1974,20 +1979,19 @@ void Scene_MainGame::sRender()
         }
     }
 
-
-    /*inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
-        inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
-        inventoryItemPositionOffset += 64;*/
-        
-        inventorySelect.setSize(sf::Vector2f(50, 50));
-        inventorySelect.setOrigin(sf::Vector2f(25, 25));
+    if (inventoryOpened)
+    {
+        inventorySelect.setRadius(23.5);
+        //inventorySelect.setSize(sf::Vector2f(45, 45));
+        inventorySelect.setOrigin(sf::Vector2f(45 / 2 + 1, 45 / 2));
         //inventorySelect.setPosition(getPosition(0,0,5,0).x, getPosition(0, 0, 5, 0).y);
-        inventorySelect.setFillColor(sf::Color(0, 0, 0,0));
+        inventorySelect.setFillColor(sf::Color(0, 0, 0, 0));
         inventorySelect.setOutlineColor(sf::Color(196, 70, 70, 255));
         inventorySelect.setOutlineThickness(5);
         m_game->window().draw(inventorySelect);
+    }
     
-   
+  
 
     if (m_drawGrid)
     {
