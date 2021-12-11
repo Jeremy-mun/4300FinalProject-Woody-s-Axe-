@@ -30,6 +30,13 @@ class Scene_MainGame : public Scene
         bool BM, BV;
         std::string Name, AI;
     };
+    struct MovingTileConfig
+    {
+        float RX, RY, TX, TY, S, N;
+        std::vector<Vec2> XnY;
+        bool BM, BV;
+        std::string Name, AI;
+    };
     struct ItemConfig
     {
         float RX, RY, TX, TY;
@@ -49,6 +56,7 @@ protected:
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
     ItemConfig              m_itemConfig;
+    MovingTileConfig        m_movingTileConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = true;

@@ -88,6 +88,28 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 tile->addComponent<CDraggable>();
                 continue;
             }
+            if (configRead == "MovingTile")
+            {
+                config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
+                auto mTile = m_entityManager.addEntity("tile");
+                mTile->addComponent<CDraggable>();
+                if (m_movingTileConfig.AI == "Patrol")
+                {
+                    std::vector<Vec2> initialPatrolPos;
+                    mTile->addComponent<CPatrol>(initialPatrolPos, m_movingTileConfig.S);
+                    config >> m_movingTileConfig.N;
+                    for (int i = 0; i < m_movingTileConfig.N; i++)
+                    {
+                        float x, y;
+                        config >> x >> y;
+                        mTile->getComponent<CPatrol>().positions.push_back(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, x, y));
+                    }
+                    mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
+                    mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                    continue;
+                }
+            }
             if (configRead == "Item")
             {
                 config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;
@@ -1786,7 +1808,7 @@ void Scene_MainGame::sRender()
             for (float x = nextGridX; x < rightX; x += m_gridSize.x)
             {
                 std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
-                std::string yCell = std::to_string(11 - (int)y / (int)m_gridSize.y);
+                std::string yCell = std::to_string(11 - ((int)y / (int)m_gridSize.y));
                 m_gridText.setString("(" + xCell + "," + yCell + ")");
                 m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
                 m_game->window().draw(m_gridText);
