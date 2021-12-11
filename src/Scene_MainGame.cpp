@@ -469,6 +469,7 @@ void Scene_MainGame::update()
         m_frameSinceAttack++;
     }
     sAI();
+    sTilesAI();
     sMovement();
     sDragAndDrop();
     sArrowMovement();
@@ -870,7 +871,7 @@ void Scene_MainGame::select(std::string direction)
 
 void Scene_MainGame::sAI()
 {
-    for (auto e : m_entityManager.getEntities())
+    for (auto e : m_entityManager.getEntities("npc"))
     {
         if (e->hasComponent<CFollowPlayer>())
         {
@@ -962,33 +963,29 @@ void Scene_MainGame::sAI()
                 desired = desired / length;
                 e->getComponent<CTransform>().pos.x += e->getComponent<CPatrol>().speed * desired.x;
                 e->getComponent<CTransform>().pos.y += e->getComponent<CPatrol>().speed * desired.y;
-                if (e->hasComponent<CState>())
+                if (desired.x != 0)
                 {
-                    if (desired.x != 0)
+                    if (desired.x < 0)
                     {
-                        e->getComponent<CState>().state = "OctorokRight";
-                        if (desired.x < 0)
-                        {
-                            e->getComponent<CTransform>().scale.x = -1;
-                        }
-                        else
-                        {
-                            e->getComponent<CTransform>().scale.x = 1;
-                        }
+                        e->getComponent<CTransform>().scale.x = -1;
                     }
                     else
                     {
-                        e->getComponent<CState>().state = "OctorokUp";
-                        if (desired.y < 0)
-                        {
-                            e->getComponent<CTransform>().scale.y = 1;
-                        }
-                        else
-                        {
-                            e->getComponent<CTransform>().scale.y = -1;
-                        }
+                        e->getComponent<CTransform>().scale.x = 1;
                     }
                 }
+                else
+                {/*
+                    if (desired.y < 0)
+                    {
+                        e->getComponent<CTransform>().scale.y = 1;
+                    }
+                    else
+                    {
+                        e->getComponent<CTransform>().scale.y = -1;
+                    }*/
+                }
+                
             }
             else
             {
@@ -1002,6 +999,39 @@ void Scene_MainGame::sAI()
     }
 }
     
+
+void Scene_MainGame::sTilesAI()
+{
+    for (auto e : m_entityManager.getEntities("tile"))
+    {
+        // Implementing Patrol behavior
+        if (e->hasComponent<CPatrol>())
+        {
+            Vec2 target = e->getComponent<CPatrol>().positions[e->getComponent<CPatrol>().currentPosition];
+            int nextLoc = e->getComponent<CPatrol>().currentPosition + 1;
+            Vec2 desired = target - e->getComponent<CTransform>().pos;
+            float length = desired.dist(Vec2(0, 0));
+            int numofWaypoints = e->getComponent<CPatrol>().positions.size();
+
+            if (int(length) > 1)
+            {
+                desired = desired / length;
+                e->getComponent<CTransform>().pos.x += e->getComponent<CPatrol>().speed * desired.x;
+                e->getComponent<CTransform>().pos.y += e->getComponent<CPatrol>().speed * desired.y;
+               
+
+            }
+            else
+            {
+                e->getComponent<CPatrol>().currentPosition++;
+                if (e->getComponent<CPatrol>().currentPosition == numofWaypoints)
+                {
+                    e->getComponent<CPatrol>().currentPosition = 0;
+                }
+            }
+        }
+    }
+}
 void Scene_MainGame::sStatus()
 {
     // Setting up LifeSpan functionality
@@ -1083,7 +1113,7 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y-2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    m_playerOnGround = true;
+                    //m_playerOnGround = true;
                 }
                 else
                 {

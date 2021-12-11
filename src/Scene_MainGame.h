@@ -133,6 +133,7 @@ protected:
     void drawLine(const Vec2& p1, const Vec2& p2);
     void sMovement();
     void sAI();
+    void sTilesAI();
     void sArrowMovement();
     void sStatus();
     void sAnimation();

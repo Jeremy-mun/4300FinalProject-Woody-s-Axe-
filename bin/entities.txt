@@ -9,6 +9,7 @@ Tile PlatformMiddle     0  0  0  9  1  1
 NPC HellHound      0  0  0  0  0  0  1  1  Follow  0
 NPC GhostShriek    0  0  0  0  0  0  2  2  Follow  0
 NPC DemonIdle      0  0  0  0  0  0  3  3  Follow  0
+NPC FireSkull      0  0  0  0  0  0  3  3  Follow  0
 
 Item Coin          0  0  0  0  0  0
 Item Heart         0  0  0  0  0  0

@@ -12,11 +12,15 @@ Texture   TexArrow	images/gothic/Arrow.png
 Texture   TexBush    	images/tloz/brown/tile_bush.png
 Texture   TexGroundGrass     images/gothic/tileGround1.png
 Texture   TexGroundDirt     images/gothic/tileGround2.png
+
+
 Texture   TexTektite    images/tloz/tektite.png
-Texture   TexGhostShriek images/gothic/ghost-shriek.png
-Texture   TexHellHound  images/gothic/hell-hound-run.png
-Texture   TexDemonIdle  images/gothic/demon-idle.png
-Texture   TexDemonAttack  images/gothic/demon-attack.png
+Texture   TexGhostShriek images/enemies/ghost-shriek.png
+Texture   TexHellHound  images/enemies/hell-hound-run.png
+Texture   TexDemonIdle  images/enemies/demon-idle.png
+Texture   TexDemonAttack  images/enemies/demon-attack.png
+Texture   TexFireSkull  images/enemies/fire-skull.png
+
 Texture	  TexCoin	images/Items/Coin.png
 Texture	  TexHeart	images/Items/Heart.png
 Texture	  TexRedPotion	images/Items/RedPotion.png
@@ -65,11 +69,14 @@ Animation Arrow		TexArrow   	 1   0
 Animation Bush    	TexBush		 1   0
 Animation Ground        TexGroundGrass        1   0
 Animation Ground2        TexGroundDirt        1   0
+
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
 Animation HellHound   	TexHellHound  	 5   5
 Animation DemonIdle	TexDemonIdle	 6   6
 Animation DemonAttack	TexDemonAttack	 11  6
+Animation FireSkull	    TexFireSkull	 8  6
+
 Animation Coin		TexCoin		 1   0
 Animation Heart		TexHeart	 1   0
 Animation RedPotion	TexRedPotion	 1   0
