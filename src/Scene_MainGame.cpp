@@ -1653,10 +1653,10 @@ void Scene_MainGame::sHUD()
     sf::View view = m_game->window().getView();
     //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - m_gridSize.x * 4, m_gridSize.y / 2);
+    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - (m_gridSize.x * 5 + 32), m_gridSize.y / 2);
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
-    Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 4 + m_gridSize.x / 2, InventoryPos.y + m_gridSize.x + 10);
+    Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
 
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
@@ -1667,8 +1667,8 @@ void Scene_MainGame::sHUD()
 
     if (weaponHolderPos.x < view.getSize().x / 2)
     {
-        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 4 + m_gridSize.x/2;
-        weaponHolderPos.y = InventoryPos.y + m_gridSize.x + 10;
+        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 5;
+        weaponHolderPos.y = InventoryPos.y;
     }
 
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -1693,7 +1693,7 @@ void Scene_MainGame::sHUD()
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
     {
         
-        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - (m_gridSize.x*3 + m_gridSize.x/2) + inventoryItemPositionOffset;
+        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - (m_gridSize.x*4) + inventoryItemPositionOffset;
         inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
         
@@ -1707,7 +1707,7 @@ void Scene_MainGame::sHUD()
             
         }
     }
-    inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 3 + m_gridSize.x / 2), InventoryPos.y);
+    inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 4), InventoryPos.y);
     
 }
 
