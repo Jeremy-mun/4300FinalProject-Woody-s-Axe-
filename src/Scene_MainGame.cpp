@@ -1,5 +1,6 @@
                           
 #include "Scene_MainGame.h"
+#include "Scene_GameOver.h"
 #include "Common.h"
 #include "Physics.h"
 #include "Assets.h"
@@ -229,6 +230,7 @@ void Scene_MainGame::drawParallaxBackground()
 
     
 }
+
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
@@ -279,7 +281,7 @@ void Scene_MainGame::update()
     m_entityManager.update();
     if (!m_player->isActive())
     {
-        spawnPlayer();
+        m_game->changeScene("GameOver", std::make_shared<Scene_GameOver>(m_game, m_levelPath));
     }
     // When the game is paused
     if (m_paused)
@@ -1225,6 +1227,7 @@ void Scene_MainGame::sEnemyCollision() {
         
     }
 }
+
 void Scene_MainGame::sAnimation()
 {
 
@@ -1501,6 +1504,7 @@ void Scene_MainGame::drawInventory()
     sDrawInventoryItems();
     
 }
+
 void Scene_MainGame::drawMinimap()
 {
     sf::View minimapView = m_game->window().getView();
@@ -1589,7 +1593,6 @@ void Scene_MainGame::drawLine(const Vec2& p1, const Vec2& p2)
     sf::Vertex line[] = { sf::Vector2f(p1.x, p1.y), sf::Vector2f(p2.x, p2.y) };
     m_game->window().draw(line, 2, sf::Lines);
 }
-
 
 void Scene_MainGame::sRender()
 {

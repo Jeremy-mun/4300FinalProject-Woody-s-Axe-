@@ -79,6 +79,7 @@ void Scene_Menu::sDoAction(const Action& action)
         }
     }
 }
+
 Vec2 Scene_Menu::getPosition(int rx, int ry, int tx, int ty) const
 {
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
