@@ -41,14 +41,14 @@ void Scene_MainGame::init(const std::string& levelPath)
     registerAction(m_selectLeftKey, "SELECT_LEFT");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
-    m_levelText.setFont(m_game->assets().getFont("Arial"));
+    m_levelText.setFont(m_game->assets().getFont("Gypsy"));
     m_levelText.setFillColor(sf::Color::White);
-    m_tutorialText.setFont(m_game->assets().getFont("Arial"));
+    m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
     m_tutorialText.setCharacterSize(20);
     m_tutorialText.setFillColor(sf::Color::White);
-    m_walletText.setFont(m_game->assets().getFont("Arial"));
-    m_walletText.setCharacterSize(12);
-    m_walletText.setFillColor(sf::Color::White);
+    m_walletText.setFont(m_game->assets().getFont("Gypsy"));
+    m_walletText.setCharacterSize(36);
+    m_walletText.setFillColor(sf::Color(137, 3, 6));
 }
 
 void Scene_MainGame::loadOptions()
@@ -461,7 +461,7 @@ void Scene_MainGame::update()
     {
         m_levelText.setString("Paused"); 
         m_levelText.setCharacterSize(24);
-        m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));
+        /*m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));*/
         m_game->pauseSound("MusicLevel");
         
         return;
@@ -1398,7 +1398,7 @@ void Scene_MainGame::sCoinCollision()
         {
             //m_game->playSound("GetItem");
             m_player->getComponent<CInventory>().money++;
-            m_walletText.setString("    +1 coin\n   Coins: x" + std::to_string(m_player->getComponent<CInventory>().money));
+            drawInventory();
             coin->destroy();
         }
     }
@@ -1616,14 +1616,10 @@ void Scene_MainGame::sCamera()
     {
         m_tutorialText.setString("");
     }
-    if (m_walletClock.getElapsedTime().asSeconds() > 1)
-    {
-        m_walletText.setString("");
-    }
 
     m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y + 128));
     m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
-    m_walletText.setPosition(sf::Vector2f(levelTextPos.x + 5, levelTextPos.y + 15));
+    
 #pragma endregion
 
     // then set the window view
@@ -1685,11 +1681,22 @@ void Scene_MainGame::sHUD()
         weaponHolderPos.y = InventoryPos.y;
     }
 
+    
+    
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y);
+
+    
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
     {
         weaponHolder->getComponent<CTransform>().pos = weaponHolderPos;
     }
 
+    for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
+    {
+        coinHUD->getComponent<CTransform>().pos = coinHUDPosition;
+        m_walletText.setPosition(sf::Vector2f(coinHUDPosition.x + 32, coinHUDPosition.y - 25));
+        m_walletText.setString("x" + std::to_string(m_player->getComponent<CInventory>().money));
+    }
 
     // Setting inventory position relative to player
     for (auto& inventory : m_entityManager.getEntities("inventory"))
@@ -1699,9 +1706,18 @@ void Scene_MainGame::sHUD()
         {
             inventory->destroy();
             inventoryOpened = false;
+            m_walletText.setString("");
         }
     }
-    
+    for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
+    {
+        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
+        {
+            coinHUD->destroy();
+            m_walletText.setString("");
+            
+        }
+    }
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
@@ -1732,6 +1748,17 @@ void Scene_MainGame::sDrawInventoryItems()
     {
         inventoryItems->destroy();
     }
+    for (auto& coinHud : m_entityManager.getEntities("CoinHUD"))
+    {
+        coinHud->destroy();
+    }
+
+    auto coin = m_entityManager.addEntity("CoinHUD");
+    
+    coin->addComponent<CTransform>(getPosition(0,0,0,0));
+    coin->addComponent<CAnimation>(m_game->assets().getAnimation("CoinHUD"), true);
+    coin->addComponent<CBoundingBox>(m_game->assets().getAnimation("CoinHUD").getSize(), m_itemConfig.BM, m_itemConfig.BV);
+
 
     auto& items = m_player->getComponent<CInventory>().items;
     if (items.size() != 0)

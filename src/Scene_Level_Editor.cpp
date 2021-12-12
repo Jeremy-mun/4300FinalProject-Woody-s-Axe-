@@ -545,7 +545,7 @@ void Scene_Level_Editor::sRender()
     sf::RectangleShape tick({ 1.0f, 6.0f });
     tick.setFillColor(sf::Color::Black);
 
-
+    
     // draw all Entity textures / animations
     if (m_drawTextures)
     {

@@ -24,6 +24,7 @@ Texture   TexHellBeastIdle   images/enemies/hell-beast-idle.png
 Texture   TexHellBeastBurn   images/enemies/hell-beast-burn.png
 
 Texture	  TexCoin	images/Items/Coin.png
+Texture   TexCoinHUD	images/Items/Coin2.png
 Texture	  TexHeart	images/Items/Heart.png
 Texture	  TexRedPotion	images/Items/RedPotion.png
 Texture	  TexGreenPotion images/Items/GreenPotion.png
@@ -82,6 +83,7 @@ Animation HellBeastIdle	   TexHellBeastIdle	 6  4
 Animation HellBeastBurn	   TexHellBeastBurn	 6  4
 
 Animation Coin		TexCoin		 1   0
+Animation CoinHUD	TexCoinHUD	 1   0
 Animation Heart		TexHeart	 1   0
 Animation RedPotion	TexRedPotion	 1   0
 Animation GreenPotion	TexGreenPotion	 1   0
