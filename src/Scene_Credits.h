@@ -16,14 +16,15 @@ protected:
 	std::vector<std::string>  m_menuStrings;
 	sf::Text                  m_menuText;
 	size_t                    m_selectedMenuIndex = 0;
-	Vec2                      menuTextPos = getPosition(0, 0, 8, 1);
-	Vec2                      menuOptionsPos = getPosition(0, 0, 9, 3);
+	Vec2                      menuTextPos = getPosition(0, 0, 7, 1);
+	Vec2                      menuOptionsPos = getPosition(0, 0, 6, 4);
 
 	void loadCredits();
 	void init();
 	void update();
 	void onEnd();
 	void sDoAction(const Action& action);
+	void scroll();
 
 public:
 
