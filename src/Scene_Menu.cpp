@@ -4,6 +4,7 @@
 #include "Scene_Level_Editor.h"
 #include "Scene_Level_Editor_Menu.h"
 #include "Scene_Options.h"
+#include "Scene_Credits.h"
 #include "Common.h"
 #include "Assets.h"
 #include "GameEngine.h"
@@ -30,6 +31,7 @@ void Scene_Menu::init()
     m_menuStrings.push_back("Level  Editor");
     m_menuStrings.push_back("Load Level");
     m_menuStrings.push_back("Options");
+    m_menuStrings.push_back("Credits");
 
     m_levelPaths.push_back("levels/level1.txt");
     m_levelPaths.push_back("levels/level2.txt");
@@ -77,7 +79,11 @@ void Scene_Menu::sDoAction(const Action& action)
             }
             else if (m_selectedMenuIndex == 5)
             {
-                m_game->changeScene("Level_Editor_Menu", std::make_shared<Scene_Options>(m_game));
+                m_game->changeScene("Options", std::make_shared<Scene_Options>(m_game));
+            }
+            else if (m_selectedMenuIndex == 6)
+            {
+                m_game->changeScene("Credits", std::make_shared<Scene_Credits>(m_game));
             }
         }
         else if (action.name() == "QUIT")
