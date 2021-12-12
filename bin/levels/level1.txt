@@ -57,5 +57,7 @@ Tile Ground    0  1  11  11  1  1
 NPC GhostShriek     0  0  1  4  0  0  2  1  Follow  0  
 NPC HellHound     0  0  1  7  0  0  2  1  Follow  0  
 NPC DemonIdle     0  0  8  3  0  0  2  1  Follow  2  
-NPC HellHound     0  0  3  7  0  0  3  3  Patrol  4  4  3  7  4  1  13  1  13  7  
-Player 415 474 40 64 4 20 3
+NPC HellHound     0  0  14  6  0  0  3  3  Patrol  4  8  14  6  4  1  13  1  13  7  7  10  12  9  9  7  14  6  
+NPC GhostShriek     0  0  18  7  0  0  2  2  Patrol  2  1  18  7  
+NPC GhostShriek     1  0  2  7  0  0  2  2  Patrol  2  1  2  7  
+Player 608 672 40 64 4 20 3
