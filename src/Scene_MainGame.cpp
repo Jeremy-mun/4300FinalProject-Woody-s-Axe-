@@ -16,29 +16,29 @@ Scene_MainGame::Scene_MainGame(GameEngine* game, const std::string& levelPath)
 
 void Scene_MainGame::init(const std::string& levelPath)
 {
+    loadOptions();
     loadLevel(levelPath);
     loadParallaxBackground();
     //m_game->playSound("MusicLevel");
 
     registerAction(sf::Keyboard::Escape, "QUIT");
-    registerAction(sf::Keyboard::P, "PAUSE");
-    registerAction(sf::Keyboard::Y, "TOGGLE_FOLLOW");       // Toggle follow camera
-    registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");      // Toggle drawing (T)extures
-    registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");    // Toggle drawing (C)ollision Boxes
-    registerAction(sf::Keyboard::G, "TOGGLE_GRID");         // Toggle drawing (G)rid Boxes
-    registerAction(sf::Keyboard::W, "UP");
-    registerAction(sf::Keyboard::S, "DOWN");
-    registerAction(sf::Keyboard::A, "LEFT");
-    registerAction(sf::Keyboard::D, "RIGHT");
-    registerAction(sf::Keyboard::F, "INTERACT");
-    registerAction(sf::Keyboard::E, "USE_ITEM");
-    registerAction(sf::Keyboard::Space, "ATTACK");
-    registerAction(sf::Keyboard::Tab, "WEAPON_SWITCH");
-    registerAction(sf::Keyboard::O, "Zoom Map");
-    registerAction(sf::Keyboard::M, "MiniMap");
-    registerAction(sf::Keyboard::I, "OPEN_INVENTORY");
-    registerAction(sf::Keyboard::Right, "SELECT_RIGHT");
-    registerAction(sf::Keyboard::Left, "SELECT_LEFT");
+    registerAction(m_pauseKey, "PAUSE");
+    registerAction(m_toggleTextureKey, "TOGGLE_TEXTURE");      // Toggle drawing (T)extures
+    registerAction(m_toggleCollisionKey, "TOGGLE_COLLISION");    // Toggle drawing (C)ollision Boxes
+    registerAction(m_toggleGridKey, "TOGGLE_GRID");         // Toggle drawing (G)rid Boxes
+    registerAction(m_jumpKey, "UP");
+    registerAction(m_downKey, "DOWN");
+    registerAction(m_leftKey, "LEFT");
+    registerAction(m_rightKey, "RIGHT");
+    registerAction(m_interactKey, "INTERACT");
+    registerAction(m_useItemKey, "USE_ITEM");
+    registerAction(m_attackKey, "ATTACK");
+    registerAction(m_weaponSwitchKey, "WEAPON_SWITCH");
+    registerAction(m_zoomMapKey, "Zoom Map");
+    registerAction(m_miniMapKey, "MiniMap");
+    registerAction(m_inventoryKey, "OPEN_INVENTORY");
+    registerAction(m_selectRightKey, "SELECT_RIGHT");
+    registerAction(m_selectLeftKey, "SELECT_LEFT");
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Arial"));
@@ -49,6 +49,134 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setFont(m_game->assets().getFont("Arial"));
     m_walletText.setCharacterSize(12);
     m_walletText.setFillColor(sf::Color::White);
+}
+
+void Scene_MainGame::loadOptions()
+{
+    std::ifstream config("options.txt");
+    if (config.is_open())
+    {
+        while (config.good())
+        {
+            // Using the getPosition() function below to convert room-tile coords to game world coords
+            //set variables equal to their values from the config file.
+            config >> ConfigRead;
+            if (ConfigRead == "MusicVolume")
+            {
+                config >> m_musicVolume;
+            }
+            else if (ConfigRead == "SFXVolume")
+            {
+                config >> m_effectVolume;
+            }
+            else if (ConfigRead == "Difficulty")
+            {
+                config >> m_difficulty;
+            }
+            else if (ConfigRead == "Jump")
+            {
+                int keyval;
+                config >> keyval;
+                m_jumpKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Left")
+            {
+                int keyval;
+                config >> keyval;
+                m_leftKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Right")
+            {
+                int keyval;
+                config >> keyval;
+                m_rightKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Down")
+            {
+                int keyval;
+                config >> keyval;
+                m_downKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Pause")
+            {
+                int keyval;
+                config >> keyval;
+                m_pauseKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Interact")
+            {
+                int keyval;
+                config >> keyval;
+                m_interactKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Attack")
+            {
+                int keyval;
+                config >> keyval;
+                m_attackKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "WeaponSwitch")
+            {
+                int keyval;
+                config >> keyval;
+                m_weaponSwitchKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ZoomMap")
+            {
+                int keyval;
+                config >> keyval;
+                m_zoomMapKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "MiniMap")
+            {
+                int keyval;
+                config >> keyval;
+                m_miniMapKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "Inventory")
+            {
+                int keyval;
+                config >> keyval;
+                m_inventoryKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "SelectRight")
+            {
+                int keyval;
+                config >> keyval;
+                m_selectRightKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "SelectLeft")
+            {
+                int keyval;
+                config >> keyval;
+                m_selectLeftKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "UseItem")
+            {
+                int keyval;
+                config >> keyval;
+                m_useItemKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ToggleTexture")
+            {
+                int keyval;
+                config >> keyval;
+                m_toggleTextureKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ToggleCollision")
+            {
+                int keyval;
+                config >> keyval;
+                m_toggleCollisionKey = sf::Keyboard::Key(keyval);
+            }
+            else if (ConfigRead == "ToggleGrid")
+            {
+                int keyval;
+                config >> keyval;
+                m_toggleGridKey = sf::Keyboard::Key(keyval);
+            }
+        }
+    }
 }
 
 void Scene_MainGame::loadLevel(const std::string& filename)
@@ -74,10 +202,49 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
 
                 auto tile = m_entityManager.addEntity("tile");
+
+                if (m_tileConfig.Name == "Ground" || m_tileConfig.Name == "FloatTileSmall" || m_tileConfig.Name == "FloatTileBig" || m_tileConfig.Name == "PlatformMiddle" || m_tileConfig.Name == "Ground2")
+                {
+                    tile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_tileConfig.Name).getSize().x, m_game->assets().getAnimation(m_tileConfig.Name).getSize().y - 20), m_tileConfig.BM, m_tileConfig.BV);
+                }
+                else
+                {
+                    tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                }
                 tile->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
                 tile->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
-                tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                
                 tile->addComponent<CDraggable>();
+                continue;
+            }
+            if (configRead == "MovingTile")
+            {
+                config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
+                auto mTile = m_entityManager.addEntity("tile");
+                mTile->addComponent<CDraggable>();
+                if (m_movingTileConfig.AI == "Patrol")
+                {
+                    std::vector<Vec2> initialPatrolPos;
+                    mTile->addComponent<CPatrol>(initialPatrolPos, m_movingTileConfig.S);
+                    config >> m_movingTileConfig.N;
+                    for (int i = 0; i < m_movingTileConfig.N; i++)
+                    {
+                        float x, y;
+                        config >> x >> y;
+                        mTile->getComponent<CPatrol>().positions.push_back(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, x, y));
+                    }
+                }
+                mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
+                mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+
+                if (m_movingTileConfig.Name == "FloatTileSmall" || m_movingTileConfig.Name == "FloatTileBig")
+                {
+                    mTile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().x, m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().y - 15), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                else
+                {
+                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
                 continue;
             }
             if (configRead == "Item")
@@ -86,6 +253,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 if (m_itemConfig.Name == "Coin")
                 {
                     auto coin = m_entityManager.addEntity("coins");
+                    coin->addComponent<CDraggable>();
                     coin->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     coin->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     coin->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -94,6 +262,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Heart")
                 {
                     auto heart = m_entityManager.addEntity("hearts");
+                    heart->addComponent<CDraggable>();
                     heart->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     heart->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     heart->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -102,6 +271,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "BluePotion" || m_itemConfig.Name == "PurplePotion" || m_itemConfig.Name == "GreenPotion" || m_itemConfig.Name == "GoldPotion" || m_itemConfig.Name == "RedPotion")
                 {
                     auto potion = m_entityManager.addEntity("potions");
+                    potion->addComponent<CDraggable>();
                     potion->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -110,6 +280,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "Chest")
                 {
                     auto interact = m_entityManager.addEntity("interactable");
+                    interact->addComponent<CDraggable>();
                     interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -118,6 +289,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
                 {
                     auto breakable = m_entityManager.addEntity("breakable");
+                    breakable->addComponent<CDraggable>();
                     breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
@@ -149,12 +321,14 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("DemonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
                     else
                     {
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     }
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    //npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -201,8 +375,8 @@ void Scene_MainGame::loadParallaxBackground()
     {
         
         m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),false);
-        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 10000, 10000));
-        m_parallaxBackgroundSprites[i].setPosition(-400, 0);
+        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+        m_parallaxBackgroundSprites[i].setPosition(-6500, -256);
     }
 }
 
@@ -221,12 +395,11 @@ void Scene_MainGame::drawParallaxBackground()
     m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
     m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
 
-    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
+    
     m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
 
-    m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+    //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
+    //m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
 
     
 }
@@ -242,8 +415,8 @@ void Scene_MainGame::spawnPlayer()
 {
     m_player = m_entityManager.addEntity("player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
-    m_player->addComponent<CState>("StandDown");
-    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandDown"), true);
+    m_player->addComponent<CState>("StandRight");
+    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandRight"), true);
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
     m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
@@ -298,6 +471,7 @@ void Scene_MainGame::update()
         m_frameSinceAttack++;
     }
     sAI();
+    sTilesAI();
     sMovement();
     sDragAndDrop();
     sArrowMovement();
@@ -327,48 +501,90 @@ void Scene_MainGame::sMovement()
             pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
         }
+
         else
         {
             pTransform.velocity.y = 0;
         }
-   
+        
+        if (pInput.right && pInput.up)
+        {
+            pState.state = "Jump";
+        }
+        m_player->removeComponent<CBoundingBox>();
+        m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
         // if only one x directional key is pressed move in that direction otherwise stop.
         if (pInput.left && !pInput.right)
         {
             pTransform.velocity.x = -1 * (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(-1, 0);
             pState.state = "RunRight";
+            if (pInput.up == true)
+            {
+                pState.state = "Jump";
+            }
+            
+            if (pInput.down == true)
+            {
+                pState.state = "StandDown";
+                m_player->removeComponent<CBoundingBox>();
+                m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
+            }
             pTransform.scale = Vec2(-1, 1);
-
-            m_parallaxBackgroundSprites[8].move(sf::Vector2f(1.1f, 0.f));
-            m_parallaxBackgroundSprites[7].move(sf::Vector2f(1.2f, 0.f));
-            m_parallaxBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[5].move(sf::Vector2f(2.f, 0.f));
-            m_parallaxBackgroundSprites[4].move(sf::Vector2f(2.2f, 0.f));
-            m_parallaxBackgroundSprites[3].move(sf::Vector2f(2.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[2].move(sf::Vector2f(2.6f, 0.f));
-            m_parallaxBackgroundSprites[1].move(sf::Vector2f(2.7f, 0.f));
-            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            
+            if (!m_collidingWithTile)
+            {
+                m_parallaxBackgroundSprites[8].move(sf::Vector2f(0.5f, 0.f));
+                m_parallaxBackgroundSprites[7].move(sf::Vector2f(0.6f, 0.f));
+                m_parallaxBackgroundSprites[6].move(sf::Vector2f(0.7f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[5].move(sf::Vector2f(1.f, 0.f));
+                m_parallaxBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
+                m_parallaxBackgroundSprites[3].move(sf::Vector2f(1.3f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[2].move(sf::Vector2f(1.8f, 0.f));
+                m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
+                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+            }
+           
         }
         else if (!pInput.left && pInput.right)
         {
             pTransform.velocity.x = (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
+            if (pInput.up == true)
+            {
+                pState.state = "Jump";
+            }
+            m_player->removeComponent<CBoundingBox>();
+            m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
+            if (pInput.down == true)
+            {
+                pState.state = "StandDown";
+                //m_player->getComponent<CBoundingBox>().size.y = 32;
+                //m_player->getComponent<CTransform>().pos.y -= m_player->getComponent<CBoundingBox>().halfSize.y - m_playerConfig.CY;
+                //pTransform.scale = Vec2(-1, 1);
+                m_player->removeComponent<CBoundingBox>();
+                m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX,20),true, false);
+            }
+
             pTransform.scale = Vec2(1, 1);
-            m_parallaxBackgroundSprites[8].move(sf::Vector2f(-1.1f, 0.f));
-            m_parallaxBackgroundSprites[7].move(sf::Vector2f(-1.2f, 0.f));
-            m_parallaxBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[5].move(sf::Vector2f(-2.f, 0.f));
-            m_parallaxBackgroundSprites[4].move(sf::Vector2f(-2.2f, 0.f));
-            m_parallaxBackgroundSprites[3].move(sf::Vector2f(-2.3f, 0.f));
-            ///
-            m_parallaxBackgroundSprites[2].move(sf::Vector2f(-2.6f, 0.f));
-            m_parallaxBackgroundSprites[1].move(sf::Vector2f(-2.7f, 0.f));
-            //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            if (!m_collidingWithTile)
+            {
+                m_parallaxBackgroundSprites[8].move(sf::Vector2f(-0.5f, 0.f));
+                m_parallaxBackgroundSprites[7].move(sf::Vector2f(-0.6f, 0.f));
+                m_parallaxBackgroundSprites[6].move(sf::Vector2f(-0.7f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[5].move(sf::Vector2f(-1.f, 0.f));
+                m_parallaxBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
+                m_parallaxBackgroundSprites[3].move(sf::Vector2f(-1.3f, 0.f));
+                ///
+                m_parallaxBackgroundSprites[2].move(sf::Vector2f(-1.8f, 0.f));
+                m_parallaxBackgroundSprites[1].move(sf::Vector2f(-1.9f, 0.f));
+                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+            }
+            
         }
         else if (!pInput.left && pInput.right)
         {
@@ -378,7 +594,7 @@ void Scene_MainGame::sMovement()
         {
             pTransform.velocity.x = 0;
         }
-   
+    
   
 #pragma endregion
 
@@ -433,11 +649,7 @@ void Scene_MainGame::sMovement()
     {
         m_FrameSinceGrounded++;
         pTransform.velocity.y += m_FrameSinceGrounded * m_player->getComponent<CGravity>().gravity;
-
-        //if (pInput.up == false)
-        //{
-        //    //m_playerHitTile = true;
-        //}
+        
     }
     else
     {
@@ -474,11 +686,7 @@ void Scene_MainGame::sDoAction(const Action& action)
 {                      
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {  m_levelText.setPosition(m_levelText.getPosition().x, m_levelText.getPosition().y - 64);
-        // m_game->playSound("MusicLevel");
-        sf::View view = m_game->window().getView();
-        view.zoom(2.0f);
-        m_game->window().setView(view);
+        if (action.name() == "PAUSE") {  setPaused(!m_paused);
         }
         else if (action.name() == "QUIT") { onEnd(); }
         else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
@@ -493,6 +701,7 @@ void Scene_MainGame::sDoAction(const Action& action)
                 m_player->getComponent<CInput>().up = true;
                 m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
+
             } 
             else{ m_player->getComponent<CInput>().up = false; }
         }
@@ -514,7 +723,7 @@ void Scene_MainGame::sDoAction(const Action& action)
             m_game->window().setView(view);
         }
         else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
-        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; drawInventory(); }
+        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; inventoryOpened = true; drawInventory(); }
     }
     else if (action.type() == "END")
     {
@@ -532,7 +741,11 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
     if (entity->hasComponent<CInventory>())
     {
         auto& inventory = entity->getComponent<CInventory>();
-
+        
+        if (inventory.items.empty())
+        {
+            return;
+        }
         if (inventory.items[m_select] == "RedPotion")
         {
             std::cout << "Red Potion";
@@ -630,6 +843,7 @@ void Scene_MainGame::sInteract()
 
 void Scene_MainGame::select(std::string direction)
 {
+    m_InventoryClock.restart();
     if (m_player->getComponent<CInventory>().items.size() == 0)
     {
         m_select = 0;
@@ -667,7 +881,7 @@ void Scene_MainGame::select(std::string direction)
 
 void Scene_MainGame::sAI()
 {
-    for (auto e : m_entityManager.getEntities())
+    for (auto e : m_entityManager.getEntities("npc"))
     {
         if (e->hasComponent<CFollowPlayer>())
         {
@@ -689,7 +903,13 @@ void Scene_MainGame::sAI()
                     }
                 }
             }
-            
+            if (e->getComponent<CAnimation>().animation.getName() == "DemonAttack")
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->getComponent<CState>().state = "DemonIdle";
+                }
+            }
             if (!Visionblocked)
             {
                 
@@ -753,33 +973,29 @@ void Scene_MainGame::sAI()
                 desired = desired / length;
                 e->getComponent<CTransform>().pos.x += e->getComponent<CPatrol>().speed * desired.x;
                 e->getComponent<CTransform>().pos.y += e->getComponent<CPatrol>().speed * desired.y;
-                if (e->hasComponent<CState>())
+                if (desired.x != 0)
                 {
-                    if (desired.x != 0)
+                    if (desired.x < 0)
                     {
-                        e->getComponent<CState>().state = "OctorokRight";
-                        if (desired.x < 0)
-                        {
-                            e->getComponent<CTransform>().scale.x = -1;
-                        }
-                        else
-                        {
-                            e->getComponent<CTransform>().scale.x = 1;
-                        }
+                        e->getComponent<CTransform>().scale.x = -1;
                     }
                     else
                     {
-                        e->getComponent<CState>().state = "OctorokUp";
-                        if (desired.y < 0)
-                        {
-                            e->getComponent<CTransform>().scale.y = 1;
-                        }
-                        else
-                        {
-                            e->getComponent<CTransform>().scale.y = -1;
-                        }
+                        e->getComponent<CTransform>().scale.x = 1;
                     }
                 }
+                else
+                {/*
+                    if (desired.y < 0)
+                    {
+                        e->getComponent<CTransform>().scale.y = 1;
+                    }
+                    else
+                    {
+                        e->getComponent<CTransform>().scale.y = -1;
+                    }*/
+                }
+                
             }
             else
             {
@@ -793,6 +1009,39 @@ void Scene_MainGame::sAI()
     }
 }
     
+
+void Scene_MainGame::sTilesAI()
+{
+    for (auto e : m_entityManager.getEntities("tile"))
+    {
+        // Implementing Patrol behavior
+        if (e->hasComponent<CPatrol>())
+        {
+            Vec2 target = e->getComponent<CPatrol>().positions[e->getComponent<CPatrol>().currentPosition];
+            int nextLoc = e->getComponent<CPatrol>().currentPosition + 1;
+            Vec2 desired = target - e->getComponent<CTransform>().pos;
+            float length = desired.dist(Vec2(0, 0));
+            int numofWaypoints = e->getComponent<CPatrol>().positions.size();
+
+            if (int(length) > 1)
+            {
+                desired = desired / length;
+                e->getComponent<CTransform>().pos.x += e->getComponent<CPatrol>().speed * desired.x;
+                e->getComponent<CTransform>().pos.y += e->getComponent<CPatrol>().speed * desired.y;
+               
+
+            }
+            else
+            {
+                e->getComponent<CPatrol>().currentPosition++;
+                if (e->getComponent<CPatrol>().currentPosition == numofWaypoints)
+                {
+                    e->getComponent<CPatrol>().currentPosition = 0;
+                }
+            }
+        }
+    }
+}
 void Scene_MainGame::sStatus()
 {
     // Setting up LifeSpan functionality
@@ -848,6 +1097,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerTransform = m_player->getComponent<CTransform>();
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
+    m_collidingWithTile = false;
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -873,17 +1123,20 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y-2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    m_playerOnGround = true;
+                    //m_playerOnGround = true;
                 }
                 else
                 {
+                    
                     if (playerTransform.pos.x > tileTransform.pos.x)
                     {
                         playerTransform.pos.x += playerTileOverlap.x;
+                        m_collidingWithTile = true;
                     }
                     else
                     {
                         playerTransform.pos.x -= playerTileOverlap.x;
+                        m_collidingWithTile = true;
                     }
                 }
             }
@@ -1414,10 +1667,10 @@ void Scene_MainGame::sHUD()
     sf::View view = m_game->window().getView();
     //Vec2 InventoryPos = Vec2(m_player->getComponent<CTransform>().pos.x + 0, m_player->getComponent<CTransform>().pos.y + 320);
     Vec2 playerPos = m_player->getComponent<CTransform>().pos;
-    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - m_gridSize.x * 5, m_gridSize.y / 2);
+    Vec2 InventoryPosOffset = Vec2(m_game->window().getSize().x / 2 - (m_gridSize.x * 5 + 32), m_gridSize.y / 2);
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
-    Vec2 weaponHolderPos = Vec2(InventoryPos.x - weaponHolderOffset.x, weaponHolderOffset.y);
+    Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
 
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
@@ -1428,7 +1681,8 @@ void Scene_MainGame::sHUD()
 
     if (weaponHolderPos.x < view.getSize().x / 2)
     {
-        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 5 + m_gridSize.x/2;
+        weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 5;
+        weaponHolderPos.y = InventoryPos.y;
     }
 
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -1444,32 +1698,36 @@ void Scene_MainGame::sHUD()
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventory->destroy();
+            inventoryOpened = false;
         }
     }
-    for (auto select : m_entityManager.getEntities("select"))
-    {
-        select->destroy();
-    }
-    auto& select = m_entityManager.addEntity("select");
-    select->addComponent<CAnimation>(m_game->assets().getAnimation("Select"), true);
-    select->addComponent<CTransform>(InventoryPos);
-    select->getComponent<CTransform>().pos.x += 64 * m_select - 220;
+    
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
     {
-        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - 220 + inventoryItemPositionOffset;
+        
+        inventoryItems->getComponent<CTransform>().pos.x = InventoryPos.x - (m_gridSize.x*4) + inventoryItemPositionOffset;
         inventoryItems->getComponent<CTransform>().pos.y = InventoryPos.y;
         inventoryItemPositionOffset += 64;
+        
+        if (inventoryItemPositionOffset > m_gridSize.x * 8)
+        {
+            inventoryItemPositionOffset = 0;
+        }
         if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
         {
             inventoryItems->destroy();
+            
         }
     }
+    inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 4), InventoryPos.y);
+    
 }
 
 void Scene_MainGame::sDrawInventoryItems()
 {
+    inventoryOpened = true;
     for (auto& inventoryItems : m_entityManager.getEntities("inventoryItems"))
     {
         inventoryItems->destroy();
@@ -1509,34 +1767,12 @@ void Scene_MainGame::drawMinimap()
 {
     sf::View minimapView = m_game->window().getView();
     minimapView.setViewport(sf::FloatRect(0.74f, 0.01f, 0.25f, 0.25f));
-    minimapView.zoom(2.0f);
+    minimapView.zoom(2.5f);
     m_game->window().setView(minimapView);
-
-    float leftX = m_game->window().getView().getCenter().x - width() / 2;
-    float rightX = leftX + width() + m_gridSize.x;
-    float nextGridX = leftX - ((int)leftX % (int)m_gridSize.x);
-
-    for (float x = nextGridX; x < rightX; x += m_gridSize.x)
-    {
-        drawLine(Vec2(x, 0), Vec2(x, height()));
-    }
-
-    for (float y = 0; y < height(); y += m_gridSize.y)
-    {
-        drawLine(Vec2(leftX, height() - y), Vec2(rightX, height() - y));
-
-        for (float x = nextGridX; x < rightX; x += m_gridSize.x)
-        {
-            std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
-            std::string yCell = std::to_string((int)y / (int)m_gridSize.y);
-            m_gridText.setString("(" + xCell + "," + yCell + ")");
-            m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
-            m_game->window().draw(m_gridText);
-        }
-    }
 
     for (auto e : m_entityManager.getEntities())
     {
+        
         if (e->hasComponent<CAnimation>())
         {
             m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
@@ -1682,6 +1918,7 @@ void Scene_MainGame::sRender()
             }
         }
     }
+    
 
     // draw all Entity collision bounding boxes with a rectangleshape
     if (m_drawCollision)
@@ -1733,7 +1970,21 @@ void Scene_MainGame::sRender()
             }
         }
     }
+
+    if (inventoryOpened)
+    {
+        inventorySelect.setRadius(23.5);
+        //inventorySelect.setSize(sf::Vector2f(45, 45));
+        inventorySelect.setOrigin(sf::Vector2f(45 / 2 + 1, 45 / 2));
+        //inventorySelect.setPosition(getPosition(0,0,5,0).x, getPosition(0, 0, 5, 0).y);
+        inventorySelect.setFillColor(sf::Color(0, 0, 0, 0));
+        inventorySelect.setOutlineColor(sf::Color(196, 70, 70, 255));
+        inventorySelect.setOutlineThickness(5);
+        m_game->window().draw(inventorySelect);
+    }
     
+  
+
     if (m_drawGrid)
     {
         float leftX = m_game->window().getView().getCenter().x - width() / 2;
@@ -1751,18 +2002,24 @@ void Scene_MainGame::sRender()
 
             for (float x = nextGridX; x < rightX; x += m_gridSize.x)
             {
+               
                 std::string xCell = std::to_string((int)x / (int)m_gridSize.x);
-                std::string yCell = std::to_string((int)y / (int)m_gridSize.y);
+                std::string yCell = std::to_string(11 - ((int)y / (int)m_gridSize.y));
                 m_gridText.setString("(" + xCell + "," + yCell + ")");
                 m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
                 m_game->window().draw(m_gridText);
             }
         }
     }
-    
+
+    // Particles on the front
+    m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
+    m_parallaxBackgroundSprites[2].setPosition(m_parallaxBackgroundSprites[2].getPosition().x, -50);
+    m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
+
     if (m_minimap)
     {
         drawMinimap();
