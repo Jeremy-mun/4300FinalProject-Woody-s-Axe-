@@ -382,20 +382,19 @@ void Scene_MainGame::loadParallaxBackground()
 
 void Scene_MainGame::drawParallaxBackground()
 {
-
     m_game->window().draw(m_parallaxBackgroundSprites[9]);// Sky;
-  
+
     m_game->window().draw(m_parallaxBackgroundSprites[8]);// Forest
     m_game->window().draw(m_parallaxBackgroundSprites[7]);// Forest
     m_game->window().draw(m_parallaxBackgroundSprites[6]);// Forest
-    
-    
+
+
     m_game->window().draw(m_parallaxBackgroundSprites[5]);// Forest
     m_parallaxBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
     m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
     m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
 
-    
+
     m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
 
     //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
