@@ -65,6 +65,7 @@ protected:
     TileConfig               m_tileConfig;
     NPCConfig                m_npcConfig;
     ItemConfig               m_itemConfig;
+    MovingTileConfig         m_movingTileConfig;
     bool                     m_editing = false;
     bool                     m_addingPoint = false;
     bool                     m_removingPoint = false;
