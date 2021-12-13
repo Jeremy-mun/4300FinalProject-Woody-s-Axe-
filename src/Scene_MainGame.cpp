@@ -76,6 +76,18 @@ void Scene_MainGame::loadOptions()
             else if (ConfigRead == "Difficulty")
             {
                 config >> m_difficulty;
+                if (m_difficulty == "Easy")
+                {
+                    m_difficultymod = 0.5;
+                }
+                else if (m_difficulty == "Hard")
+                {
+                    m_difficultymod = 2;
+                }
+                else
+                {
+                    m_difficultymod = 1;
+                }
             }
             else if (ConfigRead == "Jump")
             {
@@ -346,8 +358,8 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     }
                     //npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
-                    npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
-                    npc->addComponent<CDamage>(m_npcConfig.D);
+                    npc->addComponent<CHealth>(m_npcConfig.H * m_difficultymod, m_npcConfig.H * m_difficultymod);
+                    npc->addComponent<CDamage>(ceil(m_npcConfig.D * m_difficultymod));
 
                     if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
                     {
@@ -370,8 +382,8 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
                     npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
-                    npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
-                    npc->addComponent<CDamage>(m_npcConfig.D);
+                    npc->addComponent<CHealth>(m_npcConfig.H* m_difficultymod, m_npcConfig.H* m_difficultymod);
+                    npc->addComponent<CDamage>(ceil(m_npcConfig.D * m_difficultymod));
                     if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
                     {
                         npc->addComponent<CState>(m_npcConfig.Name);

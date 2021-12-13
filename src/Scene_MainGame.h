@@ -91,6 +91,7 @@ protected:
     int                         m_musicVolume = 100;
     int                         m_effectVolume = 100;
     std::string                 m_difficulty = "Normal";
+    float                       m_difficultymod = 1;
     sf::Keyboard::Key           m_jumpKey = sf::Keyboard::W;
     sf::Keyboard::Key           m_leftKey = sf::Keyboard::A;
     sf::Keyboard::Key           m_rightKey = sf::Keyboard::D;
