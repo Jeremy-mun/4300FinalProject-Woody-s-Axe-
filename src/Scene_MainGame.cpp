@@ -220,7 +220,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
             if (configRead == "MovingTile")
             {
                 config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
-                auto mTile = m_entityManager.addEntity("tile");
+                auto mTile = m_entityManager.addEntity("movingTile");
                 mTile->addComponent<CDraggable>();
                 if (m_movingTileConfig.AI == "Patrol")
                 {
@@ -662,6 +662,7 @@ void Scene_MainGame::sMovement()
         m_FrameSinceGrounded = 0;
     }
 
+    
     if (m_player->getComponent<CTransform>().pos.y > getPosition(0, 0, 0, 12).y)
     {
         m_player->destroy();
@@ -674,7 +675,9 @@ void Scene_MainGame::sMovement()
     {
         pTransform.velocity.y = -1 * m_MaxYSpeed;
     }
+
     pTransform.pos += pTransform.velocity;
+    
 
 }
 
@@ -1018,7 +1021,7 @@ void Scene_MainGame::sAI()
 
 void Scene_MainGame::sTilesAI()
 {
-    for (auto e : m_entityManager.getEntities("tile"))
+    for (auto e : m_entityManager.getEntities("movingTile"))
     {
         // Implementing Patrol behavior
         if (e->hasComponent<CPatrol>())
@@ -1104,6 +1107,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
     m_collidingWithTile = false;
+    m_playerOnMovingTile = false;
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -1172,6 +1176,87 @@ void Scene_MainGame::sTileCollision()
                         else
                         {
                             npcTransform.pos.x -= npcTileOverlap.x; 
+                        }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+    for (auto tile : m_entityManager.getEntities("movingTile"))
+    {
+        auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
+        if (tileBoundingBox.blockMove)
+        {
+            auto playerTileOverlap = Physics::GetOverlap(tile, m_player);
+
+            auto& tileTransform = tile->getComponent<CTransform>();
+            if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+            {
+                if (playerTileOverlap.x > playerTileOverlap.y)
+                {
+                    if (playerTransform.pos.y > tileTransform.pos.y)
+                    {
+                        playerTransform.pos.y += playerTileOverlap.y;
+                    }
+                    else
+                    {
+                        playerTransform.pos.y -= playerTileOverlap.y;
+                        m_playerOnMovingTile = true;
+                        
+                    }
+                }
+                else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
+                {
+                    playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
+                    //m_playerOnGround = true;
+                }
+                else
+                {
+
+                    if (playerTransform.pos.x > tileTransform.pos.x)
+                    {
+                        playerTransform.pos.x += playerTileOverlap.x;
+                        m_collidingWithTile = true;
+                    }
+                    else
+                    {
+                        playerTransform.pos.x -= playerTileOverlap.x;
+                        m_collidingWithTile = true;
+                    }
+                }
+            }
+            for (auto npc : m_entityManager.getEntities("npc"))
+            {
+                auto& npcTransform = npc->getComponent<CTransform>();
+                auto npcTileOverlap = Physics::GetOverlap(tile, npc);
+                if (npcTileOverlap.x > 0 && npcTileOverlap.y > 0)
+                {
+                    if (npcTileOverlap.x > npcTileOverlap.y)
+                    {
+                        if (npcTransform.pos.y > tileTransform.pos.y)
+                        {
+                            npcTransform.pos.y += npcTileOverlap.y;
+                        }
+                        else
+                        {
+                            npcTransform.pos.y -= npcTileOverlap.y;
+                        }
+                    }
+                    else
+                    {
+                        if (npcTransform.pos.x > tileTransform.pos.x)
+                        {
+                            npcTransform.pos.x += npcTileOverlap.x;
+                        }
+                        else
+                        {
+                            npcTransform.pos.x -= npcTileOverlap.x;
                         }
                     }
 
