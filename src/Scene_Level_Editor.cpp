@@ -69,7 +69,26 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 tile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
                 continue;
             }
-            
+            if (configRead == "MovingTile")
+            {
+                config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
+                auto mTile = m_entityManager.addEntity("MovingTile");
+                mTile->addComponent<CDraggable>();
+                if (m_movingTileConfig.AI == "Patrol")
+                {
+                    std::vector<Vec2> initialPatrolPos;
+                    mTile->addComponent<CPatrol>(initialPatrolPos, m_movingTileConfig.S);
+                    config >> m_movingTileConfig.N;
+                    for (int i = 0; i < m_movingTileConfig.N; i++)
+                    {
+                        float x, y;
+                        config >> x >> y;
+                        mTile->getComponent<CPatrol>().positions.push_back(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, x, y));
+                    }
+                }
+                mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
+                mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+            }
             if (configRead == "Item")
             {
                 config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;
@@ -166,6 +185,50 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 config << m_tileConfig.TY << "  ";
                 config << m_tileConfig.BM << "  ";
                 config << m_tileConfig.BV << "  ";
+                config << std::endl;
+                continue;
+            }
+            else if (e->tag() == "MovingTile")
+            {
+                m_movingTileConfig.Name = e->getComponent<CAnimation>().animation.getName();
+                auto pos = e->getComponent<CTransform>().pos;
+                m_movingTileConfig.RX = floor(pos.x / m_game->window().getView().getSize().x);
+                m_movingTileConfig.RY = floor(pos.y / m_game->window().getView().getSize().y);
+                m_movingTileConfig.TX = ((int(pos.x) - 32) - (m_movingTileConfig.RX * m_game->window().getSize().x)) / 64.0;
+                m_movingTileConfig.TY = ((int(pos.y) - 32) - (m_movingTileConfig.RY * m_game->window().getSize().y)) / 64.0;
+                m_movingTileConfig.BM = e->getComponent<CBoundingBox>().blockMove;
+                m_movingTileConfig.BV = e->getComponent<CBoundingBox>().blockVision;
+                if (e->hasComponent<CFollowPlayer>())
+                {
+                    m_movingTileConfig.AI = "Follow";
+                    m_movingTileConfig.S = e->getComponent<CFollowPlayer>().speed;
+                }
+                else if (e->hasComponent<CPatrol>())
+                {
+                    m_movingTileConfig.AI = "Patrol";
+                    m_movingTileConfig.S = e->getComponent<CPatrol>().speed;
+                    m_movingTileConfig.N = e->getComponent<CPatrol>().positions.size();
+                }
+
+                config << e->tag() << " ";
+                config << m_movingTileConfig.Name << "    ";
+                config << m_movingTileConfig.RX << "  ";
+                config << m_movingTileConfig.RY << "  ";
+                config << m_movingTileConfig.TX << "  ";
+                config << m_movingTileConfig.TY << "  ";
+                config << m_movingTileConfig.BM << "  ";
+                config << m_movingTileConfig.BV << "  ";
+                config << m_movingTileConfig.AI << "  ";
+                config << m_movingTileConfig.S << "  ";
+                if (e->hasComponent<CPatrol>())
+                {
+                    config << m_movingTileConfig.N << "  ";
+                    for (auto v : e->getComponent<CPatrol>().positions)
+                    {
+                        config << ((int(v.x) - 32) - (m_movingTileConfig.RX * m_game->window().getSize().x)) / 64 << "  ";
+                        config << ((int(v.y) - 32) - (m_movingTileConfig.RY * m_game->window().getSize().y)) / 64 << "  ";
+                    }
+                }
                 config << std::endl;
                 continue;
             }
@@ -302,6 +365,26 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                 tile->addComponent<CDraggable>();
                 continue;
             }
+            if (configRead == "MovingTile")
+            {
+                config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
+                auto mTile = m_editorManager.addEntity("tile");
+                mTile->addComponent<CDraggable>();
+                if (m_movingTileConfig.AI == "Patrol")
+                {
+                    std::vector<Vec2> initialPatrolPos;
+                    mTile->addComponent<CPatrol>(initialPatrolPos, m_movingTileConfig.S);
+                    config >> m_movingTileConfig.N;
+                    for (int i = 0; i < m_movingTileConfig.N; i++)
+                    {
+                        float x, y;
+                        config >> x >> y;
+                        mTile->getComponent<CPatrol>().positions.push_back(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, x, y));
+                    }
+                }
+                mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
+                mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+            }
             if (configRead == "Item")
             {
                 config >> m_itemConfig.Name >> m_itemConfig.RX >> m_itemConfig.RY >> m_itemConfig.TX >> m_itemConfig.TY >> m_itemConfig.BM >> m_itemConfig.BV;
@@ -432,7 +515,7 @@ void Scene_Level_Editor::sDoAction(const Action& action)
         else if (action.name() == "RIGHT")            { m_editor->getComponent<CInput>().right = true; }
         else if (action.name() == "LEFT_CLICK")       { if (!m_adding && !m_editing) { grab(); } else if (m_adding) { copy(); } else if (m_editing) { mode(); if (m_addingPoint) { addPoint(m_mPos); } else if (m_editingPoint) { editPoint(m_mPos); } } }
         else if (action.name() == "SAVE")             { saveLevel(m_levelPath); }
-        else if (action.name() == "REMOVE")           { mode(); if (m_removingPoint) { removePoint(); } else if (!m_adding && !m_editing) { remove(); } }
+        else if (action.name() == "REMOVE")           { if (m_selected != nullptr && m_editing) { mode(); } if (m_removingPoint) { removePoint(); } else if (!m_adding && !m_editing) { remove(); } }
         else if (action.name() == "SCROLL")           { if (m_editing) { if (action.pos().x < 0) { m_editIndex = (m_editIndex + 1) % m_editStrings.size(); } else if (action.pos().x > 0) { if (m_editIndex > 0) { m_editIndex--; } else { m_editIndex = m_editStrings.size() - 1; } } } else { select(action.pos().x); } }
         else if (action.name() == "COPY")             { copy(); }
         else if (action.name() == "EDIT")             { if (!m_adding && m_selected != nullptr) { m_editing = !m_editing; if (m_editing) { m_editIndex = 0; edit(); } else { m_editStrings.clear(); } } }

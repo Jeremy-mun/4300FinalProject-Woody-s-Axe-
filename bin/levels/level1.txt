@@ -11,14 +11,14 @@ Tile Ground    0  0  9  3  1  1
 Tile Ground2    0  0  8  11  1  1  
 Tile Ground    0  0  10  3  1  1  
 Tile Ground    1  0  18  1  1  1  
-Tile Ground    0  0  11  3  1  1 
-MovingTile FloatTileSmall 0 0 1 7 1 1 Patrol 2 2 1 7 1 9
+Tile Ground    0  0  11  3  1  1  
+MovingTile FloatTileSmall    0  0  1  6  0  0  Patrol  2  2  1  6  1  9  
 Tile Ground    1  0  17  1  1  1  
 Tile Ground    0  0  7  3  1  1  
 Tile Ground    2  0  5  11  1  1  
-MovingTile FloatTileBig    2  0  2  6  1  1  Patrol 2 2 2 6 2 2
+MovingTile FloatTileBig    2  0  2  6  0  0  Patrol  2  2  2  6  2  2  
 Tile FloatTileSmall    2  0  6  9  1  1  
-MovingTile FloatTileSmall    2  0  9  7  1  1  Patrol 2 2 9 7 13 7
+MovingTile FloatTileSmall    2  0  9  7  0  0  Patrol  2  2  9  7  13  7  
 Item RedPotion    1  0  6  7  0  0  
 Item RedPotion    1  0  6  7  0  0  
 Item RedPotion    1  0  6  7  0  0  
@@ -31,10 +31,10 @@ Item GoldPotion    0  0  16  2  0  0
 Item PurplePotion    0  0  12  5  0  0  
 Item Coin    0  0  9  2  0  0  
 Item Heart    0  0  14  4  0  0  
-NPC HellBeastIdle   0  0  10  8  0  0  2  1  Follow  0
-NPC FireSkull     0  0  8  1  0  0  2  1  Patrol  2 2 8 1 12 1  
+NPC HellBeastIdle     0  0  10  8  0  0  2  1  Follow  0  
+NPC FireSkull     0  0  8  1  0  0  2  1  Patrol  2  2  8  1  12  1  
 NPC DemonIdle     2  0  8  1  0  0  2  1  Follow  0  
-NPC FireSkull     1  0  5  6  0  0  2  2  Patrol  2 2 5 6 9 6  
+NPC FireSkull     1  0  5  6  0  0  2  2  Patrol  2  2  5  6  9  6  
 Item Coin    0  0  11  2  0  0  
 Item Coin    0  0  10  2  0  0  
 Item Coin    0  0  12  2  0  0  
@@ -91,7 +91,6 @@ Item Coin    1  0  14  5  0  0
 Item Coin    2  0  6  8  0  0  
 Item Coin    2  0  11  6  0  0  
 Item Coin    2  0  11  6  0  0  
-Player 416 480 40 64 4 20 2 
 Item Coin    1  0  17  0  0  0  
 Item Coin    1  0  18  0  0  0  
 Item Coin    1  0  19  0  0  0  
@@ -109,8 +108,8 @@ Tile Ground2    3  0  13  11  1  1
 Tile Ground2    3  0  14  11  1  1  
 Tile Ground2    3  0  15  11  1  1  
 Tile FloatTileBig    3  0  17  10  1  1  
-NPC GhostShriek     3  0  17  3  0  0  2  2  Patrol  2  2  17 3 20 3  
-NPC GhostShriek     3  0  17  6  0  0  2  2  Patrol  4  2  17 6 20 6      
+NPC GhostShriek     3  0  17  3  0  0  2  2  Patrol  2  2  17  3  20  3  
+NPC GhostShriek     3  0  17  6  0  0  2  2  Patrol  4  2  17  6  20  6  
 Tile FloatTileSmall    4  0  2  9  1  1  
 Tile FloatTileSmall    4  0  7  4  1  1  
 Tile FloatTileSmall    4  0  12  9  1  1  
@@ -118,3 +117,5 @@ NPC DemonIdle     4  0  10  4  0  0  3  3  Follow  0
 NPC DemonIdle     4  0  5  4  0  0  3  3  Follow  0  
 Item BluePotion    4  0  12  8  0  0  
 NPC HellHound     3  0  14  10  0  0  1  1  Follow  0  
+NPC HellHound     3  0  14  10  0  0  1  1  Follow  0  
+Player 416 480 40 64 4 20 2
