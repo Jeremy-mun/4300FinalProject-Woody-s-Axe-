@@ -648,7 +648,7 @@ void Scene_MainGame::sMovement()
     if (!m_playerOnGround)
     {
         m_FrameSinceGrounded++;
-        pTransform.velocity.y += m_FrameSinceGrounded * m_player->getComponent<CGravity>().gravity;
+        pTransform.velocity.y += m_FrameSinceGrounded/2 * m_player->getComponent<CGravity>().gravity;
         
     }
     else

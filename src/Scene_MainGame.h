@@ -81,6 +81,7 @@ protected:
     sf::Clock               m_walletClock;
     sf::Clock               m_InventoryClock;
     sf::Clock               m_time;
+    sf::Clock               m_gravityClock;
     int                     m_frameSinceAttack;
     sf::CircleShape         inventorySelect;
 

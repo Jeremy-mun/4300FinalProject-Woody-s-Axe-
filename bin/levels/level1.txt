@@ -118,4 +118,4 @@ NPC DemonIdle     4  0  5  4  0  0  3  3  Follow  0
 Item BluePotion    4  0  12  8  0  0  
 NPC HellHound     3  0  14  10  0  0  1  1  Follow  0  
 NPC HellHound     3  0  14  10  0  0  1  1  Follow  0  
-Player 416 480 40 64 4 20 2
+Player 416 480 40 64 3 20 2
