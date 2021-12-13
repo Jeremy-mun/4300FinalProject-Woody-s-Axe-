@@ -316,7 +316,13 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 npc->addComponent<CDraggable>();
                 if (m_npcConfig.AI == "Follow")
                 {
+
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
+                    if (m_npcConfig.Name == "GhostShriek")
+                    {
+                        npc->addComponent<CState>("GhostShriek");
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("GhostShriek"), true);
+                    }
                     if (m_npcConfig.Name == "DemonIdle")
                     {
                         npc->addComponent<CState>("DemonIdle");
@@ -1232,6 +1238,7 @@ void Scene_MainGame::sMeleeCollision()
                 if (npcHealth.current <= 0)
                 {
                     //m_game->playSound("EnemyDie");
+
                     auto ex = m_entityManager.addEntity("explosion");
                     ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                     ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
@@ -1333,9 +1340,22 @@ void Scene_MainGame::sArrowCollision()
                 {
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
-                    ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
-                    ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
-                    e->destroy();
+                    Vec2 exPos = e->getComponent<CTransform>().pos;
+                    
+                    if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
+                    {
+                        
+                        //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
+                        e->getComponent<CState>().state = "GhostVanish";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else
+                    {
+                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                        e->destroy();
+                    }
+                    ex->addComponent<CTransform>().pos = exPos;
+                    
                     break;
                 }
             }

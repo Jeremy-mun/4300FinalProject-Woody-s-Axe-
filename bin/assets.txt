@@ -76,7 +76,7 @@ Animation Ground2        TexGroundDirt        1   0
 
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
-Animation GhostShriek   TexGhostVanish   4  10
+Animation GhostVanish   TexGhostVanish   7  4
 Animation HellHound   	TexHellHound  	 5   5
 Animation DemonIdle	TexDemonIdle	 6   6
 Animation DemonAttack	TexDemonAttack	 11  6
