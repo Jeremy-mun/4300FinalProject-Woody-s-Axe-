@@ -24,6 +24,16 @@ Texture   TexFireSkull  images/enemies/fire-skull.png
 Texture   TexHellBeastIdle   images/enemies/hell-beast-idle.png
 Texture   TexHellBeastBurn   images/enemies/hell-beast-burn.png
 
+Texture   TexWizardIdle		images/enemies/wizardIdle.png
+Texture   TexWizardAttack1	images/enemies/wizardAttack1.png
+Texture   TexWizardAttack2	images/enemies/wizardAttack2.png
+Texture	  TexWizardTakeHit	images/enemies/wizardTakeHit.png
+Texture	  TexWizardRun		images/enemies/wizardRun.png
+Texture	  TexWizardDeath	images/enemies/wizardDeath.png
+Texture	  TexWizardFall		images/enemies/wizardFall.png
+Texture	  TexWizardJump		images/enemies/wizardJump.png
+Texture	  TexWizardProjectile	images/enemies/wizardProjectile.png
+
 Texture	  TexCoin	images/Items/Coin.png
 Texture   TexCoinHUD	images/Items/Coin2.png
 Texture	  TexHeart	images/Items/Heart.png
@@ -99,6 +109,16 @@ Animation DemonAttack	TexDemonAttack	 11  6
 Animation FireSkull	    TexFireSkull	 8  6
 Animation HellBeastIdle	   TexHellBeastIdle	 6  4
 Animation HellBeastBurn	   TexHellBeastBurn	 6  4
+
+Animation WizardIdle   	TexWizardIdle		8  2	
+Animation WizardAttack1	TexWizardAttack1	8  2
+Animation WizardAttack2	TexWizardAttack2        8  2
+Animation WizardTakeHit	TexWizardTakeHit	3  2
+Animation WizardRun	TexWizardRun		8  2
+Animation WizardDeath	TexWizardDeath		7  2
+Animation WizardFall	TexWizardFall		2  2						
+Animation WizardJump	TexWizardJump		2  2
+Animation WizardProjectile	TexWizardProjectile		1  0
 
 Animation Coin		TexCoin		 1   0
 Animation CoinHUD	TexCoinHUD	 1   0

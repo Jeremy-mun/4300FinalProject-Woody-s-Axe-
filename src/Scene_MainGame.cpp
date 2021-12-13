@@ -329,6 +329,12 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
                         npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
+                    else if (m_npcConfig.Name == "WizardIdle")
+                    {
+                        npc->addComponent<CState>("WizardIdle");
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("WizardIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     else
                     {
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
@@ -889,6 +895,7 @@ void Scene_MainGame::select(std::string direction)
 
 void Scene_MainGame::sAI()
 {
+    srand(time(0));
     for (auto e : m_entityManager.getEntities("npc"))
     {
         if (e->hasComponent<CFollowPlayer>())
@@ -946,10 +953,72 @@ void Scene_MainGame::sAI()
                             e->getComponent<CState>().state = "DemonIdle";
                         }
                     }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        if (e->getComponent<CAnimation>().animation.hasEnded())
+                        {
+                            e->getComponent<CState>().state = "WizardIdle";
+                        }
+                    }
                     else
                     {
                         e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
                         e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                    }
+                    if (e->getComponent<CAnimation>().animation.getName() == "WizardRun" || e->getComponent<CAnimation>().animation.getName() == "WizardFall" || e->getComponent<CAnimation>().animation.getName() == "WizardIdle" || e->getComponent<CAnimation>().animation.getName() == "WizardJump")
+                    {
+                        if (desired.x > 0)
+                        {
+                            if (e->getComponent<CAnimation>().animation.hasEnded() || e->getComponent<CAnimation>().animation.getName() == "WizardIdle")
+                            {
+                                e->getComponent<CState>().state = "WizardRun";
+                            }
+                        }
+                        else if (desired.x < 0)
+                        {
+                            if (e->getComponent<CAnimation>().animation.hasEnded() || e->getComponent<CAnimation>().animation.getName() == "WizardIdle")
+                            {
+                                e->getComponent<CState>().state = "WizardRun";
+                            }
+                        }
+                        else
+                        {
+                            if (e->getComponent<CAnimation>().animation.hasEnded() || e->getComponent<CAnimation>().animation.getName() == "WizardIdle")
+                            {
+                                e->getComponent<CState>().state = "WizardIdle";
+                            }
+                        }
+                    }
+                
+                }
+                if (e->hasComponent<CState>())
+                {
+                    auto& eState = e->getComponent<CState>();
+                    if (eState.state == "WizardRun" || eState.state == "WizardTakeHit" || eState.state == "WizardIdle")
+                    {
+                        int attacks = rand() % 100;
+                        if (attacks < 10)
+                        {
+                            if (length > 80)
+                            {
+                                eState.state = "WizardAttack2";
+                                auto& enemyProjectile = m_entityManager.addEntity("enemyAttack");
+                                enemyProjectile->addComponent<CAnimation>(m_game->assets().getAnimation("WizardProjectile"), true);
+                                enemyProjectile->addComponent<CTransform>(e->getComponent<CTransform>().pos);
+                                enemyProjectile->addComponent<CBoundingBox>(m_game->assets().getAnimation("WizardProjectile").getSize());
+                                enemyProjectile->addComponent<CDamage>(e->getComponent<CDamage>().damage + e->getComponent<CDamage>().tempDamage);
+                                enemyProjectile->addComponent<CLifeSpan>(240, currentFrame());
+                            }
+                            else 
+                            {
+                                eState.state = "WizardAttack2";
+                                auto& enemyProjectile = m_entityManager.addEntity("enemyAttack");
+                                enemyProjectile->addComponent<CTransform>(e->getComponent<CTransform>().pos);
+                                enemyProjectile->addComponent<CBoundingBox>(m_game->assets().getAnimation("WizardAttack1").getSize());
+                                enemyProjectile->addComponent<CDamage>(2*(e->getComponent<CDamage>().damage + e->getComponent<CDamage>().tempDamage));
+                                enemyProjectile->addComponent<CLifeSpan>(5, currentFrame());
+                            }
+                        }
                     }
                 }
               
@@ -1016,7 +1085,6 @@ void Scene_MainGame::sAI()
         }
     }
 }
-    
 
 void Scene_MainGame::sTilesAI()
 {
@@ -1151,6 +1219,7 @@ void Scene_MainGame::sTileCollision()
             }
             for (auto npc : m_entityManager.getEntities("npc"))
             {
+                bool grounded = false;
                 auto& npcTransform = npc->getComponent<CTransform>();
                 auto npcTileOverlap = Physics::GetOverlap(tile, npc);
                 if (npcTileOverlap.x > 0 && npcTileOverlap.y > 0)
@@ -1159,6 +1228,11 @@ void Scene_MainGame::sTileCollision()
                     {
                         if (npcTransform.pos.y > tileTransform.pos.y)
                         {
+                            bool grounded = true;
+                            if (npc->getComponent<CAnimation>().animation.getName() == "WizardRun" || npc->getComponent<CAnimation>().animation.getName() == "WizardFall" || npc->getComponent<CAnimation>().animation.getName() == "WizardIdle" || npc->getComponent<CAnimation>().animation.getName() == "WizardJump" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                            {
+                                npc->getComponent<CTransform>().velocity.y = 0;
+                            }
                             npcTransform.pos.y += npcTileOverlap.y;
                         }
                         else
