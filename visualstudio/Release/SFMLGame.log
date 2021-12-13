@@ -1,0 +1,11 @@
+﻿  Scene_MainGame.cpp
+C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_MainGame.cpp(390,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_MainGame.cpp(879,67): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_MainGame.cpp(901,22): warning C4018: '>': signed/unsigned mismatch
+C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_MainGame.cpp(1141,32): warning C4018: '>=': signed/unsigned mismatch
+  Generating code
+  1 of 2295 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    9 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  SFMLGame.vcxproj -> C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\bin\SFMLGame.exe

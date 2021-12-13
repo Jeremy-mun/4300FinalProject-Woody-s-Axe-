@@ -26,6 +26,26 @@ void Scene_Menu::init()
     registerAction(sf::Keyboard::D,     "ENTER");
     registerAction(sf::Keyboard::Escape, "QUIT");
 
+    std::ifstream config("options.txt");
+    if (config.is_open())
+    {
+        while (config.good())
+        {
+            // Using the getPosition() function below to convert room-tile coords to game world coords
+            //set variables equal to their values from the config file.
+            config >> ConfigRead;
+            if (ConfigRead == "MusicVolume")
+            {
+                config >> m_musicVolume;
+            }
+            else if (ConfigRead == "SFXVolume")
+            {
+                config >> m_effectVolume;
+            }
+        }
+    }
+    
+
     m_title = "Woody's AXE";
     m_menuStrings.push_back("New Game");
     m_menuStrings.push_back("Continue");
@@ -39,6 +59,7 @@ void Scene_Menu::init()
     m_menuText.setCharacterSize(64);
 
     m_game->playSound("MusicTitle");
+    m_game->setVolume("MusicTitle", m_musicVolume);
 
 
     m_backgroundSprite.setTexture(m_game->assets().getTexture("MainMenuBackground"));
@@ -68,6 +89,7 @@ void Scene_Menu::sDoAction(const Action& action)
         {
             if (m_menuStrings[m_selectedMenuIndex] == "New Game")
             {
+                m_game->stopSound("MusicTitle");
                 m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, "levels/level1.txt"));
             }
             else if (m_menuStrings[m_selectedMenuIndex] == "Continue")

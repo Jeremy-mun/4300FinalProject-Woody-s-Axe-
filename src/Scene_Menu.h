@@ -22,6 +22,10 @@ protected:
     size_t                      m_selectedMenuIndex = 0;
     Vec2                        menuTextPos = getPosition(0, 0, 8, 1);
     Vec2                        menuOptionsPos = getPosition(0, 0, 9, 3);
+    //options
+    std::string                 ConfigRead;
+    int                         m_musicVolume = 100;
+    int                         m_effectVolume = 100;
     void init();
     void update();
     void onEnd();

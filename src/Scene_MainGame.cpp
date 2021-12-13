@@ -49,6 +49,10 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setFont(m_game->assets().getFont("Gypsy"));
     m_walletText.setCharacterSize(36);
     m_walletText.setFillColor(sf::Color(137, 3, 6));
+
+    m_game->playSound("MusicGame");
+    m_game->setVolume("MusicGame", m_musicVolume);
+
 }
 
 void Scene_MainGame::loadOptions()
@@ -465,6 +469,7 @@ void Scene_MainGame::update()
     m_entityManager.update();
     if (!m_player->isActive())
     {
+        m_game->stopSound("MusicGame");
         m_game->changeScene("GameOver", std::make_shared<Scene_GameOver>(m_game, m_levelPath));
     }
     // When the game is paused
@@ -712,6 +717,11 @@ void Scene_MainGame::sDoAction(const Action& action)
             std::cout << m_player->getComponent<CInput>().canJump << ":" << m_playerOnGround << '\n';
             if (m_player->getComponent<CInput>().canJump || !m_playerOnGround) 
             {
+                if (m_player->getComponent<CInput>().canJump)
+                {
+                    m_game->playSound("Jump");
+                    m_game->setVolume("Jump", m_effectVolume);
+                }
                 m_player->getComponent<CInput>().up = true;
                 m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
@@ -760,6 +770,8 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         {
             return;
         }
+        m_game->playSound("UseItem");
+        m_game->setVolume("UseItem", m_effectVolume);
         if (inventory.items[m_select] == "RedPotion")
         {
             std::cout << "Red Potion";
@@ -1379,6 +1391,8 @@ void Scene_MainGame::sMeleeCollision()
     
     if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 24)
     {
+        m_game->playSound("Melee");
+        m_game->setVolume("Melee", m_effectVolume);
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& axe = m_entityManager.addEntity("weapon");
@@ -1409,6 +1423,8 @@ void Scene_MainGame::sMeleeCollision()
     }
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
+        m_game->playSound("Melee");
+        m_game->setVolume("Melee", m_effectVolume);
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& axe = m_entityManager.addEntity("weapon");
@@ -1425,12 +1441,19 @@ void Scene_MainGame::sMeleeCollision()
                 npcHealth.current -= axe->getComponent<CDamage>().damage;
                 if (npcHealth.current <= 0)
                 {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                     ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                     e->destroy();
                     break;
+                }
+                else
+                {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                 }
             }
         }
@@ -1472,6 +1495,8 @@ void Scene_MainGame::sArrowCollision()
 {
     if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10)
     {
+        m_game->playSound("Bow");
+        m_game->setVolume("Bow", m_effectVolume);
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& arrow = m_entityManager.addEntity("arrow");
@@ -1496,6 +1521,8 @@ void Scene_MainGame::sArrowCollision()
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     Vec2 exPos = e->getComponent<CTransform>().pos;
@@ -1515,6 +1542,11 @@ void Scene_MainGame::sArrowCollision()
                     ex->addComponent<CTransform>().pos = exPos;
                     
                     break;
+                }
+                else
+                {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                 }
             }
         }
@@ -1574,6 +1606,8 @@ void Scene_MainGame::sCoinCollision()
         auto playerCoinsOverlap = Physics::GetOverlap(coin, m_player);
         if (playerCoinsOverlap.x > coinBoundingBox.halfSize.x && playerCoinsOverlap.y > coinBoundingBox.halfSize.y)
         {
+            m_game->playSound("Coin");
+            m_game->setVolume("Coin", m_effectVolume);
             //m_game->playSound("GetItem");
             m_player->getComponent<CInventory>().money++;
             drawInventory();
@@ -2024,8 +2058,9 @@ void Scene_MainGame::snap(std::shared_ptr<Entity> e)
 
 void Scene_MainGame::onEnd()
 {
-     //m_game->stopSound("MusicLevel");
+     m_game->stopSound("MusicGame");
      m_game->playSound("MusicTitle");
+     m_game->setVolume("MusicTitle", m_musicVolume);
      m_game->changeScene("MENU", nullptr, true);
 }
 

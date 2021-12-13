@@ -38,8 +38,6 @@ void Scene_LoadGame_Menu::init()
     m_menuText.setFont(m_game->assets().getFont("Gypsy"));
     m_menuText.setCharacterSize(64);
 
-    m_game->playSound("MusicTitle");
-
     m_backgroundSprite.setTexture(m_game->assets().getTexture("MainMenuBackground"));
     m_backgroundSprite.setOrigin(m_game->window().getSize().x / 10, m_game->window().getSize().y / 6);
     m_backgroundSprite.move(sf::Vector2f(130, 125));
@@ -65,6 +63,7 @@ void Scene_LoadGame_Menu::sDoAction(const Action& action)
         }
         else if (action.name() == "ENTER")
         {
+            m_game->stopSound("MusicTitle");
             m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPaths[m_selectedMenuIndex]));
         }
         else if (action.name() == "QUIT")

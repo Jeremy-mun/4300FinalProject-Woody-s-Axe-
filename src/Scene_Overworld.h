@@ -23,6 +23,11 @@ protected:
 	int						  m_select = 1;
 	std::shared_ptr<Entity>	  m_player;
 
+	//options
+	std::string                 ConfigRead;
+	int                         m_musicVolume = 100;
+	int                         m_effectVolume = 100;
+
 	sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6, parallax7, parallax8, parallax9, parallax10, parallax11, parallax12, parallax13, parallax14;
 	std::vector<sf::String> m_parallaxBackgroundTextures = { "TexOverworldBackground1" , "TexOverworldBackground2" ,"TexOverworldBackground3" ,"TexOverworldBackground4"
 													,"TexOverworldBackground5" ,"TexOverworldBackground6","TexOverworldBackground7" 

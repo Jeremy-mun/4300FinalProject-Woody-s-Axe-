@@ -21,6 +21,25 @@ void Scene_GameOver::init()
 	registerAction(sf::Keyboard::D, "ENTER");
 	registerAction(sf::Keyboard::Escape, "QUIT");
 
+	std::ifstream config("options.txt");
+	if (config.is_open())
+	{
+		while (config.good())
+		{
+			// Using the getPosition() function below to convert room-tile coords to game world coords
+			//set variables equal to their values from the config file.
+			config >> ConfigRead;
+			if (ConfigRead == "MusicVolume")
+			{
+				config >> m_musicVolume;
+			}
+			else if (ConfigRead == "SFXVolume")
+			{
+				config >> m_effectVolume;
+			}
+		}
+	}
+
 	m_title = "Game Over";
 
 	m_menuStrings.push_back("Continue");
@@ -37,6 +56,8 @@ void Scene_GameOver::update()
 
 void Scene_GameOver::onEnd()
 {
+	m_game->playSound("MusicTitle");
+	m_game->setVolume("MusicTitle", m_musicVolume);
 	m_game->changeScene("MENU", nullptr, true);
 }
 
@@ -57,6 +78,7 @@ void Scene_GameOver::sDoAction(const Action& action)
 		{
 			if (m_selectedMenuIndex == 0)
 			{
+				
 				m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPath));
 			}
 			else

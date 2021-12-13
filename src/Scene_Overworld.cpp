@@ -20,6 +20,25 @@ void Scene_Overworld::init()
 	registerAction(sf::Keyboard::A, "LEFT");
 	registerAction(sf::Keyboard::D, "RIGHT");
 	registerAction(sf::Keyboard::Escape, "QUIT");
+
+	std::ifstream config("options.txt");
+	if (config.is_open())
+	{
+		while (config.good())
+		{
+			// Using the getPosition() function below to convert room-tile coords to game world coords
+			//set variables equal to their values from the config file.
+			config >> ConfigRead;
+			if (ConfigRead == "MusicVolume")
+			{
+				config >> m_musicVolume;
+			}
+			else if (ConfigRead == "SFXVolume")
+			{
+				config >> m_effectVolume;
+			}
+		}
+	}
 	
 	loadBackground();
 
@@ -64,6 +83,10 @@ void Scene_Overworld::init()
 
 	m_menuText.setFont(m_game->assets().getFont("Gypsy"));
 	m_menuText.setCharacterSize(64);
+
+	m_game->playSound("MusicOverworld");
+	m_game->setVolume("MusicOverworld", m_musicVolume);
+
 }
 
 
@@ -76,6 +99,9 @@ void Scene_Overworld::update()
 
 void Scene_Overworld::onEnd()
 {
+	m_game->stopSound("MusicOverworld");
+	m_game->playSound("MusicTitle");
+	m_game->setVolume("MusicTitle", m_musicVolume);
 	m_game->changeScene("MENU", nullptr, true);
 }
 
@@ -214,14 +240,17 @@ void Scene_Overworld::sDoAction(const Action& action)
 			{
 				if (m_select == 1)
 				{
+					m_game->stopSound("MusicOverworld");
 					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level1.txt"));
 				}
 				if (m_select == 2 && m_level1Completion)
 				{
+					m_game->stopSound("MusicOverworld");
 					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level2.txt"));
 				}
 				if (m_select == 3 && m_level2Completion)
 				{
+					m_game->stopSound("MusicOverworld");
 					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level3.txt"));
 				}
 			}

@@ -172,6 +172,16 @@ Animation OverworldBackground10	TexOverworldBackground12	1  0
 
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
+Sound     MusicGame    	sounds/MainGameMusic.wav
+Sound     MusicOverworld    	sounds/OverworldMusic.ogg
+Sound     UseItem	sounds/UseItem.wav
+Sound     Melee		sounds/Melee.wav
+Sound     Jump		sounds/Jump.wav
+Sound     Fire		sounds/Fire.wav
+Sound     EnemyHit	sounds/EnemyHit.wav
+Sound     Coin		sounds/Coin.wav
+Sound     Bow		sounds/Bow.wav
+
 Font      Arial         fonts/arial.ttf
 Font      Mario         fonts/mario.ttf
 Font      Megaman    fonts/megaman.ttf
