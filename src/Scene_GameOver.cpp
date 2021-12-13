@@ -6,10 +6,13 @@
 #include "Assets.h"
 #include "Scene_GameOver.h"
 #include "Scene_MainGame.h"
+#include "Scene_LoadGame_Menu.h"
+#include "Scene_Overworld.h"
 
-Scene_GameOver::Scene_GameOver(GameEngine* game, const std::string& levelPath)
+Scene_GameOver::Scene_GameOver(GameEngine* game, const std::string& levelPath, const std::string& saveFile)
 	:Scene(game)
 	, m_levelPath(levelPath)
+	, m_saveFile(saveFile)
 {
 	init();
 }
@@ -56,9 +59,18 @@ void Scene_GameOver::update()
 
 void Scene_GameOver::onEnd()
 {
-	m_game->playSound("MusicTitle");
-	m_game->setVolume("MusicTitle", m_musicVolume);
-	m_game->changeScene("MENU", nullptr, true);
+	if (m_saveFile == "NONE")
+	{
+		m_game->playSound("MusicTitle");
+		m_game->setVolume("MusicTitle", m_musicVolume);
+		m_game->changeScene("Load_Level_Menu", std::make_shared<Scene_LoadGame_Menu>(m_game));
+	}
+	else
+	{
+		m_game->playSound("MusicOverworld");
+		m_game->setVolume("MusicOverworld", m_musicVolume);
+		m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, m_saveFile));
+	}
 }
 
 void Scene_GameOver::sDoAction(const Action& action)
@@ -78,8 +90,7 @@ void Scene_GameOver::sDoAction(const Action& action)
 		{
 			if (m_selectedMenuIndex == 0)
 			{
-				
-				m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPath));
+				m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPath, m_saveFile));
 			}
 			else
 			{

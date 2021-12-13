@@ -7,9 +7,9 @@
 #include "Scene_Overworld.h"
 #include "Scene_MainGame.h"
 
-Scene_Overworld::Scene_Overworld(GameEngine* game, const std::string& levelPath)
+Scene_Overworld::Scene_Overworld(GameEngine* game, const std::string& saveFile)
 	:Scene(game)
-	, m_levelPath(levelPath)
+	, m_saveFile(saveFile)
 {
 	init();
 }
@@ -39,6 +39,8 @@ void Scene_Overworld::init()
 			}
 		}
 	}
+
+	loadSaveGame();
 	
 	loadBackground();
 
@@ -57,20 +59,26 @@ void Scene_Overworld::init()
 	level3Tile->addComponent<CTransform>(Vec2(992, 672));
 	if (m_level1Completion)
 	{
-		level1Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
-		level2Tile->addComponent<CAnimation>(m_game->assets().getAnimation("UnlockedLevel"), true);
-		level3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("LockedLevel"), true);
 		if (m_level2Completion)
 		{
-			level1Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
-			level2Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
-			level3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("UnLockedLevel"), true);
 			if (m_level3Completion)
 			{
 				level1Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
 				level2Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
 				level3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
 			}
+			else
+			{
+				level1Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
+				level2Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
+				level3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("UnlockedLevel"), true);
+			}
+		}
+		else
+		{
+			level1Tile->addComponent<CAnimation>(m_game->assets().getAnimation("CompletedLevel"), true);
+			level2Tile->addComponent<CAnimation>(m_game->assets().getAnimation("UnlockedLevel"), true);
+			level3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("LockedLevel"), true);
 		}
 		
 	}
@@ -89,7 +97,75 @@ void Scene_Overworld::init()
 
 }
 
+void Scene_Overworld::saveGame()
+{
+	std::ofstream save(m_saveFile);
+	if (save.is_open())
+	{	
+		save << "Level1   ";
+		save << m_level1Completion;
+		save << std::endl;
+		save << "Level2   ";
+		save << m_level2Completion;
+		save << std::endl;
+		save << "Level3   ";
+		save << m_level3Completion;
+		save << std::endl;
+		save << "Coins     ";
+		save << m_coinCount;
+		save << std::endl;
+		save << "MaxHealth ";
+		save << m_maxHealth;
+		save << std::endl;
+		save << "MaxArrows ";
+		save << m_arrowCount;
+		save << std::endl;
+		save << "Damage   ";
+		save << m_damage;
+		save << std::endl;
+	}
+}
 
+void Scene_Overworld::loadSaveGame()
+{
+	std::ifstream save(m_saveFile);
+	if (save.is_open())
+	{
+		while (save.good())
+		{
+			
+			save >> m_saveRead;
+			if (m_saveRead == "Level1")
+			{
+				save >> m_level1Completion;
+			}
+			else if (m_saveRead == "Level2")
+			{
+				save >> m_level2Completion;
+			}
+			else if (m_saveRead == "Level3")
+			{
+				save >> m_level3Completion;
+			}
+			else if (m_saveRead == "Coins")
+			{
+				save >> m_coinCount;
+			}
+			else if (m_saveRead == "MaxHealth")
+			{
+				save >> m_maxHealth;
+			}
+			else if (m_saveRead == "Damage")
+			{
+				save >> m_damage;
+			}
+			else if (m_saveRead == "MaxArrows")
+			{
+				save >> m_arrowCount;
+			}
+		}
+	}
+}
 
 void Scene_Overworld::update()
 {
@@ -240,18 +316,21 @@ void Scene_Overworld::sDoAction(const Action& action)
 			{
 				if (m_select == 1)
 				{
+					saveGame();
 					m_game->stopSound("MusicOverworld");
-					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level1.txt"));
+					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level1.txt", m_saveFile));
 				}
 				if (m_select == 2 && m_level1Completion)
 				{
+					saveGame();
 					m_game->stopSound("MusicOverworld");
-					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level2.txt"));
+					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level2.txt", m_saveFile));
 				}
 				if (m_select == 3 && m_level2Completion)
 				{
+					saveGame();
 					m_game->stopSound("MusicOverworld");
-					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level3.txt"));
+					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level3.txt", m_saveFile));
 				}
 			}
 		}
@@ -271,6 +350,7 @@ void Scene_Overworld::sDoAction(const Action& action)
 		}
 		else if (action.name() == "QUIT")
 		{
+			saveGame();
 			onEnd();
 		}
 	}

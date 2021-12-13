@@ -4,7 +4,7 @@
 #include "Scene_Level_Editor.h"
 #include "Scene_Level_Editor_Menu.h"
 #include "Scene_LoadGame_Menu.h"
-#include "Scene_Overworld.h"
+#include "Scene_StoryMode_Menu.h"
 #include "Scene_Options.h"
 #include "Scene_Credits.h"
 #include "Common.h"
@@ -89,12 +89,11 @@ void Scene_Menu::sDoAction(const Action& action)
         {
             if (m_menuStrings[m_selectedMenuIndex] == "New Game")
             {
-                m_game->stopSound("MusicTitle");
-                m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, "levels/level1.txt"));
+                m_game->changeScene("Overworld", std::make_shared<Scene_StoryMode_Menu>(m_game, "NEW"));
             }
             else if (m_menuStrings[m_selectedMenuIndex] == "Continue")
             {
-
+                m_game->changeScene("Overworld", std::make_shared<Scene_StoryMode_Menu>(m_game, "CONTINUE"));
             }
             else if (m_menuStrings[m_selectedMenuIndex] == "Level  Editor")
             {

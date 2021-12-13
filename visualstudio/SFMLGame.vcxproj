@@ -29,6 +29,7 @@
     <ClCompile Include="..\src\Physics.cpp" />
     <ClCompile Include="..\src\Scene_Options.cpp" />
     <ClCompile Include="..\src\Scene_Overworld.cpp" />
+    <ClCompile Include="..\src\Scene_StoryMode_Menu.cpp" />
     <ClCompile Include="..\src\Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +52,7 @@
     <ClInclude Include="..\src\Physics.h" />
     <ClInclude Include="..\src\Scene_Options.h" />
     <ClInclude Include="..\src\Scene_Overworld.h" />
+    <ClInclude Include="..\src\Scene_StoryMode_Menu.h" />
     <ClInclude Include="..\src\Vec2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

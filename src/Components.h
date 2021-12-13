@@ -157,10 +157,14 @@ class CInventory : public Component
 {
 public:
     int money = 0;
+    int maxArrows = 10;
+    int Arrows = 10;
     std::vector<std::string> items = {};
     CInventory() {}
     CInventory(int m)
         : money(m) {}
+    CInventory(int m, int a)
+        : money(m), maxArrows(a), Arrows(a) {}
 };
 
 class CShader : public Component

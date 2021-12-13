@@ -110,6 +110,12 @@ protected:
     sf::Keyboard::Key           m_toggleGridKey = sf::Keyboard::G;
     sf::Keyboard::Key           m_toggleCollisionKey = sf::Keyboard::C;
 
+    //saveGame
+    std::string               m_saveFile;
+    std::string               m_saveRead;
+    bool					  m_level1Completion = false, m_level2Completion = false, m_level3Completion = false;
+    int						  m_maxHealth = 10, m_damage = 1, m_arrowCount = 10, m_coinCount = 0;
+
     sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10;
     std::vector<sf::String> m_parallaxBackgroundTextures = { "TexParallax1" , "TexParallax2" ,"TexParallax3" ,"TexParallax4" 
                                                     ,"TexParallax5" ,"TexParallax6" ,"TexParallax7" 
@@ -167,10 +173,14 @@ protected:
     void sUseItem(std::shared_ptr<Entity> entity);
     void select(std::string direction);
     void loadOptions();
+    void loadSaveGame();
+    void saveGame();
+    void levelCompleted();
+
     
 public:
 
-    Scene_MainGame(GameEngine* gameEngine, const std::string& levelPath);
+    Scene_MainGame(GameEngine* gameEngine, const std::string& levelPath, const std::string& saveFile);
                            
     void sRender();
     void sDoAction(const Action& action);

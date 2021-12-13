@@ -14,6 +14,7 @@ protected:
 
 	std::string               m_title;
 	std::string               m_levelPath;
+	std::string               m_saveFile;
 	std::vector<std::string>  m_menuStrings;
 	sf::Text                  m_menuText;
 	size_t                    m_selectedMenuIndex = 0;
@@ -32,7 +33,7 @@ protected:
 
 public:
 
-	Scene_GameOver(GameEngine* game, const std::string& levelPath);
+	Scene_GameOver(GameEngine* game, const std::string& levelPath, const std::string& saveFile);
 	Vec2 getPosition(int sx, int sy, int tx, int ty) const;
 	void sRender();
 

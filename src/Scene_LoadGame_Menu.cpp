@@ -64,7 +64,7 @@ void Scene_LoadGame_Menu::sDoAction(const Action& action)
         else if (action.name() == "ENTER")
         {
             m_game->stopSound("MusicTitle");
-            m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPaths[m_selectedMenuIndex]));
+            m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPaths[m_selectedMenuIndex], "NONE"));
         }
         else if (action.name() == "QUIT")
         {

@@ -19,7 +19,6 @@ protected:
 	size_t                    m_selectedMenuIndex = 0;
 	Vec2                      menuTextPos = getPosition(0, 0, 4, 1);
 	Vec2                      menuOptionsPos = getPosition(0, 0, 8, 7);
-	bool					  m_level1Completion = false, m_level2Completion = false, m_level3Completion = false;
 	int						  m_select = 1;
 	std::shared_ptr<Entity>	  m_player;
 
@@ -27,6 +26,12 @@ protected:
 	std::string                 ConfigRead;
 	int                         m_musicVolume = 100;
 	int                         m_effectVolume = 100;
+
+	//saveGame
+	std::string               m_saveFile;
+	std::string               m_saveRead;
+	bool					  m_level1Completion = false, m_level2Completion = false, m_level3Completion = false;
+	int						  m_maxHealth = 10, m_damage = 1, m_arrowCount = 10, m_coinCount = 0;
 
 	sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6, parallax7, parallax8, parallax9, parallax10, parallax11, parallax12, parallax13, parallax14;
 	std::vector<sf::String> m_parallaxBackgroundTextures = { "TexOverworldBackground1" , "TexOverworldBackground2" ,"TexOverworldBackground3" ,"TexOverworldBackground4"
@@ -43,10 +48,12 @@ protected:
 	void loadBackground();
 	void drawBackground();
 	void playerMove();
+	void loadSaveGame();
+	void saveGame();
 
 public:
 
-	Scene_Overworld(GameEngine* game, const std::string& levelPath);
+	Scene_Overworld(GameEngine* game, const std::string& saveFile);
 	Vec2 getPosition(int sx, int sy, int tx, int ty) const;
 	void sRender();
 
