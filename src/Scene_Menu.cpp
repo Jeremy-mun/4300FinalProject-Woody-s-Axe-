@@ -3,6 +3,8 @@
 #include "Scene_MainGame.h"
 #include "Scene_Level_Editor.h"
 #include "Scene_Level_Editor_Menu.h"
+#include "Scene_LoadGame_Menu.h"
+#include "Scene_Overworld.h"
 #include "Scene_Options.h"
 #include "Scene_Credits.h"
 #include "Common.h"
@@ -25,17 +27,13 @@ void Scene_Menu::init()
     registerAction(sf::Keyboard::Escape, "QUIT");
 
     m_title = "Woody's AXE";
-    m_menuStrings.push_back("Level  1");
-    m_menuStrings.push_back("Level  2");
-    m_menuStrings.push_back("Level  3");
+    m_menuStrings.push_back("New Game");
+    m_menuStrings.push_back("Continue");
     m_menuStrings.push_back("Level  Editor");
     m_menuStrings.push_back("Load Level");
     m_menuStrings.push_back("Options");
     m_menuStrings.push_back("Credits");
 
-    m_levelPaths.push_back("levels/level1.txt");
-    m_levelPaths.push_back("levels/level2.txt");
-    m_levelPaths.push_back("levels/level3.txt");
 
     m_menuText.setFont(m_game->assets().getFont("Gypsy"));
     m_menuText.setCharacterSize(64);
@@ -68,20 +66,27 @@ void Scene_Menu::sDoAction(const Action& action)
         }
         else if (action.name() == "ENTER")
         {
-            if (m_selectedMenuIndex < 3)
+            if (m_menuStrings[m_selectedMenuIndex] == "New Game")
             {
-                m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, m_levelPaths[m_selectedMenuIndex]));
-                m_game->assets().getSound("MusicTitle").stop();
+                m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, "levels/level1.txt"));
             }
-            else if (m_selectedMenuIndex < 5)
+            else if (m_menuStrings[m_selectedMenuIndex] == "Continue")
+            {
+
+            }
+            else if (m_menuStrings[m_selectedMenuIndex] == "Level  Editor")
             {
                 m_game->changeScene("Level_Editor_Menu", std::make_shared<Scene_Level_Editor_Menu>(m_game));
             }
-            else if (m_selectedMenuIndex == 5)
+            else if (m_menuStrings[m_selectedMenuIndex] == "Load Level")
+            {
+                m_game->changeScene("Load_Level_Menu", std::make_shared<Scene_LoadGame_Menu>(m_game));
+            }
+            else if (m_menuStrings[m_selectedMenuIndex] == "Options")
             {
                 m_game->changeScene("Options", std::make_shared<Scene_Options>(m_game));
             }
-            else if (m_selectedMenuIndex == 6)
+            else if (m_menuStrings[m_selectedMenuIndex] == "Credits")
             {
                 m_game->changeScene("Credits", std::make_shared<Scene_Credits>(m_game));
             }
@@ -119,7 +124,7 @@ void Scene_Menu::sRender()
     {
         m_menuText.setString(m_menuStrings[i]);
         m_menuText.setFillColor(i == m_selectedMenuIndex ? sf::Color::White : sf::Color(137, 3, 6));
-        m_menuText.setPosition(sf::Vector2f(menuOptionsPos.x, menuOptionsPos.y + i * 72));
+        m_menuText.setPosition(sf::Vector2f(menuOptionsPos.x - 32, menuOptionsPos.y + i * 72));
         m_game->window().draw(m_menuText);
     }
 

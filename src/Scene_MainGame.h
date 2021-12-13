@@ -52,7 +52,7 @@ protected:
     std::string             configRead;
     const Vec2              m_gridSize = { 64, 64 };
     Vec2                    m_mPos = Vec2(0.0f, 0.0f);
-    bool                    m_drawGrid = true;
+    bool                    m_drawGrid = false;
     TileConfig              m_tileConfig;
     NPCConfig               m_npcConfig;
     ItemConfig              m_itemConfig;

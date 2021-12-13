@@ -59,6 +59,22 @@ Texture   TexParallax8 images/BackGrounds/Parallax/08_Forest.png
 Texture   TexParallax9 images/BackGrounds/Parallax/09_Forest.png
 Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
 
+Texture   TexCompletedLevel 		images/BackGrounds/Overworld/CompletedLevel.png
+Texture   TexUnlockedLevel 		images/BackGrounds/Overworld/UnlockedLevel.png
+Texture   TexLockedLevel 		images/BackGrounds/Overworld/LockedLevel.png
+Texture	  TexOverworldBackground1 	images/BackGrounds/Overworld/OverworldBackground1.png
+Texture	  TexOverworldBackground2 	images/BackGrounds/Overworld/OverworldBackground2.png
+Texture	  TexOverworldBackground3 	images/BackGrounds/Overworld/OverworldBackground3.png
+Texture	  TexOverworldBackground4 	images/BackGrounds/Overworld/OverworldBackground4.png
+Texture	  TexOverworldBackground5 	images/BackGrounds/Overworld/OverworldBackground5.png
+Texture	  TexOverworldBackground6 	images/BackGrounds/Overworld/OverworldBackground6.png
+Texture	  TexOverworldBackground7 	images/BackGrounds/Overworld/OverworldBackground7.png
+Texture	  TexOverworldBackground8 	images/BackGrounds/Overworld/OverworldBackground8.png
+Texture	  TexOverworldBackground9 	images/BackGrounds/Overworld/OverworldBackground9.png
+Texture	  TexOverworldBackground10 	images/BackGrounds/Overworld/OverworldBackground10.png
+Texture	  TexOverworldBackground11 	images/BackGrounds/Overworld/OverworldBackground11.png
+Texture	  TexOverworldBackground12	images/BackGrounds/Overworld/OverworldBackground12.png
+
 
 Animation Explosion     TexExplode     	48   2 
 Animation RunRight      TexRunRight     24   2    
@@ -118,6 +134,21 @@ Animation Parallax8	 TexParallax8 	1  0
 Animation Parallax9	 TexParallax9 	1  0
 Animation Parallax10     TexParallax10 	1  0
 
+Animation CompletedLevel 	TexCompletedLevel		1  0
+Animation UnlockedLevel 	TexUnlockedLevel		1  0
+Animation LockedLevel 		TexLockedLevel			1  0
+Animation OverworldBackground10	TexOverworldBackground1		1  0
+Animation OverworldBackground10	TexOverworldBackground2		1  0
+Animation OverworldBackground10	TexOverworldBackground3		1  0
+Animation OverworldBackground10	TexOverworldBackground4		1  0
+Animation OverworldBackground10	TexOverworldBackground5		1  0
+Animation OverworldBackground10	TexOverworldBackground6		1  0
+Animation OverworldBackground10	TexOverworldBackground7		1  0
+Animation OverworldBackground10	TexOverworldBackground8		1  0
+Animation OverworldBackground10	TexOverworldBackground9		1  0
+Animation OverworldBackground10	TexOverworldBackground10	1  0
+Animation OverworldBackground10	TexOverworldBackground11	1  0
+Animation OverworldBackground10	TexOverworldBackground12	1  0
 
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
