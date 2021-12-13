@@ -16,6 +16,7 @@ Texture   TexGroundDirt     images/gothic/tileGround2.png
 
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/enemies/ghost-shriek.png
+Texture   TexGhostVanish images/enemies/ghost-vanish.png
 Texture   TexHellHound  images/enemies/hell-hound-run.png
 Texture   TexDemonIdle  images/enemies/demon-idle.png
 Texture   TexDemonAttack  images/enemies/demon-attack.png
@@ -75,6 +76,7 @@ Animation Ground2        TexGroundDirt        1   0
 
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
+Animation GhostShriek   TexGhostVanish   4  10
 Animation HellHound   	TexHellHound  	 5   5
 Animation DemonIdle	TexDemonIdle	 6   6
 Animation DemonAttack	TexDemonAttack	 11  6
