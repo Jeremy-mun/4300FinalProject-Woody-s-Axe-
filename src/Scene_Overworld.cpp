@@ -481,19 +481,19 @@ void Scene_Overworld::sDoAction(const Action& action)
 			{
 				if (m_select == -2 && m_coinCount >= 100)
 				{
-					m_coinCount - 100;
+					m_coinCount -= 100;
 					m_damage++;
 					saveGame();
 				}
 				else if (m_select == -1 && m_coinCount >= 50)
 				{
-					m_coinCount - 50;
+					m_coinCount -= 50;
 					m_arrowCount += 5;
 					saveGame();
 				}
 				else if (m_select == 0)
 				{
-					m_coinCount - 50;
+					m_coinCount -= 50;
 					m_maxHealth += 5;
 					saveGame();
 				}

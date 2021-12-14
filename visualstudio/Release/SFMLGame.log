@@ -1,10 +1,7 @@
 ﻿  Scene_Overworld.cpp
 C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_Overworld.cpp(442,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_Overworld.cpp(484,18): warning C4552: '-': result of expression not used
-C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_Overworld.cpp(490,18): warning C4552: '-': result of expression not used
-C:\Users\kaver\Documents\GitHub\4300FinalProject-Woody-s-Axe-\src\Scene_Overworld.cpp(496,18): warning C4552: '-': result of expression not used
   Generating code
-  2 of 2346 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 2346 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     10 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
