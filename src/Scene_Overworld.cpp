@@ -89,6 +89,50 @@ void Scene_Overworld::init()
 		level3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("LockedLevel"), true);
 	}
 
+
+	auto& shop1Tile = m_entityManager.addEntity("Leveltiles");
+	shop1Tile->addComponent<CTransform>(Vec2(-352, 672));
+	auto& shop2Tile = m_entityManager.addEntity("Leveltiles");
+	shop2Tile->addComponent<CTransform>(Vec2(-672, 672));
+	auto& shop3Tile = m_entityManager.addEntity("Leveltiles");
+	shop3Tile->addComponent<CTransform>(Vec2(-992, 672));
+	shop1Tile->addComponent<CAnimation>(m_game->assets().getAnimation("ShopLevel"), true);
+	shop2Tile->addComponent<CAnimation>(m_game->assets().getAnimation("ShopLevel"), true);
+	shop3Tile->addComponent<CAnimation>(m_game->assets().getAnimation("ShopLevel"), true);
+
+	auto& shop1Pedestal = m_entityManager.addEntity("shop");
+	shop1Pedestal->addComponent<CTransform>(Vec2(-352, 642));
+	auto& shop2Pedestal = m_entityManager.addEntity("shop");
+	shop2Pedestal->addComponent<CTransform>(Vec2(-672, 642));
+	auto& shop3Pedestal = m_entityManager.addEntity("shop");
+	shop3Pedestal->addComponent<CTransform>(Vec2(-992, 642));
+	shop1Pedestal->addComponent<CAnimation>(m_game->assets().getAnimation("ShopPedestal"), true);
+	shop2Pedestal->addComponent<CAnimation>(m_game->assets().getAnimation("ShopPedestal"), true);
+	shop3Pedestal->addComponent<CAnimation>(m_game->assets().getAnimation("ShopPedestal"), true);
+	auto& shopkeeper = m_entityManager.addEntity("shop");
+	shopkeeper->addComponent<CTransform>(Vec2(-1168, 642));
+	shopkeeper->addComponent<CAnimation>(m_game->assets().getAnimation("Shopkeeper"), true);
+	shopkeeper->getComponent<CTransform>().scale.x = -1;
+	auto& shop1Item = m_entityManager.addEntity("shop");
+	shop1Item->addComponent<CTransform>(Vec2(-352, 612));
+	auto& shop2Item = m_entityManager.addEntity("shop");
+	shop2Item->addComponent<CTransform>(Vec2(-672, 612));
+	auto& shop3Item = m_entityManager.addEntity("shop");
+	shop3Item->addComponent<CTransform>(Vec2(-992, 612));
+	shop1Item->addComponent<CAnimation>(m_game->assets().getAnimation("HealthUp"), true);
+	shop2Item->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowsUp"), true);
+	shop3Item->addComponent<CAnimation>(m_game->assets().getAnimation("DamageUp"), true);
+
+	auto coin = m_entityManager.addEntity("shop");
+
+	coin->addComponent<CTransform>(Vec2(50,50));
+	coin->addComponent<CAnimation>(m_game->assets().getAnimation("CoinHUD"), true);
+	coin->addComponent<CBoundingBox>(m_game->assets().getAnimation("CoinHUD").getSize());
+
+
+	m_walletText.setFont(m_game->assets().getFont("Gypsy"));
+	m_walletText.setCharacterSize(32);
+
 	m_menuText.setFont(m_game->assets().getFont("Gypsy"));
 	m_menuText.setCharacterSize(64);
 
@@ -184,17 +228,18 @@ void Scene_Overworld::onEnd()
 void Scene_Overworld::playerMove()
 {
 	std::cout << m_select << '\n';
-	if (m_select == 1)
+	if (m_select == -2)
 	{
-		if (m_player->getComponent<CTransform>().pos == Vec2(352, 656))
+		if (m_player->getComponent<CTransform>().pos == Vec2(-992, 656))
 		{
-			if(m_player->getComponent<CAnimation>().animation.getName() != "StandUp")
+			if (m_player->getComponent<CAnimation>().animation.getName() != "StandUp")
 			{
 				m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("StandUp");
 			}
 		}
 		else
 		{
+
 			m_player->getComponent<CTransform>().pos.x -= 4;
 			if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
 			{
@@ -207,7 +252,127 @@ void Scene_Overworld::playerMove()
 			}
 		}
 	}
-	if (m_select == 2)
+	else if (m_select == -1)
+	{
+		if (m_player->getComponent<CTransform>().pos == Vec2(-672, 656))
+		{
+			if (m_player->getComponent<CAnimation>().animation.getName() != "StandUp")
+			{
+				m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("StandUp");
+			}
+		}
+		else
+		{
+			if (m_player->getComponent<CTransform>().pos.x > -672)
+			{
+				m_player->getComponent<CTransform>().pos.x -= 4;
+				if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
+				{
+					m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("RunRight");
+					m_player->getComponent<CTransform>().scale.x = -1;
+				}
+				else
+				{
+					m_player->getComponent<CTransform>().scale.x = -1;
+				}
+			}
+			else
+			{
+
+				m_player->getComponent<CTransform>().pos.x += 4;
+				if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
+				{
+					m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("RunRight");
+					m_player->getComponent<CTransform>().scale.x = 1;
+				}
+				else
+				{
+					m_player->getComponent<CTransform>().scale.x = 1;
+				}
+			}
+		}
+	}
+	else if (m_select == 0)
+	{
+		if (m_player->getComponent<CTransform>().pos == Vec2(-352, 656))
+		{
+			if (m_player->getComponent<CAnimation>().animation.getName() != "StandUp")
+			{
+				m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("StandUp");
+			}
+		}
+		else
+		{
+			if (m_player->getComponent<CTransform>().pos.x > -352)
+			{
+				m_player->getComponent<CTransform>().pos.x -= 4;
+				if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
+				{
+					m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("RunRight");
+					m_player->getComponent<CTransform>().scale.x = -1;
+				}
+				else
+				{
+					m_player->getComponent<CTransform>().scale.x = -1;
+				}
+			}
+			else
+			{
+
+				m_player->getComponent<CTransform>().pos.x += 4;
+				if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
+				{
+					m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("RunRight");
+					m_player->getComponent<CTransform>().scale.x = 1;
+				}
+				else
+				{
+					m_player->getComponent<CTransform>().scale.x = 1;
+				}
+			}
+		}
+	}
+	else if (m_select == 1)
+	{
+		if (m_player->getComponent<CTransform>().pos == Vec2(352, 656))
+		{
+			if(m_player->getComponent<CAnimation>().animation.getName() != "StandUp")
+			{
+				m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("StandUp");
+			}
+		}
+		else
+		{
+			if (m_player->getComponent<CTransform>().pos.x > 352)
+			{
+				m_player->getComponent<CTransform>().pos.x -= 4;
+				if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
+				{
+					m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("RunRight");
+					m_player->getComponent<CTransform>().scale.x = -1;
+				}
+				else
+				{
+					m_player->getComponent<CTransform>().scale.x = -1;
+				}
+			}
+			else
+			{
+
+				m_player->getComponent<CTransform>().pos.x += 4;
+				if (m_player->getComponent<CAnimation>().animation.getName() != "RunRight")
+				{
+					m_player->getComponent<CAnimation>().animation = m_game->assets().getAnimation("RunRight");
+					m_player->getComponent<CTransform>().scale.x = 1;
+				}
+				else
+				{
+					m_player->getComponent<CTransform>().scale.x = 1;
+				}
+			}
+		}
+	}
+	else if (m_select == 2)
 	{
 		if (m_player->getComponent<CTransform>().pos == Vec2(672, 656))
 		{
@@ -246,7 +411,7 @@ void Scene_Overworld::playerMove()
 			}
 		}
 	}
-	if (m_select == 3)
+	else if (m_select == 3)
 	{
 		if (m_player->getComponent<CTransform>().pos == Vec2(992, 656))
 		{
@@ -314,19 +479,37 @@ void Scene_Overworld::sDoAction(const Action& action)
 		{
 			if (m_player->getComponent<CAnimation>().animation.getName() == "StandUp")
 			{
-				if (m_select == 1)
+				if (m_select == -2 && m_coinCount >= 100)
+				{
+					m_coinCount - 100;
+					m_damage++;
+					saveGame();
+				}
+				else if (m_select == -1 && m_coinCount >= 50)
+				{
+					m_coinCount - 50;
+					m_arrowCount += 5;
+					saveGame();
+				}
+				else if (m_select == 0)
+				{
+					m_coinCount - 50;
+					m_maxHealth += 5;
+					saveGame();
+				}
+				else if (m_select == 1)
 				{
 					saveGame();
 					m_game->stopSound("MusicOverworld");
 					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level1.txt", m_saveFile));
 				}
-				if (m_select == 2 && m_level1Completion)
+				else if (m_select == 2 && m_level1Completion)
 				{
 					saveGame();
 					m_game->stopSound("MusicOverworld");
 					m_game->changeScene("MainGame", std::make_shared<Scene_MainGame>(m_game, "levels/level2.txt", m_saveFile));
 				}
-				if (m_select == 3 && m_level2Completion)
+				else if (m_select == 3 && m_level2Completion)
 				{
 					saveGame();
 					m_game->stopSound("MusicOverworld");
@@ -343,7 +526,7 @@ void Scene_Overworld::sDoAction(const Action& action)
 		}
 		else if (action.name() == "LEFT")
 		{
-			if (m_select > 1)
+			if (m_select > -2)
 			{
 				m_select--;
 			}
@@ -365,11 +548,46 @@ Vec2 Scene_Overworld::getPosition(int rx, int ry, int tx, int ty) const
 
 void Scene_Overworld::sRender()
 {
-	m_game->window().setView(m_game->window().getDefaultView());
-	m_game->window().clear(sf::Color(12, 215, 224));
+	if (m_player->getComponent<CTransform>().pos.x >= 0)
+	{
+		m_game->window().setView(m_game->window().getDefaultView());
+		m_game->window().clear(sf::Color(12, 215, 224));
+	}
+	else
+	{
+		sf::View view = m_game->window().getDefaultView();
+		view.setCenter(sf::Vector2f(m_game->window().getDefaultView().getCenter().x - m_game->window().getDefaultView().getSize().x, m_game->window().getDefaultView().getCenter().y));
+		m_game->window().setView(view);
+		m_game->window().clear(sf::Color(12, 215, 224));
+	}
 
 
 	drawBackground();
+
+	for (auto e : m_entityManager.getEntities("shop"))
+	{
+		auto& transform = e->getComponent<CTransform>();
+		auto& animation = e->getComponent<CAnimation>().animation;
+		animation.getSprite().setRotation(transform.angle);
+		animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+		animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+		m_game->window().draw(animation.getSprite());
+		if (animation.getName() == "Shopkeeper")
+		{
+			animation.update();
+		}
+		else if (animation.getName() == "CoinHUD")
+		{
+			if (m_player->getComponent<CTransform>().pos.x >= 0)
+			{
+				transform.pos.x = 50;
+			}
+			else
+			{
+				transform.pos.x = 50 - m_game->window().getDefaultView().getSize().x;
+			}
+		}
+	}
 
 	for (auto e : m_entityManager.getEntities("Leveltiles"))
 	{
@@ -392,6 +610,17 @@ void Scene_Overworld::sRender()
 	m_menuText.setCharacterSize(32);
 	m_menuText.setFillColor(sf::Color(100, 100, 100));
 	m_menuText.setString("Select Level: F     Left: A    Right: D      Back: esc");
-	m_menuText.setPosition(sf::Vector2f(10, 724));
+	m_walletText.setString("x" + std::to_string(m_coinCount));
+	if (m_player->getComponent<CTransform>().pos.x >= 0)
+	{
+		m_menuText.setPosition(sf::Vector2f(10, 724));
+		m_walletText.setPosition(sf::Vector2f(82, 25));
+	}
+	else
+	{
+		m_menuText.setPosition(sf::Vector2f(10 - m_game->window().getDefaultView().getSize().x, 724));
+		m_walletText.setPosition(sf::Vector2f(82 - m_game->window().getDefaultView().getSize().x, 25));
+	}
 	m_game->window().draw(m_menuText);
+	m_game->window().draw(m_walletText);
 }

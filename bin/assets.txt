@@ -69,6 +69,7 @@ Texture   TexParallax8 images/BackGrounds/Parallax/08_Forest.png
 Texture   TexParallax9 images/BackGrounds/Parallax/09_Forest.png
 Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
 
+Texture   TexShopLevel	 		images/BackGrounds/Overworld/ShopLevel.png
 Texture   TexCompletedLevel 		images/BackGrounds/Overworld/CompletedLevel.png
 Texture   TexUnlockedLevel 		images/BackGrounds/Overworld/UnlockedLevel.png
 Texture   TexLockedLevel 		images/BackGrounds/Overworld/LockedLevel.png
@@ -85,6 +86,12 @@ Texture	  TexOverworldBackground10 	images/BackGrounds/Overworld/OverworldBackgr
 Texture	  TexOverworldBackground11 	images/BackGrounds/Overworld/OverworldBackground11.png
 Texture	  TexOverworldBackground12	images/BackGrounds/Overworld/OverworldBackground12.png
 
+Texture   TexArrowsUp      images/BackGrounds/Overworld/ArrowsUp.png
+Texture   TexDamageUp      images/BackGrounds/Overworld/DamageUp.png
+Texture   TexHealthUp      images/BackGrounds/Overworld/HealthUp.png
+Texture   TexShopkeeper    images/BackGrounds/Overworld/Shopkeeper.png
+Texture   TexShopPedestal  images/BackGrounds/Overworld/ShopPedestal.png
+Texture   TexShopSign      images/BackGrounds/Overworld/ShopSign.png
 
 Animation Explosion     TexExplode     	48   2 
 Animation RunRight      TexRunRight     24   2    
@@ -154,6 +161,7 @@ Animation Parallax8	 TexParallax8 	1  0
 Animation Parallax9	 TexParallax9 	1  0
 Animation Parallax10     TexParallax10 	1  0
 
+Animation ShopLevel 		TexShopLevel			1  0
 Animation CompletedLevel 	TexCompletedLevel		1  0
 Animation UnlockedLevel 	TexUnlockedLevel		1  0
 Animation LockedLevel 		TexLockedLevel			1  0
@@ -169,6 +177,13 @@ Animation OverworldBackground10	TexOverworldBackground9		1  0
 Animation OverworldBackground10	TexOverworldBackground10	1  0
 Animation OverworldBackground10	TexOverworldBackground11	1  0
 Animation OverworldBackground10	TexOverworldBackground12	1  0
+
+Animation ArrowsUp  	TexArrowsUp     1  0
+Animation DamageUp  	TexDamageUp     1  0
+Animation HealthUp  	TexHealthUp     1  0
+Animation Shopkeeper 	TexShopkeeper   9  6
+Animation ShopPedestal 	TexShopPedestal 1  0
+Animation ShopSign    	TexShopSign     1  0
 
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg

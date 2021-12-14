@@ -86,16 +86,16 @@ void Scene_MainGame::saveGame()
         save << m_level3Completion;
         save << std::endl;
         save << "Coins     ";
-        save << m_coinCount;
+        save << m_player->getComponent<CInventory>().money;
         save << std::endl;
         save << "MaxHealth ";
-        save << m_maxHealth;
+        save << m_player->getComponent<CHealth>().max;
         save << std::endl;
         save << "MaxArrows ";
-        save << m_arrowCount;
+        save << m_player->getComponent<CInventory>().maxArrows;
         save << std::endl;
         save << "Damage   ";
-        save << m_damage;
+        save << m_player->getComponent<CDamage>().damage;
         save << std::endl;
     }
 }

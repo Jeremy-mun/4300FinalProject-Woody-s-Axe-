@@ -21,6 +21,7 @@ protected:
 	Vec2                      menuOptionsPos = getPosition(0, 0, 8, 7);
 	int						  m_select = 1;
 	std::shared_ptr<Entity>	  m_player;
+	sf::Text				  m_walletText;
 
 	//options
 	std::string                 ConfigRead;
