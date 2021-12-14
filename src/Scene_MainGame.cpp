@@ -1,25 +1,28 @@
                           
 #include "Scene_MainGame.h"
 #include "Scene_GameOver.h"
+#include "Scene_Overworld.h"
+#include "Scene_LoadGame_Menu.h"
 #include "Common.h"
 #include "Physics.h"
 #include "Assets.h"
 #include "GameEngine.h"
 #include "Components.h"
 
-Scene_MainGame::Scene_MainGame(GameEngine* game, const std::string& levelPath)
+Scene_MainGame::Scene_MainGame(GameEngine* game, const std::string& levelPath, const std::string& saveFile)
     : Scene(game)
     , m_levelPath(levelPath)
+    , m_saveFile(saveFile)
 {
     init(m_levelPath);
 }
 
 void Scene_MainGame::init(const std::string& levelPath)
 {
+    loadSaveGame();
     loadOptions();
     loadLevel(levelPath);
     loadParallaxBackground();
-    //m_game->playSound("MusicLevel");
 
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(m_pauseKey, "PAUSE");
@@ -49,6 +52,93 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setFont(m_game->assets().getFont("Gypsy"));
     m_walletText.setCharacterSize(36);
     m_walletText.setFillColor(sf::Color(137, 3, 6));
+
+    m_game->playSound("MusicGame");
+    m_game->setVolume("MusicGame", m_musicVolume);
+
+}
+
+void Scene_MainGame::levelCompleted()
+{
+    if (m_saveFile == "NONE")
+    {
+        m_game->changeScene("Load_Level_Menu", std::make_shared<Scene_LoadGame_Menu>(m_game));
+    }
+    else
+    {
+        saveGame();
+        m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, m_saveFile));
+    }
+}
+
+void Scene_MainGame::saveGame()
+{
+    std::ofstream save(m_saveFile);
+    if (save.is_open())
+    {
+        save << "Level1    ";
+        save << m_level1Completion;
+        save << std::endl;
+        save << "Level2    ";
+        save << m_level2Completion;
+        save << std::endl;
+        save << "Level3    ";
+        save << m_level3Completion;
+        save << std::endl;
+        save << "Coins     ";
+        save << m_coinCount;
+        save << std::endl;
+        save << "MaxHealth ";
+        save << m_maxHealth;
+        save << std::endl;
+        save << "MaxArrows ";
+        save << m_arrowCount;
+        save << std::endl;
+        save << "Damage   ";
+        save << m_damage;
+        save << std::endl;
+    }
+}
+
+void Scene_MainGame::loadSaveGame()
+{
+    std::ifstream save(m_saveFile);
+    if (save.is_open())
+    {
+        while (save.good())
+        {
+
+            save >> m_saveRead;
+            if (m_saveRead == "Level1")
+            {
+                save >> m_level1Completion;
+            }
+            else if (m_saveRead == "Level2")
+            {
+                save >> m_level2Completion;
+            }
+            else if (m_saveRead == "Level3")
+            {
+                save >> m_level3Completion;
+            }
+            else if (m_saveRead == "Coins")
+            {
+                save >> m_coinCount;
+            }
+            else if (m_saveRead == "MaxHealth")
+            {
+                save >> m_maxHealth;
+            }
+            else if (m_saveRead == "Damage")
+            {
+                save >> m_damage;
+            }
+            else if (m_saveRead == "MaxArrows")
+            {
+                save >> m_arrowCount;
+            }
+        }
+    }
 }
 
 void Scene_MainGame::loadOptions()
@@ -72,6 +162,18 @@ void Scene_MainGame::loadOptions()
             else if (ConfigRead == "Difficulty")
             {
                 config >> m_difficulty;
+                if (m_difficulty == "Easy")
+                {
+                    m_difficultymod = 0.5;
+                }
+                else if (m_difficulty == "Hard")
+                {
+                    m_difficultymod = 2;
+                }
+                else
+                {
+                    m_difficultymod = 1;
+                }
             }
             else if (ConfigRead == "Jump")
             {
@@ -293,19 +395,6 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
-                    config >> m_itemConfig.PositionInGrid;
-                    if (m_itemConfig.PositionInGrid == "Left")
-                    {
-                        breakable->getComponent<CTransform>().pos.x -= 21;
-                    }
-                    else if (m_itemConfig.PositionInGrid == "Right")
-                    {
-                        breakable->getComponent<CTransform>().pos.x += 21;
-                    }
-                    else if(m_itemConfig.PositionInGrid == "Mid")
-                    {
-
-                    }
                     continue;
                 }
             }
@@ -342,13 +431,9 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     }
                     //npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
-                    npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
-                    npc->addComponent<CDamage>(m_npcConfig.D);
+                    npc->addComponent<CHealth>(m_npcConfig.H * m_difficultymod, m_npcConfig.H * m_difficultymod);
+                    npc->addComponent<CDamage>(ceil(m_npcConfig.D * m_difficultymod));
 
-                    if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
-                    {
-                        npc->addComponent<CState>(m_npcConfig.Name);
-                    }
                     npc->addComponent<CShader>();
                     continue;
                 }
@@ -366,12 +451,8 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
                     npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
-                    npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
-                    npc->addComponent<CDamage>(m_npcConfig.D);
-                    if (m_npcConfig.Name == "OctorokUp" || m_npcConfig.Name == "OctorokRight")
-                    {
-                        npc->addComponent<CState>(m_npcConfig.Name);
-                    }
+                    npc->addComponent<CHealth>(m_npcConfig.H* m_difficultymod, m_npcConfig.H* m_difficultymod);
+                    npc->addComponent<CDamage>(ceil(m_npcConfig.D * m_difficultymod));
                     continue;
                 }
             }
@@ -429,11 +510,21 @@ void Scene_MainGame::spawnPlayer()
     m_player->addComponent<CState>("StandRight");
     m_player->addComponent<CAnimation>(m_game->assets().getAnimation("StandRight"), true);
     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
-    m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
+    if (m_saveFile == "NONE")
+    {
+        m_player->addComponent<CHealth>(m_playerConfig.HEALTH, m_playerConfig.HEALTH);
+        m_player->addComponent<CDamage>(1);
+        m_player->addComponent<CInventory>();
+        
+    }
+    else
+    {
+        m_player->addComponent<CHealth>(m_maxHealth, m_maxHealth);
+        m_player->addComponent<CDamage>(m_damage);
+        m_player->addComponent<CInventory>(m_coinCount, m_arrowCount);
+    }
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
     m_player->addComponent<CDraggable>();
-    m_player->addComponent<CDamage>(1);
-    m_player->addComponent<CInventory>();
     m_player->addComponent<CShader>();
 }
 
@@ -465,7 +556,8 @@ void Scene_MainGame::update()
     m_entityManager.update();
     if (!m_player->isActive())
     {
-        m_game->changeScene("GameOver", std::make_shared<Scene_GameOver>(m_game, m_levelPath));
+        m_game->stopSound("MusicGame");
+        m_game->changeScene("GameOver", std::make_shared<Scene_GameOver>(m_game, m_levelPath, m_saveFile));
     }
     // When the game is paused
     if (m_paused)
@@ -712,6 +804,11 @@ void Scene_MainGame::sDoAction(const Action& action)
             std::cout << m_player->getComponent<CInput>().canJump << ":" << m_playerOnGround << '\n';
             if (m_player->getComponent<CInput>().canJump || !m_playerOnGround) 
             {
+                if (m_player->getComponent<CInput>().canJump)
+                {
+                    m_game->playSound("Jump");
+                    m_game->setVolume("Jump", m_effectVolume);
+                }
                 m_player->getComponent<CInput>().up = true;
                 m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
@@ -760,6 +857,8 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         {
             return;
         }
+        m_game->playSound("UseItem");
+        m_game->setVolume("UseItem", m_effectVolume);
         if (inventory.items[m_select] == "RedPotion")
         {
             std::cout << "Red Potion";
@@ -1379,6 +1478,8 @@ void Scene_MainGame::sMeleeCollision()
     
     if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 24)
     {
+        m_game->playSound("Melee");
+        m_game->setVolume("Melee", m_effectVolume);
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& axe = m_entityManager.addEntity("weapon");
@@ -1409,6 +1510,8 @@ void Scene_MainGame::sMeleeCollision()
     }
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
+        m_game->playSound("Melee");
+        m_game->setVolume("Melee", m_effectVolume);
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& axe = m_entityManager.addEntity("weapon");
@@ -1425,12 +1528,19 @@ void Scene_MainGame::sMeleeCollision()
                 npcHealth.current -= axe->getComponent<CDamage>().damage;
                 if (npcHealth.current <= 0)
                 {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                     ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                     e->destroy();
                     break;
+                }
+                else
+                {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                 }
             }
         }
@@ -1472,6 +1582,8 @@ void Scene_MainGame::sArrowCollision()
 {
     if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10)
     {
+        m_game->playSound("Bow");
+        m_game->setVolume("Bow", m_effectVolume);
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& arrow = m_entityManager.addEntity("arrow");
@@ -1496,6 +1608,8 @@ void Scene_MainGame::sArrowCollision()
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     Vec2 exPos = e->getComponent<CTransform>().pos;
@@ -1515,6 +1629,11 @@ void Scene_MainGame::sArrowCollision()
                     ex->addComponent<CTransform>().pos = exPos;
                     
                     break;
+                }
+                else
+                {
+                    m_game->playSound("EnemyHit");
+                    m_game->setVolume("EnemyHit", m_effectVolume);
                 }
             }
         }
@@ -1574,6 +1693,8 @@ void Scene_MainGame::sCoinCollision()
         auto playerCoinsOverlap = Physics::GetOverlap(coin, m_player);
         if (playerCoinsOverlap.x > coinBoundingBox.halfSize.x && playerCoinsOverlap.y > coinBoundingBox.halfSize.y)
         {
+            m_game->playSound("Coin");
+            m_game->setVolume("Coin", m_effectVolume);
             //m_game->playSound("GetItem");
             m_player->getComponent<CInventory>().money++;
             drawInventory();
@@ -2024,8 +2145,9 @@ void Scene_MainGame::snap(std::shared_ptr<Entity> e)
 
 void Scene_MainGame::onEnd()
 {
-     //m_game->stopSound("MusicLevel");
+     m_game->stopSound("MusicGame");
      m_game->playSound("MusicTitle");
+     m_game->setVolume("MusicTitle", m_musicVolume);
      m_game->changeScene("MENU", nullptr, true);
 }
 

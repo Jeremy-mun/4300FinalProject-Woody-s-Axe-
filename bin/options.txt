@@ -1,6 +1,6 @@
-MusicVolume     10 
+MusicVolume     5 
 SFXVolume       10 
-Difficulty      Normal 
+Difficulty      Hard 
 Jump            22 
 Left            0 
 Right           3 
