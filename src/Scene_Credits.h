@@ -16,8 +16,8 @@ protected:
 	std::vector<std::string>  m_menuStrings;
 	sf::Text                  m_menuText;
 	size_t                    m_selectedMenuIndex = 0;
-	Vec2                      menuTextPos = getPosition(0, 0, 7, 1);
-	Vec2                      menuOptionsPos = getPosition(0, 0, 6, 4);
+	Vec2                      menuTextPos = getPosition(0, 0, 6, 1);
+	Vec2                      menuOptionsPos = getPosition(0, 0, 2, 4);
 
 	void loadCredits();
 	void init();
