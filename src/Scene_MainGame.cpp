@@ -340,7 +340,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 {
                     auto portal = m_entityManager.addEntity("teleport");
                     portal->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), false);
+                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
                     portal->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
                     portal->addComponent<CDraggable>();
                     continue;
@@ -2189,7 +2189,7 @@ void Scene_MainGame::sAnimation()
 #pragma endregion
 
 
-    for (auto& e : m_entityManager.getEntities("tile"))
+    for (auto& e : m_entityManager.getEntities("teleport"))
     {
         if (e->hasComponent<CState>())
         {
