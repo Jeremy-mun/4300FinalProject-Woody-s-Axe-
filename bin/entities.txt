@@ -31,3 +31,8 @@ Item PurplePotion         0  0  0  0  0  0
 Item GoldPotion           0  0  0  0  0  0
 Item BluePotion           0  0  0  0  0  0
 Item GreenPotion           0  0  0  0  0  0
+Item Chest	           0  0  0  0  0  0
+Item JarBig	           0  0  0  0  0  0
+Item JarSmall	           0  0  0  0  0  0
+Item Barrel	           0  0  0  0  0  0
+Item GreenPotion           0  0  0  0  0  0

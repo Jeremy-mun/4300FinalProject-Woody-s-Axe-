@@ -60,7 +60,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setFillColor(sf::Color(137, 3, 6));
 
     m_lighting.setTexture(m_game->assets().getTexture("TexTransparent"));
-    m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 762));
+    m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 768));
     m_lighting.setPosition(0, 0);
 
     m_game->playSound("MusicGame");
@@ -1020,28 +1020,29 @@ void Scene_MainGame::sInteract()
                 std::srand(time(0));
                 int coinAmount = std::rand() % 17 + 3;
                 m_player->getComponent<CInventory>().money += coinAmount;
-                int itemID = std::rand() % 6;
-                if (itemID == 0)
+                int itemID = std::rand() % 100;
+                if (itemID < 30)
                 {
                     m_player->getComponent<CInventory>().items.push_back("RedPotion");
                 }
-                if (itemID == 1)
+                else if (itemID <60)
                 {
                     m_player->getComponent<CInventory>().items.push_back("BluePotion");
                 }
-                if (itemID == 2)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("GoldPotion");
-                }
-                if (itemID == 3)
+                else if (itemID < 75)
                 {
                     m_player->getComponent<CInventory>().items.push_back("GreenPotion");
                 }
-                if (itemID == 4)
+                else if (itemID < 90)
                 {
                     m_player->getComponent<CInventory>().items.push_back("PurplePotion");
                 }
+                else
+                {
+                    m_player->getComponent<CInventory>().items.push_back("GoldPotion");
+                }
                 interactable->destroy();
+                drawInventory();
             }
         }
     }
@@ -1432,6 +1433,11 @@ void Scene_MainGame::sTileCollision()
     m_playerOnGround = false;
     m_collidingWithTile = false;
     m_playerOnMovingTile = false;
+    if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CBoundingBox>().halfSize.x)
+    {
+        m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
+        m_collidingWithTile = true;
+    }
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
@@ -1864,6 +1870,7 @@ void Scene_MainGame::sMeleeCollision()
 }
 void Scene_MainGame::sBreakableCollision()
 {
+    srand(time(0));
     for (auto& weapon : m_entityManager.getEntities("weapon"))
     {
         for (auto& e : m_entityManager.getEntities("breakable"))
@@ -1871,25 +1878,23 @@ void Scene_MainGame::sBreakableCollision()
             auto breakableWeaponOverlap = Physics::GetOverlap(weapon, e);
             if (breakableWeaponOverlap.x > 0 && breakableWeaponOverlap.y > 0)
             {
-                //m_game->playSound("EnemyDie");
                 auto ex = m_entityManager.addEntity("explosion");
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                 ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                 e->destroy();
-                break;
-                srand(time(0));
                 if (e->getComponent<CAnimation>().animation.getName() == "Barrel")
                 {
-                    m_player->getComponent<CInventory>().money += rand() % 10 + 2;
+                    m_player->getComponent<CInventory>().money += (rand() % 6) + 2;
                 }
                 if (e->getComponent<CAnimation>().animation.getName() == "JarBig")
                 {
-                    m_player->getComponent<CInventory>().money += rand() % 5 + 1;
+                    m_player->getComponent<CInventory>().money += (rand() % 4) + 1;
                 }
                 if (e->getComponent<CAnimation>().animation.getName() == "JarSmall")
                 {
-                    m_player->getComponent<CInventory>().money += rand() % 3;
+                    m_player->getComponent<CInventory>().money += (rand() % 3);
                 }
+                drawInventory();
             }
         }
     }
@@ -2808,7 +2813,7 @@ void Scene_MainGame::sRender()
     }
     else
     {
-        shader.setUniform("positionx", (float)m_player->getComponent<CTransform>().pos.x - m_game->window().getView().getCenter().x + m_game->window().getSize().x/2);
+        shader.setUniform("positionx", (float)m_player->getComponent<CTransform>().pos.x - m_game->window().getView().getCenter().x + m_game->window().getSize().x / 2);
         shader.setUniform("positiony", (float)m_player->getComponent<CTransform>().pos.y - m_game->window().getView().getCenter().y + m_game->window().getSize().y / 2);
         shader.setUniform("radius", 300);
         m_game->window().draw(m_lighting, &shader);
