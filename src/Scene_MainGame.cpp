@@ -85,11 +85,11 @@ void Scene_MainGame::levelCompleted()
         }
         else if (m_levelPath == "levels/level2.txt")
         {
-            m_level1Completion = true;
+            m_level2Completion = true;
         }
         else if (m_levelPath == "levels/level3.txt")
         {
-            m_level1Completion = true;
+            m_level3Completion = true;
         }
         saveGame();
         m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, m_saveFile));
@@ -990,15 +990,15 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             
             if (entity->hasComponent<CInvincibility>())
             {
-                entity->getComponent<CInvincibility>().iframes = 60;
+                entity->getComponent<CInvincibility>().iframes = 240;
             }
             else
             {
-                entity->addComponent<CInvincibility>(60);
+                entity->addComponent<CInvincibility>(240);
             }
             if (entity->hasComponent<CShader>())
             {
-                entity->getComponent<CShader>().duration = 60;
+                entity->getComponent<CShader>().duration = 240;
                 entity->getComponent<CShader>().ourShader = m_shaders[1];
             }
         }
@@ -2160,7 +2160,11 @@ void Scene_MainGame::sArrowPickCollision()
             {
                 m_game->playSound("Bow");
                 m_game->setVolume("Bow", m_effectVolume);
-                m_player->getComponent<CInventory>().Arrows++;
+                m_player->getComponent<CInventory>().Arrows += 3;
+                if (m_player->getComponent<CInventory>().Arrows > m_player->getComponent<CInventory>().maxArrows)
+                {
+                    m_player->getComponent<CInventory>().Arrows = m_player->getComponent<CInventory>().maxArrows;
+                }
                 arrowpick->destroy();
             }
             
