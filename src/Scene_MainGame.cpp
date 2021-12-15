@@ -1098,6 +1098,7 @@ void Scene_MainGame::select(std::string direction)
 
 void Scene_MainGame::sAI()
 {
+    m_wizardAttackTime++;
     srand(time(0));
     for (auto e : m_entityManager.getEntities("npc"))
     {
@@ -1200,7 +1201,7 @@ void Scene_MainGame::sAI()
                             e->getComponent<CState>().state = "DemonIdle";
                         }
                     }
-                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || e->getComponent<CAnimation>().animation.getName() == "WizardAttack2" || e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit")
                     {
                         if (e->getComponent<CAnimation>().animation.hasEnded())
                         {
@@ -1214,7 +1215,12 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
-                            e->getComponent<CAnimation>().animation.getName() == "HellHound" 
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound" ||
+                            e->getComponent<CAnimation>().animation.getName() == "WizardIdle" || 
+                            e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" || 
+                            e->getComponent<CAnimation>().animation.getName() == "WizardRun" || 
+                            e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || 
+                            e->getComponent<CAnimation>().animation.getName() == "WizardAttack2"
                             )
                         {
                             e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
@@ -1257,28 +1263,29 @@ void Scene_MainGame::sAI()
                     auto& eState = e->getComponent<CState>();
                     if (eState.state == "WizardRun" || eState.state == "WizardTakeHit" || eState.state == "WizardIdle")
                     {
-                        int attacks = rand() % 100;
-                        if (attacks < 10)
+                        if (m_wizardAttackTime > 90)
                         {
-                            if (length > 80)
+                            if (abs(e->getComponent<CTransform>().pos.x - m_player->getComponent<CTransform>().pos.x) > 80)
                             {
                                 eState.state = "WizardAttack2";
-                                auto& enemyProjectile = m_entityManager.addEntity("enemyAttack");
+                                auto& enemyProjectile = m_entityManager.addEntity("npc");
                                 enemyProjectile->addComponent<CAnimation>(m_game->assets().getAnimation("WizardProjectile"), true);
                                 enemyProjectile->addComponent<CTransform>(e->getComponent<CTransform>().pos);
                                 enemyProjectile->addComponent<CBoundingBox>(m_game->assets().getAnimation("WizardProjectile").getSize());
+                                enemyProjectile->addComponent<CFollowPlayer>(e->getComponent<CTransform>().pos,3);
                                 enemyProjectile->addComponent<CDamage>(e->getComponent<CDamage>().damage + e->getComponent<CDamage>().tempDamage);
                                 enemyProjectile->addComponent<CLifeSpan>(240, currentFrame());
                             }
                             else 
                             {
-                                eState.state = "WizardAttack2";
-                                auto& enemyProjectile = m_entityManager.addEntity("enemyAttack");
+                                eState.state = "WizardAttack1";
+                                auto& enemyProjectile = m_entityManager.addEntity("npc");
                                 enemyProjectile->addComponent<CTransform>(e->getComponent<CTransform>().pos);
                                 enemyProjectile->addComponent<CBoundingBox>(m_game->assets().getAnimation("WizardAttack1").getSize());
                                 enemyProjectile->addComponent<CDamage>(2*(e->getComponent<CDamage>().damage + e->getComponent<CDamage>().tempDamage));
-                                enemyProjectile->addComponent<CLifeSpan>(5, currentFrame());
+                                enemyProjectile->addComponent<CLifeSpan>(1, currentFrame());
                             }
+                            m_wizardAttackTime = 0;
                         }
                     }
                 }
@@ -1348,6 +1355,37 @@ void Scene_MainGame::sAI()
                 if (e->getComponent<CPatrol>().currentPosition == numofWaypoints)
                 {
                     e->getComponent<CPatrol>().currentPosition = 0;
+                }
+            }
+            if (e->hasComponent<CState>())
+            {
+                auto& eState = e->getComponent<CState>();
+                if (eState.state == "WizardRun" || eState.state == "WizardTakeHit" || eState.state == "WizardIdle")
+                {
+                    if (m_wizardAttackTime > 90)
+                    {
+                        if (abs(e->getComponent<CTransform>().pos.x - m_player->getComponent<CTransform>().pos.x) > 80)
+                        {
+                            eState.state = "WizardAttack2";
+                            auto& enemyProjectile = m_entityManager.addEntity("npc");
+                            enemyProjectile->addComponent<CAnimation>(m_game->assets().getAnimation("WizardProjectile"), true);
+                            enemyProjectile->addComponent<CTransform>(e->getComponent<CTransform>().pos);
+                            enemyProjectile->addComponent<CBoundingBox>(m_game->assets().getAnimation("WizardProjectile").getSize());
+                            enemyProjectile->addComponent<CFollowPlayer>(e->getComponent<CTransform>().pos, 3);
+                            enemyProjectile->addComponent<CDamage>(e->getComponent<CDamage>().damage + e->getComponent<CDamage>().tempDamage);
+                            enemyProjectile->addComponent<CLifeSpan>(240, currentFrame());
+                        }
+                        else
+                        {
+                            eState.state = "WizardAttack1";
+                            auto& enemyProjectile = m_entityManager.addEntity("npc");
+                            enemyProjectile->addComponent<CTransform>(e->getComponent<CTransform>().pos);
+                            enemyProjectile->addComponent<CBoundingBox>(m_game->assets().getAnimation("WizardAttack1").getSize());
+                            enemyProjectile->addComponent<CDamage>(2 * (e->getComponent<CDamage>().damage + e->getComponent<CDamage>().tempDamage));
+                            enemyProjectile->addComponent<CLifeSpan>(1, currentFrame());
+                        }
+                        m_wizardAttackTime = 0;
+                    }
                 }
             }
         }
@@ -1713,6 +1751,12 @@ void Scene_MainGame::sPlayerCollision()
         auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
         if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
         {
+            if (npc->getComponent<CAnimation>().animation.getName() == "WizardProjectile")
+            {
+                npc->destroy();
+            }
+            //m_game->playSound("LinkHurt");
+
             if (!m_player->hasComponent<CInvincibility>())
             {
                 auto& pShader = m_player->getComponent<CShader>();
@@ -1730,8 +1774,8 @@ void Scene_MainGame::sPlayerCollision()
             }
         }
     }
-    
 }
+
 void Scene_MainGame::sMeleeCollision()
 {
     //Melee collisions with NPC's are implemented here
@@ -1760,6 +1804,14 @@ void Scene_MainGame::sMeleeCollision()
                 {
                     e->getComponent<CState>().state = "SkeletonHit";
                 }
+                else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                {
+                    e->getComponent<CState>().state = "WizardTakeHit";
+                }
                 if (npcHealth.current <= 0)
                 {
                     //m_game->playSound("EnemyDie");
@@ -1770,13 +1822,24 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CState>().state = "GhostVanish";
                         e->getComponent<CAnimation>().repeat = false;
                     }
-                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                    else if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                     {
 
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                              e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                              e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2" )
+                    {
+                        m_game->playSound("WizardDeath");
+                        m_game->setVolume("WizardDeath", m_effectVolume);
+                        e->getComponent<CState>().state = "WizardDeath";
                         e->getComponent<CAnimation>().repeat = false;
                     }
                     else
@@ -1835,6 +1898,14 @@ void Scene_MainGame::sMeleeCollision()
                 {
                     e->getComponent<CState>().state = "SkeletonHit";
                 }
+                else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                {
+                    e->getComponent<CState>().state = "WizardTakeHit";
+                }
                 if (npcHealth.current <= 0)
                 {
                     m_game->playSound("EnemyHit");
@@ -1853,6 +1924,17 @@ void Scene_MainGame::sMeleeCollision()
 
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardDeath");
+                        m_game->setVolume("WizardDeath", m_effectVolume);
+                        e->getComponent<CState>().state = "WizardDeath";
                         e->getComponent<CAnimation>().repeat = false;
                     }
                     else
@@ -1937,6 +2019,14 @@ void Scene_MainGame::sArrowCollision()
                 {
                     e->getComponent<CState>().state = "SkeletonHit";
                 }
+                else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                    e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                {
+                    e->getComponent<CState>().state = "WizardTakeHit";
+                }
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
@@ -1960,6 +2050,17 @@ void Scene_MainGame::sArrowCollision()
 
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardDeath");
+                        m_game->setVolume("WizardDeath", m_effectVolume);
+                        e->getComponent<CState>().state = "WizardDeath";
                         e->getComponent<CAnimation>().repeat = false;
                     }
                     else

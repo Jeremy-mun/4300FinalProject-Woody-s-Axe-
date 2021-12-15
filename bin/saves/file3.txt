@@ -2,6 +2,6 @@ Level1   1
 Level2   1
 Level3   0
 Coins     0
-MaxHealth 10
+MaxHealth 25
 MaxArrows 10
-Damage   1
+Damage   2
