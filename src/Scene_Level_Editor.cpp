@@ -88,6 +88,15 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 }
                 mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
                 mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+                if (m_movingTileConfig.Name == "FloatTileSmall" || m_movingTileConfig.Name == "FloatTileBig")
+                {
+                    mTile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().x, m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().y - 15), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                else
+                {
+                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                continue;
             }
             if (configRead == "Item")
             {
@@ -143,7 +152,15 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if(m_npcConfig.Name == "SkeletonIdle")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -162,7 +179,14 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     }
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if (m_npcConfig.Name == "SkeletonWalk")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
                     continue;
@@ -182,6 +206,7 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
     {
         for (auto e : m_entityManager.getEntities())
         {
+
             if (e->tag() == "editor") continue;
 
             if (e->tag() == "Tile")
@@ -388,7 +413,7 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
             if (configRead == "MovingTile")
             {
                 config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
-                auto mTile = m_editorManager.addEntity("tile");
+                auto mTile = m_editorManager.addEntity("MovingTile");
                 mTile->addComponent<CDraggable>();
                 if (m_movingTileConfig.AI == "Patrol")
                 {
@@ -463,7 +488,14 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if (m_npcConfig.Name == "SkeletonIdle")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -482,7 +514,14 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                     }
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if (m_npcConfig.Name == "SkeletonWalk")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
                     continue;
@@ -980,16 +1019,13 @@ void Scene_Level_Editor::text()
     {
         std::string name = "";
         name.append(m_selected->getComponent<CAnimation>().animation.getName());
-        if (m_selected->tag() == "NPC")
+        if (m_selected->hasComponent<CPatrol>())
         {
-            if (m_selected->hasComponent<CPatrol>())
-            {
-                name.append(" Patrol");
-            }
-            else if (m_selected->hasComponent<CFollowPlayer>())
-            {
-                name.append(" Follow");
-            }
+            name.append(" Patrol");
+        }
+        else if (m_selected->hasComponent<CFollowPlayer>())
+        {
+            name.append(" Follow");
         }
         m_entityText.setPosition(m_mPos.x + m_selected->getComponent<CBoundingBox>().halfSize.x + 16, m_mPos.y);
         m_entityText.setString(name);

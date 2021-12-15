@@ -68,6 +68,7 @@ protected:
     bool                    m_playerOnMovingTile = false;
     bool                    m_minimap = true;
     bool                    m_collidingWithTile = false;
+    bool                    m_canCrouch = true;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
@@ -77,12 +78,14 @@ protected:
     sf::Text                m_tutorialText;
     sf::Text                m_levelText;
     sf::Text                m_walletText;
+    sf::Text                m_arrowHolderText;
     sf::Clock               m_weaponTextClock;
     sf::Clock               m_tutorialTextClock;
     sf::Clock               m_walletClock;
     sf::Clock               m_InventoryClock;
     sf::Clock               m_time;
     sf::Clock               m_gravityClock;
+    sf::Clock               m_crouchClock;
     int                     m_frameSinceAttack;
     sf::CircleShape         inventorySelect;
 
@@ -162,6 +165,7 @@ protected:
     void sTeleportCollision();
     void sEnemyCollision();
     void sCamera();
+    void drawWeaponSwap();
     void drawWeaponHolder();
     void sHUD();
     void sDrawInventoryItems();
