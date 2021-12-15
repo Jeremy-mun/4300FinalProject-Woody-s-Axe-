@@ -307,9 +307,18 @@ void Scene_MainGame::loadLevel(const std::string& filename)
             if (configRead == "Tile")
             {
                 config >> m_tileConfig.Name >> m_tileConfig.RX >> m_tileConfig.RY >> m_tileConfig.TX >> m_tileConfig.TY >> m_tileConfig.BM >> m_tileConfig.BV;
-
+                if (m_tileConfig.Name == "DamagedRock")
+                {
+                    auto damaged = m_entityManager.addEntity("damaged");
+                    damaged->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    damaged->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
+                    damaged->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                    damaged->addComponent<CDraggable>();
+                    continue;
+                }
                 auto tile = m_entityManager.addEntity("tile");
 
+                
                 if (m_tileConfig.Name == "Ground" || m_tileConfig.Name == "FloatTileSmall" || m_tileConfig.Name == "FloatTileBig" || m_tileConfig.Name == "PlatformMiddle" || m_tileConfig.Name == "Ground2")
                 {
                     tile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_tileConfig.Name).getSize().x, m_game->assets().getAnimation(m_tileConfig.Name).getSize().y - 20), m_tileConfig.BM, m_tileConfig.BV);
@@ -1445,6 +1454,92 @@ void Scene_MainGame::sTileCollision()
             continue;
         }
     }
+
+    for (auto tile : m_entityManager.getEntities("damaged"))
+    {
+        auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
+        if (tileBoundingBox.blockMove)
+        {
+            auto playerTileOverlap = Physics::GetOverlap(tile, m_player);
+
+            auto& tileTransform = tile->getComponent<CTransform>();
+            if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+            {
+                if (playerTileOverlap.x > playerTileOverlap.y)
+                {
+                    if (playerTransform.pos.y > tileTransform.pos.y)
+                    {
+                        playerTransform.pos.y += playerTileOverlap.y;
+                    }
+                    else
+                    {
+                        playerTransform.pos.y -= playerTileOverlap.y;
+                        m_playerOnGround = true;
+                    }
+                }
+                else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
+                {
+                    playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
+                    //m_playerOnGround = true;
+                }
+                else
+                {
+
+                    if (playerTransform.pos.x > tileTransform.pos.x)
+                    {
+                        playerTransform.pos.x += playerTileOverlap.x;
+                        m_collidingWithTile = true;
+                    }
+                    else
+                    {
+                        playerTransform.pos.x -= playerTileOverlap.x;
+                        m_collidingWithTile = true;
+                    }
+                }
+            }
+            for (auto npc : m_entityManager.getEntities("npc"))
+            {
+                bool grounded = false;
+                auto& npcTransform = npc->getComponent<CTransform>();
+                auto npcTileOverlap = Physics::GetOverlap(tile, npc);
+                if (npcTileOverlap.x > 0 && npcTileOverlap.y > 0)
+                {
+                    if (npcTileOverlap.x > npcTileOverlap.y)
+                    {
+                        if (npcTransform.pos.y > tileTransform.pos.y)
+                        {
+                            bool grounded = true;
+                            if (npc->getComponent<CAnimation>().animation.getName() == "WizardRun" || npc->getComponent<CAnimation>().animation.getName() == "WizardFall" || npc->getComponent<CAnimation>().animation.getName() == "WizardIdle" || npc->getComponent<CAnimation>().animation.getName() == "WizardJump" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                            {
+                                npc->getComponent<CTransform>().velocity.y = 0;
+                            }
+                            npcTransform.pos.y += npcTileOverlap.y;
+                        }
+                        else
+                        {
+                            npcTransform.pos.y -= npcTileOverlap.y;
+                        }
+                    }
+                    else
+                    {
+                        if (npcTransform.pos.x > tileTransform.pos.x)
+                        {
+                            npcTransform.pos.x += npcTileOverlap.x;
+                        }
+                        else
+                        {
+                            npcTransform.pos.x -= npcTileOverlap.x;
+                        }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            continue;
+        }
+    }
 }
 void Scene_MainGame::sPlayerCollision()
 {
@@ -1511,7 +1606,25 @@ void Scene_MainGame::sMeleeCollision()
                 }
             }
         }
+        for (auto& e : m_entityManager.getEntities("damaged"))
+        {
+            auto RockOverlap = Physics::GetOverlap(axe, e);
+            if (RockOverlap.x > 0 && RockOverlap.y > 0)
+            {
 
+                m_game->playSound("EnemyHit");
+                m_game->setVolume("EnemyHit", m_effectVolume);
+                auto ex = m_entityManager.addEntity("explosion");
+                Vec2 exPos = e->getComponent<CTransform>().pos;
+                ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                e->destroy();
+
+                ex->addComponent<CTransform>().pos = exPos;
+
+                break;
+            }
+
+        }
     }
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
@@ -1642,8 +1755,31 @@ void Scene_MainGame::sArrowCollision()
                 }
             }
         }
+        
+        for (auto& e : m_entityManager.getEntities("damaged"))
+        {
+            auto RockOverlap = Physics::GetOverlap(arrow, e);
+            if (RockOverlap.x > 0 && RockOverlap.y > 0)
+            {
+                arrow->destroy();
+                m_game->playSound("EnemyHit");
+                m_game->setVolume("EnemyHit", m_effectVolume);
+                auto ex = m_entityManager.addEntity("explosion");
+                Vec2 exPos = e->getComponent<CTransform>().pos;
+                ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                e->destroy();
+
+                ex->addComponent<CTransform>().pos = exPos;
+
+                break;
+            }
+
+        }
     }
+    
 }
+
+
 void Scene_MainGame::sHeartCollision()
 {
     //Heart collisions with entities are implemented here

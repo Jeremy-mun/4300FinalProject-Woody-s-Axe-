@@ -12,7 +12,8 @@ Texture   TexArrow	images/gothic/Arrow.png
 Texture   TexBush    	images/tloz/brown/tile_bush.png
 Texture   TexGroundGrass     images/gothic/tileGround1.png
 Texture   TexGroundDirt     images/gothic/tileGround2.png
-
+Texture   TexRock           images/gothic/rock.png
+Texture   TexDamagedRock           images/gothic/damagedRock.png
 
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/enemies/ghost-shriek.png
@@ -107,6 +108,8 @@ Animation Arrow		TexArrow   	 1   0
 Animation Bush    	TexBush		 1   0
 Animation Ground        TexGroundGrass        1   0
 Animation Ground2        TexGroundDirt        1   0
+Animation Rock          TexRock             1   0
+Animation DamagedRock    TexDamagedRock             1   0
 
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
