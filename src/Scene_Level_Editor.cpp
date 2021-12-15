@@ -116,6 +116,24 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
+                else if (m_itemConfig.Name == "Chest")
+                {
+                    auto interact = m_entityManager.addEntity("Interactable");
+                    interact->addComponent<CDraggable>();
+                    interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
+                {
+                    auto breakable = m_entityManager.addEntity("Breakable");
+                    breakable->addComponent<CDraggable>();
+                    breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
             }
             if (configRead == "NPC")
             {
@@ -232,11 +250,13 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
                 config << std::endl;
                 continue;
             }
-            else if (e->tag() == "Coin" ||
+            else if (e->tag() == "Interactable" ||
+                     e->tag() == "Breakable" ||
+                     e->tag() == "Coin" ||
                      e->tag() == "Heart" ||
                      e->tag() == "Potion")
             {
-                if (e->tag() == "Potion")
+                if (e->tag() == "Potion" || e->tag() == "Interactable" || e->tag() == "Breakable")
                 {
                     m_itemConfig.Name = e->getComponent<CAnimation>().animation.getName();
                 }
@@ -413,6 +433,24 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                     potion->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     potion->addComponent<CDraggable>();
+                    continue;
+                }
+                else if (m_itemConfig.Name == "Chest")
+                {
+                    auto interact = m_editorManager.addEntity("Interactable");
+                    interact->addComponent<CDraggable>();
+                    interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
+                {
+                    auto breakable = m_editorManager.addEntity("Breakable");
+                    breakable->addComponent<CDraggable>();
+                    breakable->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    breakable->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    breakable->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
             }
