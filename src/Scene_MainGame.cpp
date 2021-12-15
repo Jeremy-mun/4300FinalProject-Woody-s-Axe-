@@ -913,9 +913,9 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         }
         m_game->playSound("UseItem");
         m_game->setVolume("UseItem", m_effectVolume);
-        if (inventory.items[m_select] == "RedPotion")
+        if (inventory.items[m_select] == "RedPotion") // health
         {
-            std::cout << "Red Potion";  // health
+            std::cout << "Red Potion"; 
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& health = entity->getComponent<CHealth>();
             health.current = health.max;
@@ -2429,7 +2429,7 @@ void Scene_MainGame::drawMinimap()
     minimapView.zoom(2.5f);
     m_game->window().setView(minimapView);
 
-    for (auto e : m_entityManager.getEntities())
+    for (auto e : m_entityManager.getEntities("tile"))
     {
         
         if (e->hasComponent<CAnimation>())
@@ -2437,6 +2437,15 @@ void Scene_MainGame::drawMinimap()
             m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
         }
     }
+    for (auto e : m_entityManager.getEntities("movingTile"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    m_game->window().draw(m_player->getComponent<CAnimation>().animation.getSprite());
 }
 
 void Scene_MainGame::sDragAndDrop()
