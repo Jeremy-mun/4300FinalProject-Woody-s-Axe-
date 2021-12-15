@@ -316,6 +316,16 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     damaged->addComponent<CDraggable>();
                     continue;
                 }
+                if (m_tileConfig.Name == "Portal")
+                {
+                    auto portal = m_entityManager.addEntity("teleport");
+                    portal->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
+                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), false);
+                    portal->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
+                    portal->addComponent<CDraggable>();
+                    continue;
+                }
+
                 auto tile = m_entityManager.addEntity("tile");
 
                 
@@ -438,6 +448,12 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("WizardIdle"), true);
                         npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
+                    else if (m_npcConfig.Name == "SkeletonIdle")
+                    {
+                        npc->addComponent<CState>("SkeletonIdle");
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("SkeletonIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     else
                     {
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
@@ -462,8 +478,19 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                         npc->getComponent<CPatrol>().positions.push_back(getPosition(m_npcConfig.RX, m_npcConfig.RY, x, y));
                     }
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
-                    npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                   
+                    if (m_npcConfig.Name == "SkeletonWalk")
+                    {
+                        npc->addComponent<CState>("SkeletonWalk");
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("SkeletonWalk"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    
                     npc->addComponent<CHealth>(m_npcConfig.H* m_difficultymod, m_npcConfig.H* m_difficultymod);
                     npc->addComponent<CDamage>(ceil(m_npcConfig.D * m_difficultymod));
                     continue;
@@ -754,7 +781,7 @@ void Scene_MainGame::sMovement()
         }
         else
         {
-            pState.state = "StandDown";
+            pState.state = "StandRight";
             pTransform.scale = Vec2(1, 1);
         }
     }
@@ -1036,6 +1063,17 @@ void Scene_MainGame::sAI()
                     e->getComponent<CState>().state = "DemonIdle";
                 }
             }
+
+            if (e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" ||
+                e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                e->getComponent<CAnimation>().animation.getName() == "SkeletonHit")
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->getComponent<CState>().state = "SkeletonIdle";
+                }
+            }
+
             if (!Visionblocked)
             {
                 
@@ -1049,13 +1087,46 @@ void Scene_MainGame::sAI()
                     // when npc is following the player to the right
                     if (desired.x > 0)
                     {
-                        e->getComponent<CTransform>().scale.x = -1;
+                        if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" || 
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" || 
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack"||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" || 
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" )
+                        {
+                            e->getComponent<CTransform>().scale.x = 1;
+                        }
+                        else
+                        {
+                            e->getComponent<CTransform>().scale.x = -1;
+                        }
                     }
 
                     // when npc is following the player to the left
                     else if (desired.x < 0)
                     {
-                        e->getComponent<CTransform>().scale.x = 1;
+                        if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit")
+                        {
+                            e->getComponent<CTransform>().scale.x = -1;
+                        }
+                        else
+                        {
+                            e->getComponent<CTransform>().scale.x = 1;
+                        }
+                    }
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle")
+                    {
+                         e->getComponent<CState>().state = "SkeletonWalk";
+                    }
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonHit")
+                    {
+                        if (e->getComponent<CAnimation>().animation.hasEnded())
+                        {
+                            e->getComponent<CState>().state = "SkeletonWalk";
+                        }
                     }
                     if (e->getComponent<CAnimation>().animation.getName() == "DemonAttack")
                     {
@@ -1073,8 +1144,22 @@ void Scene_MainGame::sAI()
                     }
                     else
                     {
-                        e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
-                        e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                        // Enemies who should not fly
+                        if (e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" ||
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound" 
+                            )
+                        {
+                            e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
+                        }
+                        else
+                        {
+                            e->getComponent<CTransform>().pos.x += e->getComponent<CFollowPlayer>().speed * desired.x;
+                            e->getComponent<CTransform>().pos.y += e->getComponent<CFollowPlayer>().speed * desired.y;
+                        }
+                        
                     }
                     if (e->getComponent<CAnimation>().animation.getName() == "WizardRun" || e->getComponent<CAnimation>().animation.getName() == "WizardFall" || e->getComponent<CAnimation>().animation.getName() == "WizardIdle" || e->getComponent<CAnimation>().animation.getName() == "WizardJump")
                     {
@@ -1155,7 +1240,14 @@ void Scene_MainGame::sAI()
             Vec2 desired = target - e->getComponent<CTransform>().pos;
             float length = desired.dist(Vec2(0, 0));
             int numofWaypoints = e->getComponent<CPatrol>().positions.size();
-            
+            if (e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                e->getComponent<CAnimation>().animation.getName() == "SkeletonHit")
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->getComponent<CState>().state = "SkeletonWalk";
+                }
+            }
             if (int(length) > 1)
             {
                 desired = desired / length;
@@ -1592,14 +1684,37 @@ void Scene_MainGame::sMeleeCollision()
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
                 npcHealth.current -= axe->getComponent<CDamage>().damage;
+                if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                    e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                {
+                    e->getComponent<CState>().state = "SkeletonHit";
+                }
                 if (npcHealth.current <= 0)
                 {
                     //m_game->playSound("EnemyDie");
 
                     auto ex = m_entityManager.addEntity("explosion");
-                    ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
-                    ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
-                    e->destroy();
+                    if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
+                    {
+                        e->getComponent<CState>().state = "GhostVanish";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+
+                        //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
+                        e->getComponent<CState>().state = "SkeletonDead";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else
+                    {
+                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                        ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
+                        e->destroy();
+                    }
                     break;
                 }
             }
@@ -1642,15 +1757,41 @@ void Scene_MainGame::sMeleeCollision()
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
                 npcHealth.current -= axe->getComponent<CDamage>().damage;
+
+                // Animation when enemy gets hit
+                if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                    e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                {
+                    e->getComponent<CState>().state = "SkeletonHit";
+                }
                 if (npcHealth.current <= 0)
                 {
                     m_game->playSound("EnemyHit");
                     m_game->setVolume("EnemyHit", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
-                    ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
-                    ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
-                    e->destroy();
+                    if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
+                    {
+                        e->getComponent<CState>().state = "GhostVanish";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+
+                        //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
+                        e->getComponent<CState>().state = "SkeletonDead";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else
+                    {
+                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                        ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
+                        e->destroy();
+                    }
+                    
                     break;
                 }
                 else
@@ -1721,6 +1862,12 @@ void Scene_MainGame::sArrowCollision()
             {
                 npcHealth.current -= arrowDamage.damage;
                 arrow->destroy();
+                if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                    e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                {
+                    e->getComponent<CState>().state = "SkeletonHit";
+                }
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
@@ -1735,6 +1882,15 @@ void Scene_MainGame::sArrowCollision()
                         
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "GhostVanish";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" )
+                    {
+
+                        //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
+                        e->getComponent<CState>().state = "SkeletonDead";
                         e->getComponent<CAnimation>().repeat = false;
                     }
                     else
@@ -1886,11 +2042,18 @@ void Scene_MainGame::sTeleportCollision()
         if (playerteleportsOverlap.x > teleportsBoundingBox.halfSize.x && playerteleportsOverlap.y > teleportsBoundingBox.halfSize.y)
         {
             Vec2 newLocation = teleportLocations[rand() % teleportLocations.size()];
-            if (newLocation.x != teleports->getComponent<CTransform>().pos.x)
+            
+            if (newLocation != teleports->getComponent<CTransform>().pos)
             {
-                playerTransform.pos.x = newLocation.x;
-                playerTransform.pos.y = newLocation.y + 64;
+                playerTransform.pos.x = newLocation.x + 64;
+                playerTransform.pos.y = newLocation.y;
             } 
+            else
+            {
+                newLocation = teleportLocations[rand() % teleportLocations.size()];
+                playerTransform.pos.x = newLocation.x + 64;
+                playerTransform.pos.y = newLocation.y;
+            }
         }
     }
 
@@ -1915,7 +2078,22 @@ void Scene_MainGame::sEnemyCollision() {
             }
             
         }
-        
+        if (npc->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+        {
+            //npc->getComponent<CAnimation>().animation.get
+            auto& npcState = npc->getComponent<CState>();
+            auto& npcDamage = npc->getComponent<CDamage>();
+            auto& npcTransform = npc->getComponent<CTransform>();
+
+            auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
+            if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
+            {
+                //auto frame = m_currentFrame;
+                npcState.state = "SkeletonAttack";
+                auto& npcTransform = npc->getComponent<CTransform>();
+            }
+
+        }
     }
 }
 

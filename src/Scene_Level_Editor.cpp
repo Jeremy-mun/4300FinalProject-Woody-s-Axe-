@@ -134,7 +134,15 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if(m_npcConfig.Name == "SkeletonIdle")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -153,7 +161,14 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     }
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if (m_npcConfig.Name == "SkeletonWalk")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
                     continue;
@@ -435,7 +450,14 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                 {
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if (m_npcConfig.Name == "SkeletonIdle")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
@@ -454,7 +476,14 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                     }
                     npc->addComponent<CTransform>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY));
                     npc->addComponent<CAnimation>(m_game->assets().getAnimation(m_npcConfig.Name), true);
-                    npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    if (m_npcConfig.Name == "SkeletonWalk")
+                    {
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else
+                    {
+                        npc->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_npcConfig.Name).getSize(), m_npcConfig.BM, m_npcConfig.BV);
+                    }
                     npc->addComponent<CHealth>(m_npcConfig.H, m_npcConfig.H);
                     npc->addComponent<CDamage>(m_npcConfig.D);
                     continue;
