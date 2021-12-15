@@ -291,7 +291,6 @@ Tile Ground    9  0  9  11  1  1
 Tile Ground    9  0  8  11  1  1  
 Tile Ground    9  0  10  11  1  1  
 Item Chest    0  0  5  10  0  0  
-Item Chest    0  0  5  10  0  0  
 Item Barrel    0  0  0  10  0  0  
 Item Barrel    0  0  1  10  0  0  
 Item Chest    2  0  9  10  0  0  
@@ -330,7 +329,6 @@ Item Coin    7  0  17  9  0  0
 Item Coin    8  0  0  9  0  0  
 Item Coin    8  0  3  9  0  0  
 Item GoldPotion    8  0  11  11  0  0  
-Player 416 544 40 64 3 3 2 
 Item JarBig    1  0  5  10  0  0  
 Item JarSmall    1  0  6  10  0  0  
 Item JarSmall    1  0  6  10  0  0  
@@ -342,4 +340,6 @@ Tile DamagedRock    4  0  10  2  1  1
 Item Barrel    4  0  2  7  0  0  
 Item Heart    7  0  11  6  0  0  
 Item Heart    7  0  5  7  0  0  
-Item Heart    7  0  15  4  0  0
+Item Heart    7  0  15  4  0  0  
+Player 416 544 40 64 3 3 2
+

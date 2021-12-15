@@ -630,6 +630,7 @@ void Scene_MainGame::update()
         /*m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));*/
         m_game->pauseSound("MusicLevel");
         sCamera();
+        drawInventory();
         sHUD();
         
         return;
@@ -647,6 +648,7 @@ void Scene_MainGame::update()
     sCollision();
     sAnimation();
     sCamera();
+    drawInventory();
     sHUD();
     m_currentFrame++;
 }
@@ -927,7 +929,7 @@ void Scene_MainGame::sDoAction(const Action& action)
             m_game->window().setView(view);
         }
         else if (action.name() == "MiniMap") { m_minimap = !m_minimap; }
-        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; inventoryOpened = true; drawInventory(); }
+        else if (action.name() == "OPEN_INVENTORY") { std::cout << "Inventory"; inventoryOpened = true; }
     }
     else if (action.type() == "END")
     {
@@ -1005,7 +1007,6 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
 
     }
     select("None");
-    drawInventory();
 }
 
 void Scene_MainGame::sInteract()
@@ -1042,7 +1043,6 @@ void Scene_MainGame::sInteract()
                     m_player->getComponent<CInventory>().items.push_back("GoldPotion");
                 }
                 interactable->destroy();
-                drawInventory();
             }
         }
     }
@@ -1894,7 +1894,6 @@ void Scene_MainGame::sBreakableCollision()
                 {
                     m_player->getComponent<CInventory>().money += (rand() % 3);
                 }
-                drawInventory();
             }
         }
     }
@@ -2057,7 +2056,6 @@ void Scene_MainGame::sCoinCollision()
             m_game->setVolume("Coin", m_effectVolume);
             //m_game->playSound("GetItem");
             m_player->getComponent<CInventory>().money++;
-            drawInventory();
             coin->destroy();
         }
     }
@@ -2076,7 +2074,6 @@ void Scene_MainGame::sItemCollision()
         if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
         {
             m_player->getComponent<CInventory>().items.push_back(potionAnim.getName());
-            drawInventory();
             potion->destroy();
         }
     }
@@ -2495,21 +2492,6 @@ void Scene_MainGame::sHUD()
     for (auto& inventory : m_entityManager.getEntities("inventory"))
     {
         inventory->getComponent<CTransform>().pos = InventoryPos;
-        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
-        {
-            inventory->destroy();
-            inventoryOpened = false;
-            m_walletText.setString("");
-        }
-    }
-    for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
-    {
-        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
-        {
-            coinHUD->destroy();
-            m_walletText.setString("");
-            
-        }
     }
     int inventoryItemPositionOffset = 0;
     // Setting inventory items positions
@@ -2523,11 +2505,6 @@ void Scene_MainGame::sHUD()
         if (inventoryItemPositionOffset > m_gridSize.x * 8)
         {
             inventoryItemPositionOffset = 0;
-        }
-        if (m_InventoryClock.getElapsedTime().asSeconds() > 4)
-        {
-            inventoryItems->destroy();
-            
         }
     }
     inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 4), InventoryPos.y);
@@ -2568,6 +2545,10 @@ void Scene_MainGame::sDrawInventoryItems()
 
 void Scene_MainGame::drawInventory()
 {
+    for (auto& inventory : m_entityManager.getEntities("inventory"))
+    {
+        inventory->destroy();
+    }
     m_InventoryClock.restart();
     float viewX = m_game->window().getView().getCenter().x - (m_game->window().getSize().x / 2);
     float viewY = m_game->window().getView().getCenter().y - (m_game->window().getSize().y / 2);
@@ -2858,6 +2839,62 @@ void Scene_MainGame::sRender()
     m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
     m_parallaxBackgroundSprites[2].setPosition(m_parallaxBackgroundSprites[2].getPosition().x, -50);
     m_game->window().draw(m_parallaxBackgroundSprites[2]);// Particles
+    m_InventoryClock.restart();
+    for (auto e : m_entityManager.getEntities("inventory"))
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animation = e->getComponent<CAnimation>().animation;
+        animation.getSprite().setRotation(transform.angle);
+        animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+        animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+        m_game->window().draw(animation.getSprite());
+    }
+    for (auto e : m_entityManager.getEntities("inventoryItems"))
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animation = e->getComponent<CAnimation>().animation;
+        animation.getSprite().setRotation(transform.angle);
+        animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+        animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+        m_game->window().draw(animation.getSprite());
+    }
+    for (auto e : m_entityManager.getEntities("CoinHUD"))
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animation = e->getComponent<CAnimation>().animation;
+        animation.getSprite().setRotation(transform.angle);
+        animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+        animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+        m_game->window().draw(animation.getSprite());
+    }
+    for (auto e : m_entityManager.getEntities("weaponHolder"))
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animation = e->getComponent<CAnimation>().animation;
+        animation.getSprite().setRotation(transform.angle);
+        animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+        animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+        m_game->window().draw(animation.getSprite());
+    }
+    for (auto e : m_entityManager.getEntities("weaponSwap"))
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animation = e->getComponent<CAnimation>().animation;
+        animation.getSprite().setRotation(transform.angle);
+        animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+        animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+        m_game->window().draw(animation.getSprite());
+    }
+    for (auto e : m_entityManager.getEntities("arrowHolder"))
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animation = e->getComponent<CAnimation>().animation;
+        animation.getSprite().setRotation(transform.angle);
+        animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+        animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+        m_game->window().draw(animation.getSprite());
+    }
+
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
