@@ -2188,6 +2188,42 @@ void Scene_MainGame::sAnimation()
     }
 #pragma endregion
 
+
+    for (auto& e : m_entityManager.getEntities("tile"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
+
+    }
 #pragma region NPC Animation
     for (auto& e : m_entityManager.getEntities("npc"))
     {
@@ -2407,7 +2443,7 @@ void Scene_MainGame::sHUD()
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
-    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y + 64);
+    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 - 10, InventoryPos.y + 55);
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
