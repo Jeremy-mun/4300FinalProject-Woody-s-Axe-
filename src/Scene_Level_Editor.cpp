@@ -164,6 +164,7 @@ void Scene_Level_Editor::saveLevel(const std::string& filename)
     {
         for (auto e : m_entityManager.getEntities())
         {
+
             if (e->tag() == "editor") continue;
 
             if (e->tag() == "Tile")
@@ -368,7 +369,7 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
             if (configRead == "MovingTile")
             {
                 config >> m_movingTileConfig.Name >> m_movingTileConfig.RX >> m_movingTileConfig.RY >> m_movingTileConfig.TX >> m_movingTileConfig.TY >> m_movingTileConfig.BM >> m_movingTileConfig.BV >> m_movingTileConfig.AI >> m_movingTileConfig.S;
-                auto mTile = m_editorManager.addEntity("tile");
+                auto mTile = m_editorManager.addEntity("MovingTile");
                 mTile->addComponent<CDraggable>();
                 if (m_movingTileConfig.AI == "Patrol")
                 {
@@ -941,16 +942,13 @@ void Scene_Level_Editor::text()
     {
         std::string name = "";
         name.append(m_selected->getComponent<CAnimation>().animation.getName());
-        if (m_selected->tag() == "NPC")
+        if (m_selected->hasComponent<CPatrol>())
         {
-            if (m_selected->hasComponent<CPatrol>())
-            {
-                name.append(" Patrol");
-            }
-            else if (m_selected->hasComponent<CFollowPlayer>())
-            {
-                name.append(" Follow");
-            }
+            name.append(" Patrol");
+        }
+        else if (m_selected->hasComponent<CFollowPlayer>())
+        {
+            name.append(" Follow");
         }
         m_entityText.setPosition(m_mPos.x + m_selected->getComponent<CBoundingBox>().halfSize.x + 16, m_mPos.y);
         m_entityText.setString(name);

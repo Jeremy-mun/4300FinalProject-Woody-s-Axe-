@@ -12,7 +12,7 @@ Tile Ground2    0  0  8  11  1  1
 Tile Ground    0  0  10  3  1  1  
 Tile Ground    1  0  18  1  1  1  
 Tile Ground    0  0  11  3  1  1  
-MovingTile FloatTileSmall    0  0  1.09375  6.01562  1  0  Patrol  2  5  1.09375  6.01562  1  9  1  7  5  5  1  3  
+MovingTile FloatTileSmall    0  0  1  6  0  0  Patrol  2  5  1  6  1  9  1  7  5  5  1  3  
 Tile Ground    1  0  17  1  1  1  
 Tile Ground    0  0  7  3  1  1  
 Tile Ground    2  0  5  11  1  1  
@@ -118,5 +118,6 @@ NPC DemonIdle     4  0  5  4  0  0  3  3  Follow  0
 Item BluePotion    4  0  12  8  0  0  
 NPC HellHound     3  0  14  10  0  0  1  1  Follow  0  
 NPC HellHound     3  0  14  10  0  0  1  1  Follow  0  
-NPC GhostShriek     0  0  4  5  0  0  2  2  Follow  2  
-Player 416 480 40 64 3 20 2
+NPC GhostShriek     0  0  3  3  0  0  2  2  Follow  2  
+Player 416 480 40 64 3 20 2 
+MovingTile FloatTileSmall    0  0  4  8  0  0  Patrol  1  1  4  8
