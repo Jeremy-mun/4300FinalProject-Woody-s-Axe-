@@ -525,7 +525,7 @@ void Scene_Overworld::sDoAction(const Action& action)
 					m_arrowCount += 5;
 					saveGame();
 				}
-				else if (m_select == 0)
+				else if (m_select == 0 && m_coinCount >= 50)
 				{
 					m_coinCount -= 50;
 					m_maxHealth += 5;
