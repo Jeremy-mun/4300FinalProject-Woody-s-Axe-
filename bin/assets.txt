@@ -14,6 +14,9 @@ Texture   TexGroundGrass     images/gothic/tileGround1.png
 Texture   TexGroundDirt     images/gothic/tileGround2.png
 Texture   TexRock           images/gothic/rock.png
 Texture   TexDamagedRock           images/gothic/damagedRock.png
+Texture   TexGoal           images/gothic/Goal.png
+Texture   TexPortal           images/gothic/portal.png
+
 
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexGhostShriek images/enemies/ghost-shriek.png
@@ -24,6 +27,13 @@ Texture   TexDemonAttack  images/enemies/demon-attack.png
 Texture   TexFireSkull  images/enemies/fire-skull.png
 Texture   TexHellBeastIdle   images/enemies/hell-beast-idle.png
 Texture   TexHellBeastBurn   images/enemies/hell-beast-burn.png
+Texture   TexSkeleton   images/enemies/Idle.png
+Texture   TexSkeletonWalk   images/enemies/Walk.png
+Texture   TexSkeletonAttack   images/enemies/Attack.png
+Texture   TexSkeletonHit   images/enemies/Take_Hit.png
+Texture   TexSkeletonDead   images/enemies/Death.png
+
+
 
 Texture   TexWizardIdle		images/enemies/wizardIdle.png
 Texture   TexWizardAttack1	images/enemies/wizardAttack1.png
@@ -110,6 +120,8 @@ Animation Ground        TexGroundGrass        1   0
 Animation Ground2        TexGroundDirt        1   0
 Animation Rock          TexRock             1   0
 Animation DamagedRock    TexDamagedRock             1   0
+Animation Goal    TexGoal             1   0
+Animation Portal    TexPortal             60   2
 
 Animation Tektite       TexTektite       2  10
 Animation GhostShriek   TexGhostShriek   4  10
@@ -120,6 +132,11 @@ Animation DemonAttack	TexDemonAttack	 11  6
 Animation FireSkull	    TexFireSkull	 8  6
 Animation HellBeastIdle	   TexHellBeastIdle	 6  4
 Animation HellBeastBurn	   TexHellBeastBurn	 6  4
+Animation SkeletonIdle	   TexSkeleton	 4  4
+Animation SkeletonWalk	   TexSkeletonWalk	 4  4
+Animation SkeletonAttack	   TexSkeletonAttack	 8  4
+Animation SkeletonHit	   TexSkeletonHit	 4  4
+Animation SkeletonDead	   TexSkeletonDead	 4  4
 
 Animation WizardIdle   	TexWizardIdle		8  2	
 Animation WizardAttack1	TexWizardAttack1	8  2

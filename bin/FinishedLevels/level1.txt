@@ -28,6 +28,9 @@ Tile Ground    1  0  16  11  1  1
 Tile Ground    1  0  17  11  1  1  
 Tile Ground    1  0  19  11  1  1  
 Tile Ground    1  0  18  11  1  1  
+MovingTile FloatTileSmall    1  0  8  8  1  0  Patrol  1  3  8  8  8  8  13  8  
+Tile FloatTileBig    1  0  9  4  1  1  
+MovingTile FloatTileSmall    1  0  6  6  1  0  Patrol  1  3  6  6  6  6  11  6  
 NPC HellHound     1  0  16  10  0  0  3  1  Patrol  2  3  16  10  16  10  22  10  
 MovingTile FloatTileSmall    0  0  14  7  1  0  Patrol  2  3  14  7  14  7  17  7  
 Tile FloatTileSmall    0  0  19  9  1  1  
@@ -223,49 +226,5 @@ Tile Ground    8  0  14  11  1  1
 MovingTile FloatTileSmall    7  0  15  5  0  1  Patrol  3  3  15  5  15  5  22  5  
 NPC DemonIdle     8  0  1  1  0  0  7  3  Follow  3  
 NPC DemonIdle     7  0  17  3  0  0  7  3  Follow  3  
-Tile Goal    8  0  13  10  1  1  
-MovingTile FloatTileSmall    1  0  7  6  1  0  Patrol  2  3  7  6  7  6  11  6  
-Tile FloatTileSmall    1  0  5  8  1  1  
-Tile FloatTileBig    1  0  13  5  1  1  
-Item Coin    0  0  8  9  0  0  
-Item Coin    0  0  10  8  0  0  
-Item Coin    0  0  12  7  0  0  
-Item Coin    0  0  14  6  0  0  
-Player 320 224 40 64 3 3 2 
-Item Coin    0  0  19  8  0  0  
-Item GoldPotion    1  0  13  4  0  0  
-Item Coin    1  0  12  4  0  0  
-Item Coin    1  0  14  4  0  0  
-Item Coin    1  0  13  3  0  0  
-Item Coin    1  0  12  3  0  0  
-Item Coin    1  0  14  3  0  0  
-Item Coin    1  0  7  5  0  0  
-Item Coin    1  0  5  7  0  0  
-Item Coin    1  0  18  10  0  0  
-Item Coin    2  0  0  10  0  0  
-Item Coin    2  0  2  10  0  0  
-Item Coin    2  0  4  9  0  0  
-Item Coin    2  0  9  10  0  0  
-Item Coin    2  0  11  10  0  0  
-Item Coin    2  0  14  9  0  0  
-Item RedPotion    2  0  18  8  0  0  
-NPC SkeletonIdle     5  0  7  10  0  0  2  1  Follow  1  
-NPC SkeletonIdle     5  0  14  10  0  0  2  1  Follow  1  
-NPC SkeletonIdle     6  0  0  10  0  0  2  1  Follow  1  
-NPC SkeletonIdle     6  0  9  10  0  0  2  1  Follow  1  
-Tile Ground    8  0  15  11  1  1  
-Tile Ground    8  0  16  11  1  1  
-Tile Ground    8  0  17  11  1  1  
-Tile Ground    8  0  18  11  1  1  
-Tile Ground    8  0  19  11  1  1  
-Tile Ground    9  0  0  11  1  1  
-Tile Ground    9  0  1  11  1  1  
-Tile Ground    9  0  3  11  1  1  
-Tile Ground    9  0  2  11  1  1  
-Tile Ground    9  0  4  11  1  1  
-Tile Ground    9  0  6  11  1  1  
-Tile Ground    9  0  5  11  1  1  
-Tile Ground    9  0  7  11  1  1  
-Tile Ground    9  0  9  11  1  1  
-Tile Ground    9  0  8  11  1  1  
-Tile Ground    9  0  10  11  1  1
+Player 544 224 40 64 3 3 2 
+Tile Goal    8  0  13  10  1  1
