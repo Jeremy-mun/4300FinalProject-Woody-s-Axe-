@@ -62,6 +62,10 @@ Texture   TexBowHUD images/Inventory/CurrentBow.png
 Texture   TexAxeHUD images/Inventory/CurrentAxe.png
 Texture   TexDaggerHUD images/Inventory/CurrentDagger.png
 Texture   TexSelect    images/Inventory/Select.png
+Texture   TexArrowHolder    images/Inventory/arrowHolder.png
+Texture   TexEmptyArrowHolder    images/Inventory/emptyarrowHolder.png
+
+
 Texture   TexFloatTileSmall    images/gothic/floatingTile1.png
 Texture   TexFloatTileBig      images/gothic/floatingTile2.png
 Texture   TexPlatformRight      images/gothic/platformRight.png
@@ -165,6 +169,9 @@ Animation BowHUD	 TexBowHUD 	1  0
 Animation AxeHUD	 TexAxeHUD 	1  0
 Animation DaggerHUD	 TexDaggerHUD 	1  0
 Animation Select	 TexSelect 	1  0
+Animation ArrowHolder TexArrowHolder 1  0
+Animation EmptyArrowHolder TexEmptyArrowHolder 1  0
+
 Animation FloatTileSmall   TexFloatTileSmall 1 0
 Animation FloatTileBig  TexFloatTileBig 1 0
 Animation PlatformRight TexPlatformRight 1 0
