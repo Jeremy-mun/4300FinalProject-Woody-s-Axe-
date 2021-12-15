@@ -61,6 +61,8 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_game->setVolume("MusicGame", m_musicVolume);
     m_game->loopSound("MusicGame");
 
+    std::cout << m_levelPath <<  '\n';
+
 }
 
 void Scene_MainGame::levelCompleted()
@@ -71,6 +73,18 @@ void Scene_MainGame::levelCompleted()
     }
     else
     {
+        if (m_levelPath == "levels/level1.txt")
+        {
+            m_level1Completion = true;
+        }
+        else if (m_levelPath == "levels/level2.txt")
+        {
+            m_level1Completion = true;
+        }
+        else if (m_levelPath == "levels/level3.txt")
+        {
+            m_level1Completion = true;
+        }
         saveGame();
         m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, m_saveFile));
     }
@@ -571,6 +585,8 @@ void Scene_MainGame::update()
         m_levelText.setCharacterSize(24);
         /*m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));*/
         m_game->pauseSound("MusicLevel");
+        sCamera();
+        sHUD();
         
         return;
     } 
@@ -1282,13 +1298,18 @@ void Scene_MainGame::sTileCollision()
     for (auto tile : m_entityManager.getEntities("tile"))
     {
         auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
-        if (tileBoundingBox.blockMove)
+        auto& tileAnimation = tile->getComponent<CAnimation>().animation;
+        if (tileBoundingBox.blockMove || tileAnimation.getName() == "Goal")
         {
             auto playerTileOverlap = Physics::GetOverlap(tile, m_player);
             
             auto& tileTransform = tile->getComponent<CTransform>();
             if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
             {
+                if (tileAnimation.getName() == "Goal")
+                {
+                    levelCompleted();
+                }
                 if (playerTileOverlap.x > playerTileOverlap.y)
                 {
                     if (playerTransform.pos.y > tileTransform.pos.y)
