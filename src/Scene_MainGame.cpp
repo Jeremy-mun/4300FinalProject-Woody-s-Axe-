@@ -682,7 +682,7 @@ void Scene_MainGame::sMovement()
             {
                 pState.state = "Jump";
             }
-            
+           
             if (pInput.down == true)
             {
                 if (m_canCrouch)
@@ -718,6 +718,7 @@ void Scene_MainGame::sMovement()
         }
         else if (!pInput.left && pInput.right)
         {
+            
             pTransform.velocity.x = (m_playerConfig.SPEED + pTransform.tempSpeed);
             pTransform.facing = Vec2(1, 0);
             pState.state = "RunRight";
@@ -795,6 +796,7 @@ void Scene_MainGame::sMovement()
     // if the player is not attacking or has no velocity give it a standing state.
     else if (pTransform.velocity.x == 0 && pTransform.velocity.y == 0)
     {
+        m_crouchClock.restart();
         if (pTransform.facing == Vec2(1, 0))
         {
             pState.state = "StandRight";
@@ -2250,7 +2252,7 @@ void Scene_MainGame::sCamera()
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
     
     
-    m_tutorialText.setString(" Move:W, A, S D Weapon Swap: TAB");
+    m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nWeapon Swap: TAB");
     if (m_weaponSwitch == 0)
     {
         m_levelText.setString("Dagger Activated");
