@@ -164,6 +164,7 @@ protected:
     void sTeleportCollision();
     void sEnemyCollision();
     void sCamera();
+    void drawWeaponSwap();
     void drawWeaponHolder();
     void sHUD();
     void sDrawInventoryItems();
