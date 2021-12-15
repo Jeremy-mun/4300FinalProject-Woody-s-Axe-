@@ -1,11 +1,14 @@
 None
 Tile Ground               0  0  0  0  1  1
 Tile Ground2              0  0  0  0  1  1
+Tile Rock              0  0  0  0  1  1
+Tile DamagedRock              0  0  0  0  1  1
+
 Tile FloatTileSmall       0  0  0  0  1  1
 Tile FloatTileBig         0  0  0  0  1  1
 Tile PlatformMiddle         0  0  0  0  1  1
-MovingTile FloatTileSmall 0  0  0  0  1  1        Patrol  1 1 0 0
-MovingTile FloatTileBig   0  0  0  0  1  1        Patrol  1 1 0 0
+MovingTile FloatTileSmall 0  0  0  0  1  1 Patrol  1 1 0 0
+MovingTile FloatTileBig   0  0  0  0  1  1 Patrol  1 1 0 0
 NPC HellHound             0  0  0  0  0  0  1  1  Follow  1
 NPC HellHound             0  0  0  0  0  0  1  1  Patrol  1 1 0 0
 NPC GhostShriek           0  0  0  0  0  0  2  2  Follow  2
