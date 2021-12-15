@@ -612,6 +612,7 @@ void Scene_Level_Editor::sEditor()
 void Scene_Level_Editor::onEnd()
 {
     m_game->playSound("MusicTitle");
+    m_game->loopSound("MusicTitle");
     m_game->changeScene("Level_Editor_Menu", nullptr, true);
 }
 

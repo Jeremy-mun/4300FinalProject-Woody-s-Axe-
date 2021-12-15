@@ -63,12 +63,14 @@ void Scene_GameOver::onEnd()
 	{
 		m_game->playSound("MusicTitle");
 		m_game->setVolume("MusicTitle", m_musicVolume);
+		m_game->loopSound("MusicTitle");
 		m_game->changeScene("Load_Level_Menu", std::make_shared<Scene_LoadGame_Menu>(m_game));
 	}
 	else
 	{
 		m_game->playSound("MusicOverworld");
 		m_game->setVolume("MusicOverworld", m_musicVolume);
+		m_game->loopSound("MusicOverworld");
 		m_game->changeScene("Overworld", std::make_shared<Scene_Overworld>(m_game, m_saveFile));
 	}
 }

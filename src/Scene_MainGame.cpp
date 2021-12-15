@@ -53,8 +53,13 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_walletText.setCharacterSize(36);
     m_walletText.setFillColor(sf::Color(137, 3, 6));
 
+    m_lighting.setTexture(m_game->assets().getTexture("TexTransparent"));
+    m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 762));
+    m_lighting.setPosition(0, 0);
+
     m_game->playSound("MusicGame");
     m_game->setVolume("MusicGame", m_musicVolume);
+    m_game->loopSound("MusicGame");
 
 }
 
@@ -1882,6 +1887,7 @@ void Scene_MainGame::sCamera()
         newCamPos.x = view.getSize().x / 2;
     }
     
+    m_lighting.setPosition(sf::Vector2f(newCamPos.x - m_game->window().getSize().x/2, newCamPos.y - m_game->window().getSize().y / 2));
     auto mDiff = center - newCamPos;
     //m_mPos += Vec2(mDiff.x, mDiff.y);
     view.setCenter(newCamPos);
@@ -2338,7 +2344,19 @@ void Scene_MainGame::sRender()
             }
         }
     }
-
+    sf::Shader shader;
+    if (!shader.loadFromFile(m_shaders[2], sf::Shader::Fragment))
+    {
+        std::cerr << "Error while shaders" << std::endl;
+        m_game->window().draw(m_lighting);
+    }
+    else
+    {
+        shader.setUniform("positionx", (float)m_player->getComponent<CTransform>().pos.x - m_game->window().getView().getCenter().x + m_game->window().getSize().x/2);
+        shader.setUniform("positiony", (float)m_player->getComponent<CTransform>().pos.y - m_game->window().getView().getCenter().y + m_game->window().getSize().y / 2);
+        shader.setUniform("radius", 300);
+        m_game->window().draw(m_lighting, &shader);
+    }
     // Particles on the front
     m_parallaxBackgroundSprites[2].move(sf::Vector2f(0.4f, 0.f));
     m_parallaxBackgroundSprites[2].setPosition(m_parallaxBackgroundSprites[2].getPosition().x, -50);

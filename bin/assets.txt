@@ -68,6 +68,7 @@ Texture   TexParallax7 images/BackGrounds/Parallax/07_Forest.png
 Texture   TexParallax8 images/BackGrounds/Parallax/08_Forest.png
 Texture   TexParallax9 images/BackGrounds/Parallax/09_Forest.png
 Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
+Texture   TexTransparent images/BackGrounds/Parallax/Transparent.png
 
 Texture   TexShopLevel	 		images/BackGrounds/Overworld/ShopLevel.png
 Texture   TexCompletedLevel 		images/BackGrounds/Overworld/CompletedLevel.png

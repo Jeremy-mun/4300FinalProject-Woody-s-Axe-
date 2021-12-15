@@ -116,7 +116,7 @@ protected:
     bool					  m_level1Completion = false, m_level2Completion = false, m_level3Completion = false;
     int						  m_maxHealth = 10, m_damage = 1, m_arrowCount = 10, m_coinCount = 0;
 
-    sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10;
+    sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10, m_lighting;
     std::vector<sf::String> m_parallaxBackgroundTextures = { "TexParallax1" , "TexParallax2" ,"TexParallax3" ,"TexParallax4" 
                                                     ,"TexParallax5" ,"TexParallax6" ,"TexParallax7" 
                                                     ,"TexParallax8" ,"TexParallax9" ,"TexParallax10" };
@@ -125,7 +125,8 @@ protected:
     std::vector<sf::String> m_shaders =
     {
         "shaders/shaderFade.frag",
-        "shaders/shaderInvincibility.frag"
+        "shaders/shaderInvincibility.frag",
+        "shaders/shaderLighting.frag"
     };
      
     

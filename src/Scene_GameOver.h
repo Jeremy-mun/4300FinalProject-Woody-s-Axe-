@@ -16,6 +16,7 @@ protected:
 	std::string               m_levelPath;
 	std::string               m_saveFile;
 	std::vector<std::string>  m_menuStrings;
+	sf::Text				  m_shopText;
 	sf::Text                  m_menuText;
 	size_t                    m_selectedMenuIndex = 0;
 	Vec2                      menuTextPos = getPosition(0, 0, 4, 1);
