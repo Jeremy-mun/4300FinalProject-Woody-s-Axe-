@@ -58,7 +58,6 @@ NPC SkeletonWalk     1  0  17  10  0  0  5  3  Patrol  2  3  17  10  17  10  22 
 NPC SkeletonWalk     2  0  5  10  0  0  5  3  Patrol  3  3  5  10  5  10  9  10  
 NPC FireSkull     1  0  0  5  0  0  7  3  Patrol  2  5  0  5  2  5  2  9  0  9  0  5  
 NPC FireSkull     0  0  18  9  0  0  7  3  Patrol  3  5  18  9  13  5  13  9  18  9  18  5  
-Player 352 672 40 64 3 3 2 
 Tile PlatformMiddle    2  0  10  11  1  1  
 Tile PlatformMiddle    2  0  11  11  1  1  
 Tile PlatformMiddle    2  0  12  11  1  1  
@@ -192,4 +191,6 @@ Tile PlatformMiddle    5  0  14  11  1  1
 Tile PlatformMiddle    5  0  15  11  1  1  
 Tile PlatformMiddle    5  0  16  11  1  1  
 Tile PlatformMiddle    5  0  17  11  1  1  
-Tile PlatformMiddle    5  0  18  11  1  1
+Tile PlatformMiddle    5  0  18  11  1  1  
+Player 352 672 40 64 3 86 2 
+NPC WizardIdle     0  0  13  9  0  0  3  3  Follow  2
