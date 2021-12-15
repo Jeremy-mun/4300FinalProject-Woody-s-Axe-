@@ -22,8 +22,6 @@ NPC GhostShriek           0  0  0  0  0  0  2  2  Follow  2
 NPC GhostShriek           0  0  0  0  0  0  2  2  Patrol  2 1 0 0
 NPC DemonIdle             0  0  0  0  0  0  3  3  Follow  3
 NPC DemonIdle             0  0  0  0  0  0  3  3  Patrol  3 1 0 0
-NPC HellBeastIdle         0  0  0  0  0  0  3  3  Follow  4
-NPC HellBeastIdle         0  0  0  0  0  0  3  3  Patrol  4 1 0 0
 NPC FireSkull             0  0  0  0  0  0  3  3  Follow  5
 NPC FireSkull             0  0  0  0  0  0  3  3  Patrol  5 1 0 0
 Item Coin                 0  0  0  0  0  0
@@ -32,3 +30,4 @@ Item RedPotion            0  0  0  0  0  0
 Item PurplePotion         0  0  0  0  0  0
 Item GoldPotion           0  0  0  0  0  0
 Item BluePotion           0  0  0  0  0  0
+Item GreenPotion           0  0  0  0  0  0

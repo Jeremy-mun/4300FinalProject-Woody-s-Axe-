@@ -669,9 +669,18 @@ void Scene_MainGame::sMovement()
             
             if (pInput.down == true)
             {
-                pState.state = "StandDown";
-                m_player->removeComponent<CBoundingBox>();
-                m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
+                if (m_canCrouch)
+                {
+                    pState.state = "StandDown";
+                    m_player->removeComponent<CBoundingBox>();
+                    m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
+                }
+                
+                if (m_crouchClock.getElapsedTime().asSeconds() > 1)
+                {
+                    m_canCrouch = false;
+                }
+
             }
             pTransform.scale = Vec2(-1, 1);
             
@@ -704,12 +713,18 @@ void Scene_MainGame::sMovement()
             m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), true, false);
             if (pInput.down == true)
             {
-                pState.state = "StandDown";
-                //m_player->getComponent<CBoundingBox>().size.y = 32;
-                //m_player->getComponent<CTransform>().pos.y -= m_player->getComponent<CBoundingBox>().halfSize.y - m_playerConfig.CY;
-                //pTransform.scale = Vec2(-1, 1);
-                m_player->removeComponent<CBoundingBox>();
-                m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX,20),true, false);
+
+                if (m_canCrouch)
+                {
+                    pState.state = "StandDown";
+                    m_player->removeComponent<CBoundingBox>();
+                    m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
+                }
+
+                if (m_crouchClock.getElapsedTime().asSeconds() > 1)
+                {
+                    m_canCrouch = false;
+                }
             }
 
             pTransform.scale = Vec2(1, 1);
@@ -878,7 +893,7 @@ void Scene_MainGame::sDoAction(const Action& action)
     else if (action.type() == "END")
     {
         if (action.name() == "UP") { m_player->getComponent<CInput>().up = false; m_player->getComponent<CInput>().canJump = true;}
-        else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = false; }
+        else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = false; m_canCrouch = true; m_crouchClock.restart(); }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = false; }
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = false; }
     }
@@ -900,26 +915,26 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         m_game->setVolume("UseItem", m_effectVolume);
         if (inventory.items[m_select] == "RedPotion")
         {
-            std::cout << "Red Potion";
+            std::cout << "Red Potion";  // health
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& health = entity->getComponent<CHealth>();
             health.current = health.max;
         }
-        else if (inventory.items[m_select] == "BluePotion")
+        else if (inventory.items[m_select] == "BluePotion") // Speed
         {
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& transform = entity->getComponent<CTransform>();
             transform.tempSpeed = 3;
             transform.duration = 600;
         }
-        else if (inventory.items[m_select] == "GreenPotion")
+        else if (inventory.items[m_select] == "GreenPotion")  // Damage Increase
         {
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& damage = entity->getComponent<CDamage>();
             damage.tempDamage = 2;
             damage.duration = 600;
         }
-        else if (inventory.items[m_select] == "GoldPotion")
+        else if (inventory.items[m_select] == "GoldPotion") // Invincibility
         {
             inventory.items.erase(inventory.items.begin() + m_select);
             
@@ -937,7 +952,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
                 entity->getComponent<CShader>().ourShader = m_shaders[1];
             }
         }
-        else if (inventory.items[m_select] == "PurplePotion")
+        else if (inventory.items[m_select] == "PurplePotion")   // explosive
         {
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& eTransform = entity->getComponent<CTransform>();

@@ -68,6 +68,7 @@ protected:
     bool                    m_playerOnMovingTile = false;
     bool                    m_minimap = true;
     bool                    m_collidingWithTile = false;
+    bool                    m_canCrouch = true;
     int                     m_roomX = 0;
     int                     m_roomY = 0;
     int                     m_wallet = 0;
@@ -83,6 +84,7 @@ protected:
     sf::Clock               m_InventoryClock;
     sf::Clock               m_time;
     sf::Clock               m_gravityClock;
+    sf::Clock               m_crouchClock;
     int                     m_frameSinceAttack;
     sf::CircleShape         inventorySelect;
 
