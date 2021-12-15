@@ -52,12 +52,12 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_tutorialText.setFillColor(sf::Color::Red);
 
     m_arrowHolderText.setFont(m_game->assets().getFont("Gypsy"));
-    m_arrowHolderText.setCharacterSize(20);
+    m_arrowHolderText.setCharacterSize(30);
     m_arrowHolderText.setFillColor(sf::Color::Red);
 
     m_walletText.setFont(m_game->assets().getFont("Gypsy"));
-    m_walletText.setCharacterSize(36);
-    m_walletText.setFillColor(sf::Color(137, 3, 6));
+    m_walletText.setCharacterSize(30);
+    m_walletText.setFillColor(sf::Color::Red);
 
     m_lighting.setTexture(m_game->assets().getTexture("TexTransparent"));
     m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 768));
@@ -423,9 +423,18 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
-                else if (m_itemConfig.Name == "Chest")
+                else if (m_itemConfig.Name == "Chest" )
                 {
                     auto interact = m_entityManager.addEntity("interactable");
+                    interact->addComponent<CDraggable>();
+                    interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
+                else if (m_itemConfig.Name == "ArrowPick")
+                {
+                    auto interact = m_entityManager.addEntity("arrowpick");
                     interact->addComponent<CDraggable>();
                     interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
                     interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
@@ -973,7 +982,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& damage = entity->getComponent<CDamage>();
             damage.tempDamage = 2;
-            damage.duration = 600;
+            damage.duration = 30;
         }
         else if (inventory.items[m_select] == "GoldPotion") // Invincibility
         {
@@ -981,15 +990,15 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             
             if (entity->hasComponent<CInvincibility>())
             {
-                entity->getComponent<CInvincibility>().iframes = 420;
+                entity->getComponent<CInvincibility>().iframes = 60;
             }
             else
             {
-                entity->addComponent<CInvincibility>(420);
+                entity->addComponent<CInvincibility>(60);
             }
             if (entity->hasComponent<CShader>())
             {
-                entity->getComponent<CShader>().duration = 420;
+                entity->getComponent<CShader>().duration = 60;
                 entity->getComponent<CShader>().ourShader = m_shaders[1];
             }
         }
@@ -1014,7 +1023,7 @@ void Scene_MainGame::sInteract()
     for (auto interactable : m_entityManager.getEntities("interactable"))
     {
         auto overlap = Physics::GetOverlap(interactable, m_player);
-        if (overlap.x > 2 && overlap.y > 2)
+        if (overlap.x > 0 && overlap.y > 0)
         {
             if (interactable->getComponent<CAnimation>().animation.getName() == "Chest")
             {
@@ -1044,6 +1053,7 @@ void Scene_MainGame::sInteract()
                 }
                 interactable->destroy();
             }
+
         }
     }
 }
@@ -1457,6 +1467,7 @@ void Scene_MainGame::sCollision()
     sArrowCollision();
     sBreakableCollision();
     sHeartCollision();
+    sArrowPickCollision();
     sCoinCollision();
     sItemCollision();
     sTeleportCollision();
@@ -1506,7 +1517,6 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y-2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    //m_playerOnGround = true;
                 }
                 else
                 {
@@ -1593,7 +1603,6 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    //m_playerOnGround = true;
                 }
                 else
                 {
@@ -1673,11 +1682,9 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    //m_playerOnGround = true;
                 }
                 else
                 {
-
                     if (playerTransform.pos.x > tileTransform.pos.x)
                     {
                         playerTransform.pos.x += playerTileOverlap.x;
@@ -1749,6 +1756,7 @@ void Scene_MainGame::sPlayerCollision()
                 npc->destroy();
             }
             //m_game->playSound("LinkHurt");
+
             if (!m_player->hasComponent<CInvincibility>())
             {
                 auto& pShader = m_player->getComponent<CShader>();
@@ -1759,7 +1767,6 @@ void Scene_MainGame::sPlayerCollision()
 
                 if (playerHealth.current <= 0)
                 {
-                    //m_game->playSound("LinkDie");
                     m_player->destroy();
                     m_tutorialTextClock.restart();
                 }
@@ -2138,6 +2145,28 @@ void Scene_MainGame::sHeartCollision()
         }
     }
 }
+void Scene_MainGame::sArrowPickCollision()
+{
+    for (auto arrowpick : m_entityManager.getEntities("arrowpick"))
+    {
+        auto& arrowpickBoundingBox = arrowpick->getComponent<CBoundingBox>();
+        auto& arrowpickAnim = arrowpick->getComponent<CAnimation>().animation;
+
+        // Checking for player and rupee collision
+        auto arrowpickCoinsOverlap = Physics::GetOverlap(arrowpick, m_player);
+        if (arrowpickCoinsOverlap.x > arrowpickBoundingBox.halfSize.x && arrowpickCoinsOverlap.y > arrowpickBoundingBox.halfSize.y)
+        {
+            if (m_player->getComponent<CInventory>().Arrows < m_player->getComponent<CInventory>().maxArrows)
+            {
+                m_game->playSound("Bow");
+                m_game->setVolume("Bow", m_effectVolume);
+                m_player->getComponent<CInventory>().Arrows++;
+                arrowpick->destroy();
+            }
+            
+        }
+    }
+}
 void Scene_MainGame::sCoinCollision()
 {
     //Rupee collisions with entities are implemented here
@@ -2158,6 +2187,8 @@ void Scene_MainGame::sCoinCollision()
             coin->destroy();
         }
     }
+
+    
 }
 void Scene_MainGame::sItemCollision()
 {
@@ -2411,15 +2442,15 @@ void Scene_MainGame::sCamera()
     m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nWeapon Swap: TAB");
     if (m_weaponSwitch == 0)
     {
-        m_levelText.setString("Dagger Activated");
+        //m_levelText.setString("Dagger Activated");
     }
     else if (m_weaponSwitch == 1)
     {
-        m_levelText.setString("  Bow Activated");
+        //m_levelText.setString("  Bow Activated");
     }
     else
     {
-        m_levelText.setString("  Axe Activated");
+        //m_levelText.setString("  Axe Activated");
     }
 
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
@@ -2436,7 +2467,7 @@ void Scene_MainGame::sCamera()
         m_tutorialText.setString("");
     }*/
 
-    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y + 128));
+    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 128));
     //m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
 
     m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 6).x, getPosition(0, 0, 2, 6).y));
@@ -2500,20 +2531,6 @@ void Scene_MainGame::drawWeaponHolder()
     {
         currentWeaponHUD = "BowHUD";
 
-        if (m_player->getComponent<CInventory>().Arrows != 0)
-        {
-            auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
-            arrowHolder->addComponent<CState>().state = "ArrowHolder";
-            arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowHolder"), false);
-            arrowHolder->addComponent<CTransform>(Vec2(0, 0));
-        }
-        else if (m_player->getComponent<CInventory>().Arrows <= 0)
-        {
-            auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
-            arrowHolder->addComponent<CState>().state = "EmptyArrowHolder";
-            arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("EmptyArrowHolder"), false);
-            arrowHolder->addComponent<CTransform>(Vec2(0, 0));
-        }
         
     }
     else
@@ -2528,6 +2545,20 @@ void Scene_MainGame::drawWeaponHolder()
     weaponHolder->addComponent<CAnimation>(anim, false);
     weaponHolder->addComponent<CTransform>(weaponHolderPos);
 
+    if (m_player->getComponent<CInventory>().Arrows != 0)
+    {
+        auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
+        arrowHolder->addComponent<CState>().state = "ArrowHolder";
+        arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowHolder"), false);
+        arrowHolder->addComponent<CTransform>(Vec2(0, 0));
+    }
+    else if (m_player->getComponent<CInventory>().Arrows <= 0)
+    {
+        auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
+        arrowHolder->addComponent<CState>().state = "EmptyArrowHolder";
+        arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("EmptyArrowHolder"), false);
+        arrowHolder->addComponent<CTransform>(Vec2(0, 0));
+    }
 }
 
 void Scene_MainGame::sHUD()
@@ -2539,7 +2570,7 @@ void Scene_MainGame::sHUD()
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
-    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 - 10, InventoryPos.y + 55);
+    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 , InventoryPos.y + 55);
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
@@ -2554,7 +2585,7 @@ void Scene_MainGame::sHUD()
     }
     if (arrowHolderPos.x < view.getSize().x / 2)
     {
-        arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 - 10;
+        arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 ;
         arrowHolderPos.y = InventoryPos.y + 55;
     }
 
@@ -2564,7 +2595,7 @@ void Scene_MainGame::sHUD()
         weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
     }
     
-    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y*2);
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y + 32);
 
     
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -2575,7 +2606,7 @@ void Scene_MainGame::sHUD()
     for (auto& arrowHolder : m_entityManager.getEntities("arrowHolder"))
     {
         arrowHolder->getComponent<CTransform>().pos = arrowHolderPos;
-        m_arrowHolderText.setPosition(sf::Vector2f(arrowHolderPos.x + 32, arrowHolderPos.y-15));
+        m_arrowHolderText.setPosition(sf::Vector2f(arrowHolderPos.x + 32, arrowHolderPos.y-20));
         m_arrowHolderText.setString("x" + std::to_string(m_player->getComponent<CInventory>().Arrows)+ "/"+ std::to_string(m_player->getComponent<CInventory>().maxArrows));
    
     }
@@ -2583,7 +2614,7 @@ void Scene_MainGame::sHUD()
     for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
     {
         coinHUD->getComponent<CTransform>().pos = coinHUDPosition;
-        m_walletText.setPosition(sf::Vector2f(coinHUDPosition.x + 32, coinHUDPosition.y - 25));
+        m_walletText.setPosition(sf::Vector2f(coinHUDPosition.x + 32, coinHUDPosition.y - 20));
         m_walletText.setString("x" + std::to_string(m_player->getComponent<CInventory>().money));
     }
 
@@ -2993,7 +3024,17 @@ void Scene_MainGame::sRender()
         animation.getSprite().setScale(transform.scale.x, transform.scale.y);
         m_game->window().draw(animation.getSprite());
     }
-
+    if (inventoryOpened)
+    {
+        inventorySelect.setRadius(23.5);
+        //inventorySelect.setSize(sf::Vector2f(45, 45));
+        inventorySelect.setOrigin(sf::Vector2f(45 / 2 + 1, 45 / 2));
+        //inventorySelect.setPosition(getPosition(0,0,5,0).x, getPosition(0, 0, 5, 0).y);
+        inventorySelect.setFillColor(sf::Color(0, 0, 0, 0));
+        inventorySelect.setOutlineColor(sf::Color(196, 70, 70, 255));
+        inventorySelect.setOutlineThickness(5);
+        m_game->window().draw(inventorySelect);
+    }
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);

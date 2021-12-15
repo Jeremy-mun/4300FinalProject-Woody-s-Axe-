@@ -125,7 +125,7 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
-                else if (m_itemConfig.Name == "Chest")
+                else if (m_itemConfig.Name == "Chest"|| m_itemConfig.Name == "ArrowPick")
                 {
                     auto interact = m_entityManager.addEntity("Interactable");
                     interact->addComponent<CDraggable>();
@@ -460,7 +460,7 @@ void Scene_Level_Editor::templateEntities(const std::string& filename)
                     potion->addComponent<CDraggable>();
                     continue;
                 }
-                else if (m_itemConfig.Name == "Chest")
+                else if (m_itemConfig.Name == "Chest" || m_itemConfig.Name == "ArrowPick")
                 {
                     auto interact = m_editorManager.addEntity("Interactable");
                     interact->addComponent<CDraggable>();

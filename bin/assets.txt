@@ -9,6 +9,7 @@ Texture   TexDagger    	images/gothic/DaggerAttack.png
 Texture   TexAxe    	images/gothic/AxeAttack.png 
 Texture   TexBow    	images/gothic/BowAttack.png 
 Texture   TexArrow	images/gothic/Arrow.png
+Texture   TexArrowPick  images/Items/arrowPick.png
 Texture   TexBush    	images/tloz/brown/tile_bush.png
 Texture   TexGroundGrass     images/gothic/tileGround1.png
 Texture   TexGroundDirt     images/gothic/tileGround2.png
@@ -119,6 +120,8 @@ Animation Dagger        TexDagger       26   4
 Animation Axe	        TexAxe	        12   6
 Animation Bow	        TexBow	         9   2
 Animation Arrow		TexArrow   	 1   0
+Animation ArrowPick		TexArrowPick   	 1   0
+
 Animation Bush    	TexBush		 1   0
 Animation Ground        TexGroundGrass        1   0
 Animation Ground2        TexGroundDirt        1   0

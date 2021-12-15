@@ -161,6 +161,7 @@ protected:
     void sBreakableCollision();
     void sArrowCollision();
     void sHeartCollision();
+    void sArrowPickCollision();
     void sCoinCollision();
     void sItemCollision();
     void sTeleportCollision();
