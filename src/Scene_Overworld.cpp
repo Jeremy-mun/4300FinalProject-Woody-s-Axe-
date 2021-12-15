@@ -123,6 +123,39 @@ void Scene_Overworld::init()
 	shop2Item->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowsUp"), true);
 	shop3Item->addComponent<CAnimation>(m_game->assets().getAnimation("DamageUp"), true);
 
+	auto& shop1Coin = m_entityManager.addEntity("shop");
+	shop1Coin->addComponent<CTransform>(Vec2(-357, 662));
+	auto& shop2Coin = m_entityManager.addEntity("shop");
+	shop2Coin->addComponent<CTransform>(Vec2(-677, 662));
+	auto& shop3Coin = m_entityManager.addEntity("shop");
+	shop3Coin->addComponent<CTransform>(Vec2(-997, 662));
+	shop1Coin->addComponent<CAnimation>(m_game->assets().getAnimation("Coin"), true);
+	shop2Coin->addComponent<CAnimation>(m_game->assets().getAnimation("Coin"), true);
+	shop3Coin->addComponent<CAnimation>(m_game->assets().getAnimation("Coin"), true);
+
+	auto& sign = m_entityManager.addEntity("shop");
+	sign->addComponent<CTransform>(Vec2(49, 400));
+	sign->addComponent<CAnimation>(m_game->assets().getAnimation("ShopSign"), true);
+
+	
+	m_shopText.setFont(m_game->assets().getFont("Gypsy"));
+	m_shopText.setCharacterSize(20);
+	m_shopText.setString("x50");
+	m_shopText.setPosition(sf::Vector2f(-352, 647));
+	m_shopText.setFillColor(sf::Color::Black);
+
+	m_shopText2.setFont(m_game->assets().getFont("Gypsy"));
+	m_shopText2.setCharacterSize(20);
+	m_shopText2.setString("x50");
+	m_shopText2.setPosition(sf::Vector2f(-672, 647));
+	m_shopText2.setFillColor(sf::Color::Black);
+
+	m_shopText3.setFont(m_game->assets().getFont("Gypsy"));
+	m_shopText3.setCharacterSize(20);
+	m_shopText3.setString("x100");
+	m_shopText3.setPosition(sf::Vector2f(-992, 647));
+	m_shopText3.setFillColor(sf::Color::Black);
+
 	auto coin = m_entityManager.addEntity("shop");
 
 	coin->addComponent<CTransform>(Vec2(50,50));
@@ -137,6 +170,7 @@ void Scene_Overworld::init()
 	m_menuText.setCharacterSize(64);
 
 	m_game->playSound("MusicOverworld");
+	m_game->loopSound("MusicOverworld");
 	m_game->setVolume("MusicOverworld", m_musicVolume);
 
 }
@@ -598,6 +632,10 @@ void Scene_Overworld::sRender()
 		animation.getSprite().setScale(transform.scale.x, transform.scale.y);
 		m_game->window().draw(animation.getSprite());
 	}
+	m_game->window().draw(m_shopText);
+	m_game->window().draw(m_shopText2);
+	m_game->window().draw(m_shopText3);
+
 	auto& ptransform = m_player->getComponent<CTransform>();
 	auto& panimation = m_player->getComponent<CAnimation>().animation;
 	panimation.getSprite().setRotation(ptransform.angle);

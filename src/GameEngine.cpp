@@ -396,6 +396,10 @@ void GameEngine::pauseSound(const std::string& soundName)
 {
     m_assets.getSound(soundName).pause();
 }
+void GameEngine::loopSound(const std::string& soundName)
+{
+    m_assets.getSound(soundName).setLoop(true);
+}
 
 void GameEngine::remap()
 {

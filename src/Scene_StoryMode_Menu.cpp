@@ -35,7 +35,7 @@ void Scene_StoryMode_Menu::init()
         std::string name = p.path().string();
 
         std::stringstream ss;
-        ss << ((num < 10) ? " " : "") << (num) << ") " << name.substr(7);
+        ss << ((num < 10) ? " " : "") << (num) << ") " << name.substr(6, name.size()-6-4);
         num++;
 
         m_menuStrings.push_back(ss.str());

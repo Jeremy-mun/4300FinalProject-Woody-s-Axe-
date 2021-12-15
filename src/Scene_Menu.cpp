@@ -60,6 +60,7 @@ void Scene_Menu::init()
 
     m_game->playSound("MusicTitle");
     m_game->setVolume("MusicTitle", m_musicVolume);
+    m_game->loopSound("MusicTitle");
 
 
     m_backgroundSprite.setTexture(m_game->assets().getTexture("MainMenuBackground"));

@@ -23,6 +23,10 @@ protected:
 	std::shared_ptr<Entity>	  m_player;
 	sf::Text				  m_walletText;
 
+	sf::Text				  m_shopText;
+	sf::Text				  m_shopText2;
+	sf::Text				  m_shopText3;
+
 	//options
 	std::string                 ConfigRead;
 	int                         m_musicVolume = 100;

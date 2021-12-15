@@ -28,7 +28,7 @@ void Scene_LoadGame_Menu::init()
         std::string name = p.path().string();
 
         std::stringstream ss;
-        ss << ((num < 10) ? " " : "") << (num) << ") " << name.substr(7);
+        ss << ((num < 10) ? " " : "") << (num) << ") " << name.substr(7, name.size() - 7 - 4);
         num++;
 
         m_menuStrings.push_back(ss.str());
