@@ -423,7 +423,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
-                else if (m_itemConfig.Name == "Chest")
+                else if (m_itemConfig.Name == "Chest" || m_itemConfig.Name == "ArrowPick")
                 {
                     auto interact = m_entityManager.addEntity("interactable");
                     interact->addComponent<CDraggable>();
@@ -432,6 +432,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
+               
                 else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
                 {
                     auto breakable = m_entityManager.addEntity("breakable");
@@ -973,7 +974,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& damage = entity->getComponent<CDamage>();
             damage.tempDamage = 2;
-            damage.duration = 600;
+            damage.duration = 30;
         }
         else if (inventory.items[m_select] == "GoldPotion") // Invincibility
         {
@@ -981,15 +982,15 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             
             if (entity->hasComponent<CInvincibility>())
             {
-                entity->getComponent<CInvincibility>().iframes = 420;
+                entity->getComponent<CInvincibility>().iframes = 60;
             }
             else
             {
-                entity->addComponent<CInvincibility>(420);
+                entity->addComponent<CInvincibility>(60);
             }
             if (entity->hasComponent<CShader>())
             {
-                entity->getComponent<CShader>().duration = 420;
+                entity->getComponent<CShader>().duration = 60;
                 entity->getComponent<CShader>().ourShader = m_shaders[1];
             }
         }
@@ -1014,7 +1015,7 @@ void Scene_MainGame::sInteract()
     for (auto interactable : m_entityManager.getEntities("interactable"))
     {
         auto overlap = Physics::GetOverlap(interactable, m_player);
-        if (overlap.x > 2 && overlap.y > 2)
+        if (overlap.x > 0 && overlap.y > 0)
         {
             if (interactable->getComponent<CAnimation>().animation.getName() == "Chest")
             {
@@ -1043,6 +1044,12 @@ void Scene_MainGame::sInteract()
                     m_player->getComponent<CInventory>().items.push_back("GoldPotion");
                 }
                 interactable->destroy();
+            }
+
+            if (interactable->getComponent<CAnimation>().animation.getName() == "ArrowPick")
+            {
+                m_player->getComponent<CInventory>().Arrows += 1;
+                //interactable->destroy();
             }
         }
     }
@@ -2312,15 +2319,15 @@ void Scene_MainGame::sCamera()
     m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nWeapon Swap: TAB");
     if (m_weaponSwitch == 0)
     {
-        m_levelText.setString("Dagger Activated");
+        //m_levelText.setString("Dagger Activated");
     }
     else if (m_weaponSwitch == 1)
     {
-        m_levelText.setString("  Bow Activated");
+        //m_levelText.setString("  Bow Activated");
     }
     else
     {
-        m_levelText.setString("  Axe Activated");
+        //m_levelText.setString("  Axe Activated");
     }
 
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
@@ -2440,7 +2447,7 @@ void Scene_MainGame::sHUD()
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
-    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 - 10, InventoryPos.y + 55);
+    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 , InventoryPos.y + 55);
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
@@ -2455,7 +2462,7 @@ void Scene_MainGame::sHUD()
     }
     if (arrowHolderPos.x < view.getSize().x / 2)
     {
-        arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 - 10;
+        arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 ;
         arrowHolderPos.y = InventoryPos.y + 55;
     }
 
@@ -2465,7 +2472,7 @@ void Scene_MainGame::sHUD()
         weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
     }
     
-    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y*2);
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y);
 
     
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -2894,7 +2901,17 @@ void Scene_MainGame::sRender()
         animation.getSprite().setScale(transform.scale.x, transform.scale.y);
         m_game->window().draw(animation.getSprite());
     }
-
+    if (inventoryOpened)
+    {
+        inventorySelect.setRadius(23.5);
+        //inventorySelect.setSize(sf::Vector2f(45, 45));
+        inventorySelect.setOrigin(sf::Vector2f(45 / 2 + 1, 45 / 2));
+        //inventorySelect.setPosition(getPosition(0,0,5,0).x, getPosition(0, 0, 5, 0).y);
+        inventorySelect.setFillColor(sf::Color(0, 0, 0, 0));
+        inventorySelect.setOutlineColor(sf::Color(196, 70, 70, 255));
+        inventorySelect.setOutlineThickness(5);
+        m_game->window().draw(inventorySelect);
+    }
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
