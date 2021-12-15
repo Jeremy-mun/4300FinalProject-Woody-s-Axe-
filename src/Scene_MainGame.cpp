@@ -963,8 +963,8 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         {
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& transform = entity->getComponent<CTransform>();
-            transform.tempSpeed = 3;
-            transform.duration = 600;
+            transform.tempSpeed = 2;
+            transform.duration = 30;
         }
         else if (inventory.items[m_select] == "GreenPotion")  // Damage Increase
         {
