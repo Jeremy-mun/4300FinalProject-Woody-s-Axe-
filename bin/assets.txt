@@ -143,11 +143,11 @@ Animation SkeletonHit	   TexSkeletonHit	 4  4
 Animation SkeletonDead	   TexSkeletonDead	 4  4
 
 Animation WizardIdle   	TexWizardIdle		8  2	
-Animation WizardAttack1	TexWizardAttack1	8  2
+Animation WizardAttack1	TexWizardAttack1	7  2
 Animation WizardAttack2	TexWizardAttack2        8  2
-Animation WizardTakeHit	TexWizardTakeHit	3  2
-Animation WizardRun	TexWizardRun		8  2
-Animation WizardDeath	TexWizardDeath		7  2
+Animation WizardTakeHit	TexWizardTakeHit	3  4
+Animation WizardRun	TexWizardRun		8  3
+Animation WizardDeath	TexWizardDeath		7  3
 Animation WizardFall	TexWizardFall		2  2						
 Animation WizardJump	TexWizardJump		2  2
 Animation WizardProjectile	TexWizardProjectile		1  0
@@ -224,6 +224,7 @@ Sound     Fire		sounds/Fire.wav
 Sound     EnemyHit	sounds/EnemyHit.wav
 Sound     Coin		sounds/Coin.wav
 Sound     Bow		sounds/Bow.wav
+Sound     WizardDeath	sounds/WizardDeath.ogg
 
 Font      Arial         fonts/arial.ttf
 Font      Mario         fonts/mario.ttf

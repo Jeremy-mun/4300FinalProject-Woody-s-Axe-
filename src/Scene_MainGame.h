@@ -88,6 +88,7 @@ protected:
     sf::Clock               m_crouchClock;
     int                     m_frameSinceAttack;
     sf::CircleShape         inventorySelect;
+    int                     m_wizardAttackTime;
 
     //options
     std::string                 ConfigRead;

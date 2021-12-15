@@ -24,6 +24,7 @@ NPC DemonIdle             0  0  0  0  0  0  3  3  Follow  3
 NPC DemonIdle             0  0  0  0  0  0  3  3  Patrol  3 1 0 0
 NPC FireSkull             0  0  0  0  0  0  3  3  Follow  5
 NPC FireSkull             0  0  0  0  0  0  3  3  Patrol  5 1 0 0
+NPC WizardIdle            0  0  0  0  0  0  3  3  Follow  2
 Item Coin                 0  0  0  0  0  0
 Item Heart                0  0  0  0  0  0
 Item RedPotion            0  0  0  0  0  0
