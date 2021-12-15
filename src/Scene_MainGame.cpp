@@ -47,8 +47,8 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_levelText.setFont(m_game->assets().getFont("Gypsy"));
     m_levelText.setFillColor(sf::Color::White);
     m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
-    m_tutorialText.setCharacterSize(20);
-    m_tutorialText.setFillColor(sf::Color::White);
+    m_tutorialText.setCharacterSize(40);
+    m_tutorialText.setFillColor(sf::Color::Red);
     m_walletText.setFont(m_game->assets().getFont("Gypsy"));
     m_walletText.setCharacterSize(36);
     m_walletText.setFillColor(sf::Color(137, 3, 6));
@@ -877,7 +877,10 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
         else if (action.name() == "INTERACT") { sInteract(); }
         else if (action.name() == "ATTACK") { if (!m_player->getComponent<CInput>().attack && !m_paused) { startAttack(m_player);  m_player->getComponent<CInput>().attack = true; } }
-        else if (action.name() == "WEAPON_SWITCH") { if (!m_player->getComponent<CInput>().attack) {  m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; } else { m_weaponSwitch = 0; } drawWeaponHolder();
+        else if (action.name() == "WEAPON_SWITCH") {
+            if (!m_player->getComponent<CInput>().attack) {
+                m_weaponTextClock.restart(); if (m_weaponSwitch < 2) { m_weaponSwitch++; }
+                else { m_weaponSwitch = 0; } drawWeaponHolder(); drawWeaponSwap();
         } }
         else if (action.name() == "SELECT_RIGHT") { select("Right"); }
         else if (action.name() == "SELECT_LEFT") { select("Left"); }
@@ -2243,21 +2246,57 @@ void Scene_MainGame::sCamera()
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
     {
         m_levelText.setString("");
+        for (auto& weaponSwap : m_entityManager.getEntities("weaponSwap"))
+        {
+            weaponSwap->destroy();
+        }
+
     }
-    if (m_tutorialTextClock.getElapsedTime().asSeconds() > 3)
+    /*if (m_tutorialTextClock.getElapsedTime().asSeconds() > 3)
     {
         m_tutorialText.setString("");
-    }
+    }*/
 
     m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y + 128));
-    m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
-    
+    //m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
+
+    m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 6).x, getPosition(0, 0, 2, 6).y));
 #pragma endregion
 
     // then set the window view
     m_game->window().setView(view);
 }
 
+void Scene_MainGame::drawWeaponSwap()
+{
+    for (auto& weaponSwap : m_entityManager.getEntities("weaponSwap"))
+    {
+        weaponSwap->destroy();
+    }
+
+    std::string currentWeaponHUD = "";
+
+    if (m_weaponSwitch == 0)
+    {
+        currentWeaponHUD = "DaggerHUD";
+    }
+
+    // use Bow Animation
+    else if (m_weaponSwitch == 1)
+    {
+        currentWeaponHUD = "BowHUD";
+    }
+    else
+    {
+        currentWeaponHUD = "AxeHUD";
+    }
+    auto anim = m_game->assets().getAnimation(currentWeaponHUD);
+    Vec2 weaponSwapPos = Vec2(0, 0);
+
+    auto& weaponSwap = m_entityManager.addEntity("weaponSwap");
+    weaponSwap->addComponent<CAnimation>(anim, false);
+    weaponSwap->addComponent<CTransform>(weaponSwapPos);
+}
 void Scene_MainGame::drawWeaponHolder()
 {
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -2287,7 +2326,6 @@ void Scene_MainGame::drawWeaponHolder()
     auto& weaponHolder = m_entityManager.addEntity("weaponHolder");
     weaponHolder->addComponent<CAnimation>(anim, false);
     weaponHolder->addComponent<CTransform>(weaponHolderPos);
-    //weaponHolder->addComponent<CBoundingBox>(Vec2(anim.getSize().x, anim.getSize().y));
 }
 
 void Scene_MainGame::sHUD()
@@ -2313,7 +2351,10 @@ void Scene_MainGame::sHUD()
         weaponHolderPos.y = InventoryPos.y;
     }
 
-    
+    for (auto& weaponHolder : m_entityManager.getEntities("weaponSwap"))
+    {
+        weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
+    }
     
     Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y);
 
@@ -2322,7 +2363,7 @@ void Scene_MainGame::sHUD()
     {
         weaponHolder->getComponent<CTransform>().pos = weaponHolderPos;
     }
-
+    
     for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
     {
         coinHUD->getComponent<CTransform>().pos = coinHUDPosition;
