@@ -52,12 +52,12 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_tutorialText.setFillColor(sf::Color::Red);
 
     m_arrowHolderText.setFont(m_game->assets().getFont("Gypsy"));
-    m_arrowHolderText.setCharacterSize(20);
+    m_arrowHolderText.setCharacterSize(30);
     m_arrowHolderText.setFillColor(sf::Color::Red);
 
     m_walletText.setFont(m_game->assets().getFont("Gypsy"));
-    m_walletText.setCharacterSize(36);
-    m_walletText.setFillColor(sf::Color(137, 3, 6));
+    m_walletText.setCharacterSize(30);
+    m_walletText.setFillColor(sf::Color::Red);
 
     m_lighting.setTexture(m_game->assets().getTexture("TexTransparent"));
     m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 768));
@@ -423,7 +423,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     potion->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
-                else if (m_itemConfig.Name == "Chest" || m_itemConfig.Name == "ArrowPick")
+                else if (m_itemConfig.Name == "Chest" )
                 {
                     auto interact = m_entityManager.addEntity("interactable");
                     interact->addComponent<CDraggable>();
@@ -432,7 +432,15 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
                     continue;
                 }
-               
+                else if (m_itemConfig.Name == "ArrowPick")
+                {
+                    auto interact = m_entityManager.addEntity("arrowpick");
+                    interact->addComponent<CDraggable>();
+                    interact->addComponent<CTransform>(getPosition(m_itemConfig.RX, m_itemConfig.RY, m_itemConfig.TX, m_itemConfig.TY));
+                    interact->addComponent<CAnimation>(m_game->assets().getAnimation(m_itemConfig.Name), true);
+                    interact->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_itemConfig.Name).getSize(), m_itemConfig.BM, m_itemConfig.BV);
+                    continue;
+                }
                 else if (m_itemConfig.Name == "JarBig" || m_itemConfig.Name == "JarSmall" || m_itemConfig.Name == "Barrel")
                 {
                     auto breakable = m_entityManager.addEntity("breakable");
@@ -1046,11 +1054,6 @@ void Scene_MainGame::sInteract()
                 interactable->destroy();
             }
 
-            if (interactable->getComponent<CAnimation>().animation.getName() == "ArrowPick")
-            {
-                m_player->getComponent<CInventory>().Arrows += 1;
-                //interactable->destroy();
-            }
         }
     }
 }
@@ -1426,6 +1429,7 @@ void Scene_MainGame::sCollision()
     sArrowCollision();
     sBreakableCollision();
     sHeartCollision();
+    sArrowPickCollision();
     sCoinCollision();
     sItemCollision();
     sTeleportCollision();
@@ -1475,7 +1479,6 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y-2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    //m_playerOnGround = true;
                 }
                 else
                 {
@@ -1562,7 +1565,6 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    //m_playerOnGround = true;
                 }
                 else
                 {
@@ -1642,11 +1644,9 @@ void Scene_MainGame::sTileCollision()
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
                 {
                     playerTransform.pos.y = tileTransform.pos.y - tileBoundingBox.halfSize.y - playerBoundingBox.halfSize.y;
-                    //m_playerOnGround = true;
                 }
                 else
                 {
-
                     if (playerTransform.pos.x > tileTransform.pos.x)
                     {
                         playerTransform.pos.x += playerTileOverlap.x;
@@ -1713,7 +1713,6 @@ void Scene_MainGame::sPlayerCollision()
         auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
         if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
         {
-            //m_game->playSound("LinkHurt");
             if (!m_player->hasComponent<CInvincibility>())
             {
                 auto& pShader = m_player->getComponent<CShader>();
@@ -1724,7 +1723,6 @@ void Scene_MainGame::sPlayerCollision()
 
                 if (playerHealth.current <= 0)
                 {
-                    //m_game->playSound("LinkDie");
                     m_player->destroy();
                     m_tutorialTextClock.restart();
                 }
@@ -2046,6 +2044,28 @@ void Scene_MainGame::sHeartCollision()
         }
     }
 }
+void Scene_MainGame::sArrowPickCollision()
+{
+    for (auto arrowpick : m_entityManager.getEntities("arrowpick"))
+    {
+        auto& arrowpickBoundingBox = arrowpick->getComponent<CBoundingBox>();
+        auto& arrowpickAnim = arrowpick->getComponent<CAnimation>().animation;
+
+        // Checking for player and rupee collision
+        auto arrowpickCoinsOverlap = Physics::GetOverlap(arrowpick, m_player);
+        if (arrowpickCoinsOverlap.x > arrowpickBoundingBox.halfSize.x && arrowpickCoinsOverlap.y > arrowpickBoundingBox.halfSize.y)
+        {
+            if (m_player->getComponent<CInventory>().Arrows < m_player->getComponent<CInventory>().maxArrows)
+            {
+                m_game->playSound("Bow");
+                m_game->setVolume("Bow", m_effectVolume);
+                m_player->getComponent<CInventory>().Arrows++;
+                arrowpick->destroy();
+            }
+            
+        }
+    }
+}
 void Scene_MainGame::sCoinCollision()
 {
     //Rupee collisions with entities are implemented here
@@ -2066,6 +2086,8 @@ void Scene_MainGame::sCoinCollision()
             coin->destroy();
         }
     }
+
+    
 }
 void Scene_MainGame::sItemCollision()
 {
@@ -2344,7 +2366,7 @@ void Scene_MainGame::sCamera()
         m_tutorialText.setString("");
     }*/
 
-    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y + 128));
+    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 128));
     //m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
 
     m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 6).x, getPosition(0, 0, 2, 6).y));
@@ -2408,20 +2430,6 @@ void Scene_MainGame::drawWeaponHolder()
     {
         currentWeaponHUD = "BowHUD";
 
-        if (m_player->getComponent<CInventory>().Arrows != 0)
-        {
-            auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
-            arrowHolder->addComponent<CState>().state = "ArrowHolder";
-            arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowHolder"), false);
-            arrowHolder->addComponent<CTransform>(Vec2(0, 0));
-        }
-        else if (m_player->getComponent<CInventory>().Arrows <= 0)
-        {
-            auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
-            arrowHolder->addComponent<CState>().state = "EmptyArrowHolder";
-            arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("EmptyArrowHolder"), false);
-            arrowHolder->addComponent<CTransform>(Vec2(0, 0));
-        }
         
     }
     else
@@ -2436,6 +2444,20 @@ void Scene_MainGame::drawWeaponHolder()
     weaponHolder->addComponent<CAnimation>(anim, false);
     weaponHolder->addComponent<CTransform>(weaponHolderPos);
 
+    if (m_player->getComponent<CInventory>().Arrows != 0)
+    {
+        auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
+        arrowHolder->addComponent<CState>().state = "ArrowHolder";
+        arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowHolder"), false);
+        arrowHolder->addComponent<CTransform>(Vec2(0, 0));
+    }
+    else if (m_player->getComponent<CInventory>().Arrows <= 0)
+    {
+        auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
+        arrowHolder->addComponent<CState>().state = "EmptyArrowHolder";
+        arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("EmptyArrowHolder"), false);
+        arrowHolder->addComponent<CTransform>(Vec2(0, 0));
+    }
 }
 
 void Scene_MainGame::sHUD()
@@ -2472,7 +2494,7 @@ void Scene_MainGame::sHUD()
         weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
     }
     
-    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y);
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y + 32);
 
     
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -2483,7 +2505,7 @@ void Scene_MainGame::sHUD()
     for (auto& arrowHolder : m_entityManager.getEntities("arrowHolder"))
     {
         arrowHolder->getComponent<CTransform>().pos = arrowHolderPos;
-        m_arrowHolderText.setPosition(sf::Vector2f(arrowHolderPos.x + 32, arrowHolderPos.y-15));
+        m_arrowHolderText.setPosition(sf::Vector2f(arrowHolderPos.x + 32, arrowHolderPos.y-20));
         m_arrowHolderText.setString("x" + std::to_string(m_player->getComponent<CInventory>().Arrows)+ "/"+ std::to_string(m_player->getComponent<CInventory>().maxArrows));
    
     }
@@ -2491,7 +2513,7 @@ void Scene_MainGame::sHUD()
     for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
     {
         coinHUD->getComponent<CTransform>().pos = coinHUDPosition;
-        m_walletText.setPosition(sf::Vector2f(coinHUDPosition.x + 32, coinHUDPosition.y - 25));
+        m_walletText.setPosition(sf::Vector2f(coinHUDPosition.x + 32, coinHUDPosition.y - 20));
         m_walletText.setString("x" + std::to_string(m_player->getComponent<CInventory>().money));
     }
 
