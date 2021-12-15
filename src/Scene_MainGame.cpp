@@ -447,7 +447,6 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     npc->addComponent<CFollowPlayer>(getPosition(m_npcConfig.RX, m_npcConfig.RY, m_npcConfig.TX, m_npcConfig.TY), m_npcConfig.S);
                     npc->addComponent<CHealth>(m_npcConfig.H * m_difficultymod, m_npcConfig.H * m_difficultymod);
                     npc->addComponent<CDamage>(ceil(m_npcConfig.D * m_difficultymod));
-
                     npc->addComponent<CShader>();
                     continue;
                 }
@@ -773,7 +772,6 @@ void Scene_MainGame::sMovement()
         m_FrameSinceGrounded = 0;
     }
 
-    
     if (m_player->getComponent<CTransform>().pos.y > getPosition(0, 0, 0, 12).y)
     {
         m_player->destroy();
@@ -1393,7 +1391,7 @@ void Scene_MainGame::sTileCollision()
                     else
                     {
                         playerTransform.pos.y -= playerTileOverlap.y;
-                        m_playerOnMovingTile = true;
+                        m_playerOnGround = true;
                         
                     }
                 }

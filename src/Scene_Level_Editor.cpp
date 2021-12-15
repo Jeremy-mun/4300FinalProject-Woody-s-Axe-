@@ -88,6 +88,15 @@ void Scene_Level_Editor::loadLevel(const std::string& filename)
                 }
                 mTile->addComponent<CTransform>(getPosition(m_movingTileConfig.RX, m_movingTileConfig.RY, m_movingTileConfig.TX, m_movingTileConfig.TY));
                 mTile->addComponent<CAnimation>(m_game->assets().getAnimation(m_movingTileConfig.Name), true);
+                if (m_movingTileConfig.Name == "FloatTileSmall" || m_movingTileConfig.Name == "FloatTileBig")
+                {
+                    mTile->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().x, m_game->assets().getAnimation(m_movingTileConfig.Name).getSize().y - 15), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                else
+                {
+                    mTile->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_movingTileConfig.Name).getSize(), m_movingTileConfig.BM, m_movingTileConfig.BV);
+                }
+                continue;
             }
             if (configRead == "Item")
             {
