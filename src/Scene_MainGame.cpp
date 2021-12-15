@@ -46,9 +46,15 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Gypsy"));
     m_levelText.setFillColor(sf::Color::White);
+
     m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
     m_tutorialText.setCharacterSize(40);
     m_tutorialText.setFillColor(sf::Color::Red);
+
+    m_arrowHolderText.setFont(m_game->assets().getFont("Gypsy"));
+    m_arrowHolderText.setCharacterSize(20);
+    m_arrowHolderText.setFillColor(sf::Color::Red);
+
     m_walletText.setFont(m_game->assets().getFont("Gypsy"));
     m_walletText.setCharacterSize(36);
     m_walletText.setFillColor(sf::Color(137, 3, 6));
@@ -597,7 +603,10 @@ void Scene_MainGame::startAttack(std::shared_ptr<Entity> entity)
     // use Bow Animation
     else if(m_weaponSwitch == 1)
     {
-        eState.state = "Bow";
+        if (m_player->getComponent<CInventory>().Arrows != 0)
+        {
+            eState.state = "Bow";
+        }
     }
     else
     {
@@ -783,7 +792,16 @@ void Scene_MainGame::sMovement()
         }
         else if (m_weaponSwitch == 1)
         {
-            pState.state = "Bow";
+            if (m_player->getComponent<CInventory>().Arrows != 0)
+            {
+                pState.state = "Bow";
+            }
+            else
+            {
+                pState.state = "Dagger";
+                drawWeaponHolder();
+            }
+            
         }
         else 
         {
@@ -1878,7 +1896,7 @@ void Scene_MainGame::sBreakableCollision()
 }
 void Scene_MainGame::sArrowCollision()
 {
-    if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10)
+    if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10 && m_player->getComponent<CInventory>().Arrows != 0)
     {
         m_game->playSound("Bow");
         m_game->setVolume("Bow", m_effectVolume);
@@ -1890,6 +1908,7 @@ void Scene_MainGame::sArrowCollision()
         arrow->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5,playerTransform.pos.y),Vec2(5 * playerTransform.scale.x,0),playerTransform.scale,0);
         arrow->addComponent<CDamage>(playerDamage.damage + playerDamage.tempDamage);
         arrow->addComponent<CLifeSpan>(180, m_currentFrame);
+        m_player->getComponent<CInventory>().Arrows-=1;
     }
     //Arrow collisions with NPC's are implemented here
     for (auto& arrow : m_entityManager.getEntities("arrow"))
@@ -2327,20 +2346,42 @@ void Scene_MainGame::drawWeaponHolder()
         weaponHolder->destroy();
     }
 
+    for (auto& arrowHolder : m_entityManager.getEntities("arrowHolder"))
+    {
+        arrowHolder->destroy();
+    }
     std::string currentWeaponHUD = "";
     
     if (m_weaponSwitch == 0)
     {
         currentWeaponHUD = "DaggerHUD";
+        m_arrowHolderText.setString("");
     }
 
     // use Bow Animation
     else if (m_weaponSwitch == 1)
     {
         currentWeaponHUD = "BowHUD";
+
+        if (m_player->getComponent<CInventory>().Arrows != 0)
+        {
+            auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
+            arrowHolder->addComponent<CState>().state = "ArrowHolder";
+            arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("ArrowHolder"), false);
+            arrowHolder->addComponent<CTransform>(Vec2(0, 0));
+        }
+        else if (m_player->getComponent<CInventory>().Arrows <= 0)
+        {
+            auto& arrowHolder = m_entityManager.addEntity("arrowHolder");
+            arrowHolder->addComponent<CState>().state = "EmptyArrowHolder";
+            arrowHolder->addComponent<CAnimation>(m_game->assets().getAnimation("EmptyArrowHolder"), false);
+            arrowHolder->addComponent<CTransform>(Vec2(0, 0));
+        }
+        
     }
     else
     {
+        m_arrowHolderText.setString("");
         currentWeaponHUD = "AxeHUD";
     }
     auto anim = m_game->assets().getAnimation(currentWeaponHUD);
@@ -2349,6 +2390,7 @@ void Scene_MainGame::drawWeaponHolder()
     auto& weaponHolder = m_entityManager.addEntity("weaponHolder");
     weaponHolder->addComponent<CAnimation>(anim, false);
     weaponHolder->addComponent<CTransform>(weaponHolderPos);
+
 }
 
 void Scene_MainGame::sHUD()
@@ -2360,7 +2402,7 @@ void Scene_MainGame::sHUD()
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
-
+    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y + 64);
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
@@ -2373,18 +2415,32 @@ void Scene_MainGame::sHUD()
         weaponHolderPos.x = InventoryPos.x - m_gridSize.x * 5;
         weaponHolderPos.y = InventoryPos.y;
     }
+    if (arrowHolderPos.x < view.getSize().x / 2)
+    {
+        arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 - 10;
+        arrowHolderPos.y = InventoryPos.y + 55;
+    }
+
 
     for (auto& weaponHolder : m_entityManager.getEntities("weaponSwap"))
     {
         weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
     }
     
-    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y);
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y*2);
 
     
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
     {
         weaponHolder->getComponent<CTransform>().pos = weaponHolderPos;
+    }
+
+    for (auto& arrowHolder : m_entityManager.getEntities("arrowHolder"))
+    {
+        arrowHolder->getComponent<CTransform>().pos = arrowHolderPos;
+        m_arrowHolderText.setPosition(sf::Vector2f(arrowHolderPos.x + 32, arrowHolderPos.y-15));
+        m_arrowHolderText.setString("x" + std::to_string(m_player->getComponent<CInventory>().Arrows)+ "/"+ std::to_string(m_player->getComponent<CInventory>().maxArrows));
+   
     }
     
     for (auto& coinHUD : m_entityManager.getEntities("CoinHUD"))
@@ -2764,7 +2820,7 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_tutorialText);
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
-
+    m_game->window().draw(m_arrowHolderText);
     if (m_minimap)
     {
         drawMinimap();
