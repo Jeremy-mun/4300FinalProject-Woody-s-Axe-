@@ -47,6 +47,12 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_levelText.setFont(m_game->assets().getFont("Gypsy"));
     m_levelText.setFillColor(sf::Color::White);
 
+   
+    m_inventorySelectText.setFont(m_game->assets().getFont("Gypsy"));
+    m_inventorySelectText.setCharacterSize(15);
+    m_inventorySelectText.setFillColor(sf::Color::White);
+    
+
     m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
     m_tutorialText.setCharacterSize(40);
     m_tutorialText.setFillColor(sf::Color::Red);
@@ -63,6 +69,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 768));
     m_lighting.setPosition(0, 0);
 
+    m_game->stopSound("GameOver");
     m_game->playSound("MusicGame");
     m_game->setVolume("MusicGame", m_musicVolume);
     m_game->loopSound("MusicGame");
@@ -2669,8 +2676,7 @@ void Scene_MainGame::sCamera()
     
     if (!m_paused)
     {
-        m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space\n\nWeapon Swap: TAB\n\nInteract: F");
-
+        m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space     Weapon Swap: TAB\n\nInventory Select Items: Left/Right \n\nItem Use: E");
     }
 
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
@@ -2685,7 +2691,7 @@ void Scene_MainGame::sCamera()
 
     // Setting texts for help during the game
 
-    if (m_tutorialTextClock.getElapsedTime().asSeconds() > 1)
+    if (m_tutorialTextClock.getElapsedTime().asSeconds() > 0.1)
     {
         m_levelText.setString("");
     }
@@ -2709,6 +2715,7 @@ void Scene_MainGame::sCamera()
             m_tutorialTextClock.restart();
         }
     }
+    
     for (auto interactable : m_entityManager.getEntities("arrowpick"))
     {
         auto IsInside = Physics::IsInside(Vec2(interactable->getComponent<CTransform>().pos.x + 32, interactable->getComponent<CTransform>().pos.y), m_player);
@@ -2722,16 +2729,23 @@ void Scene_MainGame::sCamera()
         }
     }
     m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 10));
-
-
-    if (m_player->getComponent<CTransform>().pos.x > getPosition(0, 0, 50, 0).x)
+    if (m_levelText.getString() == "Full")
     {
-        m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 71, 1).x, getPosition(0, 0, 71, 1).y));
+        m_levelText.setPosition(sf::Vector2f(levelTextPos.x + 32, levelTextPos.y - 10));
+    }
+
+
+  /*  if (m_player->getComponent<CTransform>().pos.x > getPosition(0, 0, 50, 0).x)
+    {
+     
+            m_tutorialText.setString("Arrows, Fire Spell and Axe are \nstrong enough to break damaged rocks");
+            m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 71, 1).x, getPosition(0, 0, 71, 1).y));
+
     }
     else
     {
-        m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 2).x, getPosition(0, 0, 2, 2).y));
-    }
+       */ m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 1).x, getPosition(0, 0, 2, 1).y));
+    //}
 
   
 
@@ -2835,7 +2849,7 @@ void Scene_MainGame::sHUD()
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
-    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 , InventoryPos.y + 55);
+    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 , InventoryPos.y + 70);
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
@@ -2851,7 +2865,7 @@ void Scene_MainGame::sHUD()
     if (arrowHolderPos.x < view.getSize().x / 2)
     {
         arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 ;
-        arrowHolderPos.y = InventoryPos.y + 55;
+        arrowHolderPos.y = InventoryPos.y + 70;
     }
 
 
@@ -2860,7 +2874,7 @@ void Scene_MainGame::sHUD()
         weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
     }
     
-    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y + 32);
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y + 64);
 
     
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -2903,6 +2917,8 @@ void Scene_MainGame::sHUD()
         }
     }
     inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 4), InventoryPos.y);
+    m_inventorySelectText.setString("E");
+    m_inventorySelectText.setPosition(inventorySelect.getPosition().x, inventorySelect.getPosition().y + 32);
     
 }
 
@@ -3345,6 +3361,7 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
     m_game->window().draw(m_arrowHolderText);
+    m_game->window().draw(m_inventorySelectText);
     if (m_minimap)
     {
         drawMinimap();

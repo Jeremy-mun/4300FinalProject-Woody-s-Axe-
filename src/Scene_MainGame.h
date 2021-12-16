@@ -78,6 +78,7 @@ protected:
     sf::Text                m_tutorialText;
     sf::Text                m_levelText;
     sf::Text                m_walletText;
+    sf::Text                m_inventorySelectText;
     sf::Text                m_arrowHolderText;
     sf::Clock               m_weaponTextClock;
     sf::Clock               m_tutorialTextClock;
