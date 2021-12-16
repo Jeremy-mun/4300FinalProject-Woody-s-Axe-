@@ -1805,6 +1805,7 @@ void Scene_MainGame::sMeleeCollision()
                 {
                     npcHealth.current -= axe->getComponent<CDamage>().damage;
                 }
+
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
@@ -1915,18 +1916,18 @@ void Scene_MainGame::sMeleeCollision()
         m_game->setVolume("Melee", m_effectVolume);
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
-        auto& axe = m_entityManager.addEntity("weapon");
-        axe->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x*2/3, m_player->getComponent<CAnimation>().animation.getSize().y));
-        axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
-        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage));
-        axe->addComponent<CLifeSpan>(0, m_currentFrame);
+        auto& dagger = m_entityManager.addEntity("weapon");
+        dagger->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x*2/3, m_player->getComponent<CAnimation>().animation.getSize().y));
+        dagger->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
+        dagger->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage));
+        dagger->addComponent<CLifeSpan>(0, m_currentFrame);
         for (auto& e : m_entityManager.getEntities("npc"))
         {
             auto& npcHealth = e->getComponent<CHealth>();
-            auto npcWeaponOverlap = Physics::GetOverlap(axe, e);
+            auto npcWeaponOverlap = Physics::GetOverlap(dagger, e);
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
-                npcHealth.current -= axe->getComponent<CDamage>().damage;
+                npcHealth.current -= dagger->getComponent<CDamage>().damage;
 
                 // Animation when enemy gets hit
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
@@ -1958,8 +1959,6 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                     {
-                        
-                        //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
                         e->getComponent<CAnimation>().repeat = false;
                     }
