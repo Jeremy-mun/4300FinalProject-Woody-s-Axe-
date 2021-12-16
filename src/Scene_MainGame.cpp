@@ -712,7 +712,7 @@ void Scene_MainGame::sMovement()
                     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
                 }
                 
-                if (m_crouchClock.getElapsedTime().asSeconds() > 1)
+                if (m_crouchClock.getElapsedTime().asSeconds() > 2)
                 {
                     m_canCrouch = false;
                 }
@@ -758,7 +758,7 @@ void Scene_MainGame::sMovement()
                     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
                 }
 
-                if (m_crouchClock.getElapsedTime().asSeconds() > 1)
+                if (m_crouchClock.getElapsedTime().asSeconds() > 2)
                 {
                     m_canCrouch = false;
                 }
