@@ -1171,8 +1171,9 @@ void Scene_MainGame::sAI()
 
             if (!Visionblocked)
             {
-                
+
                 // Performing Steering
+
                 Vec2 target = m_player->getComponent<CTransform>().pos;
                 Vec2 desired = target - e->getComponent<CTransform>().pos;
                 float length = desired.dist(Vec2(0, 0));
@@ -1324,6 +1325,7 @@ void Scene_MainGame::sAI()
             }
             else if (e->getComponent<CTransform>().pos != e->getComponent<CFollowPlayer>().home && Visionblocked)
             {
+          
                 Vec2 target = e->getComponent<CFollowPlayer>().home;
                 Vec2 desired = target - e->getComponent<CTransform>().pos;
                 float length = desired.dist(Vec2(0, 0));
