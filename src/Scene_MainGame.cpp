@@ -640,14 +640,16 @@ void Scene_MainGame::update()
     // When the game is paused
     if (m_paused)
     {
-        m_levelText.setString("Paused"); 
+        m_tutorialText.setString("Paused"); 
         m_levelText.setCharacterSize(24);
         /*m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));*/
-        m_game->pauseSound("MusicLevel");
+        m_game->pauseSound("MusicGame");
+        m_game->pauseSound("MonsterDeath");
+        m_game->pauseSound("Fear");
         sCamera();
         drawInventory();
         sHUD();
-        
+        m_tutorialText.setPosition(sf::Vector2f(m_player->getComponent<CTransform>().pos.x - 32, m_player->getComponent<CTransform>().pos.y - 128));
         return;
     } 
     if (m_player->getComponent<CInput>().attack)
@@ -899,8 +901,9 @@ void Scene_MainGame::sDoAction(const Action& action)
 {                      
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {  setPaused(!m_paused);
-        }
+        if (action.name() == "PAUSE") {  setPaused(!m_paused); m_game->playSound("MusicGame"); m_game->playSound("MusicGame");
+        m_game->setVolume("MusicGame", m_musicVolume);
+        m_game->loopSound("MusicGame");}
         else if (action.name() == "QUIT") { onEnd(); }
         else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
         else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
@@ -1014,6 +1017,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         }
         else if (inventory.items[m_select] == "PurplePotion")   // explosive
         {
+            
             m_game->playSound("fireBird");
             m_game->setVolume("fireBird", m_effectVolume);
             inventory.items.erase(inventory.items.begin() + m_select);
@@ -1046,25 +1050,28 @@ void Scene_MainGame::sInteract()
                 int coinAmount = std::rand() % 17 + 3;
                 m_player->getComponent<CInventory>().money += coinAmount;
                 int itemID = std::rand() % 100;
-                if (itemID < 30)
+                if (m_player->getComponent<CInventory>().items.size() < 9)
                 {
-                    m_player->getComponent<CInventory>().items.push_back("RedPotion");
-                }
-                else if (itemID <60)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("BluePotion");
-                }
-                else if (itemID < 75)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("GreenPotion");
-                }
-                else if (itemID < 90)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("PurplePotion");
-                }
-                else
-                {
-                    m_player->getComponent<CInventory>().items.push_back("GoldPotion");
+                    if (itemID < 30)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("RedPotion");
+                    }
+                    else if (itemID < 60)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("BluePotion");
+                    }
+                    else if (itemID < 75)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("GreenPotion");
+                    }
+                    else if (itemID < 90)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("PurplePotion");
+                    }
+                    else
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("GoldPotion");
+                    }
                 }
                 interactable->destroy();
             }
@@ -1486,7 +1493,10 @@ void Scene_MainGame::sCollision()
     sHeartCollision();
     sArrowPickCollision();
     sCoinCollision();
-    sItemCollision();
+    if (m_player->getComponent<CInventory>().items.size() < 9)
+    {
+        sItemCollision();
+    }
     sTeleportCollision();
     sEnemyCollision();
 }
@@ -1672,6 +1682,8 @@ void Scene_MainGame::sTileCollision()
         {
             continue;
         }
+
+
     }
 
     for (auto tile : m_entityManager.getEntities("damaged"))
@@ -1835,17 +1847,12 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 if (npcHealth.current <= 0)
                 {
-                    //m_game->playSound("EnemyDie");
+                    m_game->stopSound("Fear");
                     auto ex = m_entityManager.addEntity("explosion");
                     m_game->playSound("MonsterDeath");
                     m_game->setVolume("MonsterDeath", m_effectVolume);
                     e->removeComponent<CHealth>();
-                    if (e->getComponent<CAnimation>().animation.getName() == "DemonIdle")
-                    {
-                        e->getComponent<CState>().state = "GhostVanish";
-                        e->getComponent<CAnimation>().repeat = false;
-                    }
-                    else if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
+                    if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
                     {
                         e->getComponent<CState>().state = "GhostVanish";
                         e->getComponent<CAnimation>().repeat = false;
@@ -1963,6 +1970,7 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 if (npcHealth.current <= 0)
                 {
+                    m_game->stopSound("Fear");
                     e->removeComponent<CHealth>();
                     m_game->playSound("MonsterDeath");
                     m_game->setVolume("MonsterDeath", m_effectVolume);
@@ -2108,6 +2116,7 @@ void Scene_MainGame::sArrowCollision()
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
+                    m_game->stopSound("Fear");
                     e->removeComponent<CHealth>();
                     m_game->playSound("MonsterDeath");
                     m_game->setVolume("MonsterDeath", m_effectVolume);
@@ -2312,6 +2321,8 @@ void Scene_MainGame::sItemCollision()
             }
             else
             {
+                m_levelText.setString("E to Use");
+                m_tutorialTextClock.restart();
                 m_game->playSound("Fire");
             }
             m_player->getComponent<CInventory>().items.push_back(potionAnim.getName());
@@ -2653,42 +2664,78 @@ void Scene_MainGame::sCamera()
     
 #pragma region Setting Up strings and positions of UI Texts
    
-    m_levelText.setCharacterSize(12);
+    m_levelText.setCharacterSize(30);
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
     
-    
-    m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space\n\nWeapon Swap: TAB\n\nInteract: F");
-    if (m_weaponSwitch == 0)
+    if (!m_paused)
     {
-        //m_levelText.setString("Dagger Activated");
-    }
-    else if (m_weaponSwitch == 1)
-    {
-        //m_levelText.setString("  Bow Activated");
-    }
-    else
-    {
-        //m_levelText.setString("  Axe Activated");
+        m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space\n\nWeapon Swap: TAB\n\nInteract: F");
+
     }
 
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
     {
-        m_levelText.setString("");
+        //m_levelText.setString("");
         for (auto& weaponSwap : m_entityManager.getEntities("weaponSwap"))
         {
             weaponSwap->destroy();
         }
 
     }
-    /*if (m_tutorialTextClock.getElapsedTime().asSeconds() > 3)
+
+    // Setting texts for help during the game
+
+    if (m_tutorialTextClock.getElapsedTime().asSeconds() > 1)
     {
-        m_tutorialText.setString("");
-    }*/
+        m_levelText.setString("");
+    }
 
-    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 128));
-    //m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
 
-    m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2,2).x, getPosition(0, 0, 2, 2).y));
+    for (auto interactable : m_entityManager.getEntities("interactable"))
+    {
+        auto IsInside = Physics::IsInside(interactable->getComponent<CTransform>().pos, m_player);
+        if (IsInside)
+        {
+            m_levelText.setString("F to Interact");
+            m_tutorialTextClock.restart();
+        }
+    }
+    for (auto interactable : m_entityManager.getEntities("breakable"))
+    {
+        auto IsInside = Physics::IsInside(interactable->getComponent<CTransform>().pos, m_player);
+        if (IsInside)
+        {
+            m_levelText.setString("Space to Break");
+            m_tutorialTextClock.restart();
+        }
+    }
+    for (auto interactable : m_entityManager.getEntities("arrowpick"))
+    {
+        auto IsInside = Physics::IsInside(Vec2(interactable->getComponent<CTransform>().pos.x + 32, interactable->getComponent<CTransform>().pos.y), m_player);
+        if (IsInside)
+        {   
+            if (m_player->getComponent<CInventory>().Arrows == m_player->getComponent<CInventory>().maxArrows)
+            {
+                m_levelText.setString("Full");
+                m_tutorialTextClock.restart();
+            }
+        }
+    }
+    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 10));
+
+
+    if (m_player->getComponent<CTransform>().pos.x > getPosition(0, 0, 50, 0).x)
+    {
+        m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 71, 1).x, getPosition(0, 0, 71, 1).y));
+    }
+    else
+    {
+        m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 2).x, getPosition(0, 0, 2, 2).y));
+    }
+
+  
+
+    
 #pragma endregion
 
     // then set the window view
