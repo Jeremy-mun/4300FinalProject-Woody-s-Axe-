@@ -340,7 +340,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 {
                     auto portal = m_entityManager.addEntity("teleport");
                     portal->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), false);
+                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
                     portal->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
                     portal->addComponent<CDraggable>();
                     continue;
@@ -1159,7 +1159,8 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" || 
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack"||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" || 
-                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" )
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" ||
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound")
                         {
                             e->getComponent<CTransform>().scale.x = 1;
                         }
@@ -1176,7 +1177,8 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" ||
-                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit")
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit"||
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound")
                         {
                             e->getComponent<CTransform>().scale.x = -1;
                         }
@@ -1799,7 +1801,10 @@ void Scene_MainGame::sMeleeCollision()
             auto npcWeaponOverlap = Physics::GetOverlap(axe, e);
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
-                npcHealth.current -= axe->getComponent<CDamage>().damage;
+                if (npcHealth.current >= 0)
+                {
+                    npcHealth.current -= axe->getComponent<CDamage>().damage;
+                }
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
@@ -1851,8 +1856,7 @@ void Scene_MainGame::sMeleeCollision()
                     }
                     else
                     {
-                        
-                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Thunder"), false);
                         ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                         e->destroy();
                     }
@@ -1860,6 +1864,7 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 else
                 {
+                    
                     if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
@@ -2395,6 +2400,42 @@ void Scene_MainGame::sAnimation()
 #pragma endregion
 
 
+    for (auto& e : m_entityManager.getEntities("teleport"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
+
+    }
+
     for (auto& e : m_entityManager.getEntities("tile"))
     {
         if (e->hasComponent<CState>())
@@ -2780,6 +2821,47 @@ void Scene_MainGame::drawMinimap()
     minimapView.zoom(2.5f);
     m_game->window().setView(minimapView);
 
+    for (auto e : m_entityManager.getEntities("arrowpick"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    for (auto e : m_entityManager.getEntities("breakable"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    for (auto e : m_entityManager.getEntities("interactable"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+
+    for (auto e : m_entityManager.getEntities("teleport"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    for (auto e : m_entityManager.getEntities("damaged"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
     for (auto e : m_entityManager.getEntities("tile"))
     {
         

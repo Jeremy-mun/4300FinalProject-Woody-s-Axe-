@@ -1,4 +1,5 @@
 Texture   MainMenuBackground images/MainMenu_Background.png
+Texture   TexThunder	images/misc/thunder.png
 Texture   TexExplode    images/misc/explosion128.png        
 Texture   TexRunRight   images/gothic/run_right.png
 Texture   TexJump      	images/gothic/jump.png
@@ -111,6 +112,7 @@ Texture   TexShopPedestal  images/BackGrounds/Overworld/ShopPedestal.png
 Texture   TexShopSign      images/BackGrounds/Overworld/ShopSign.png
 
 Animation Explosion     TexExplode     	48   2 
+Animation Thunder       TexThunder    	12   2 
 Animation RunRight      TexRunRight     24   2    
 Animation Jump         	TexJump        	19   2
 Animation StandDown     TexStandD       8    3
@@ -143,7 +145,7 @@ Animation SkeletonIdle	   TexSkeleton	 4  4
 Animation SkeletonWalk	   TexSkeletonWalk	 4  4
 Animation SkeletonAttack	   TexSkeletonAttack	 8  4
 Animation SkeletonHit	   TexSkeletonHit	 4  4
-Animation SkeletonDead	   TexSkeletonDead	 4  4
+Animation SkeletonDead	   TexSkeletonDead	 4  8
 
 Animation WizardIdle   	TexWizardIdle		8  2	
 Animation WizardAttack1	TexWizardAttack1	7  2
