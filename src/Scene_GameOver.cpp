@@ -44,7 +44,7 @@ void Scene_GameOver::init()
 	}
 
 	m_title = "Game Over";
-
+	m_game->playSound("GameOver");
 	m_menuStrings.push_back("Continue");
 	m_menuStrings.push_back("Main Menu");
 

@@ -238,6 +238,7 @@ Sound     SkeletonHurt	sounds/skeletonHurt.wav
 Sound     MonsterHit	sounds/monsterHit.wav
 Sound     RockBreak	sounds/BreakRock.wav
 Sound     BreakSound	sounds/BreakableSound.wav
+Sound     GameOver	sounds/GameOver.wav
 
 Font      Arial         fonts/arial.ttf
 Font      Mario         fonts/mario.ttf
