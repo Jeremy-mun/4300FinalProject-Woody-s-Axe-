@@ -2306,7 +2306,14 @@ void Scene_MainGame::sItemCollision()
         auto playerPotionsOverlap = Physics::GetOverlap(potion, m_player);
         if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
         {
-            m_game->playSound("Potion");
+            if (potionAnim.getName() != "PurplePotion")
+            {
+                m_game->playSound("Potion");
+            }
+            else
+            {
+                m_game->playSound("Fire");
+            }
             m_player->getComponent<CInventory>().items.push_back(potionAnim.getName());
             potion->destroy();
         }
