@@ -1782,8 +1782,8 @@ void Scene_MainGame::sPlayerCollision()
 
 void Scene_MainGame::sMeleeCollision()
 {
-    //Melee collisions with NPC's are implemented here
-    
+ //Melee collisions with NPC's are implemented here
+#pragma region Axe
     if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 24)
     {
         m_game->playSound("Melee");
@@ -1793,7 +1793,7 @@ void Scene_MainGame::sMeleeCollision()
         auto& axe = m_entityManager.addEntity("weapon");
         axe->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().animation.getSize());
         axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
-        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage)*3);
+        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage) * 3);
         axe->addComponent<CLifeSpan>(0, m_currentFrame);
         for (auto& e : m_entityManager.getEntities("npc"))
         {
@@ -1845,10 +1845,10 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CAnimation>().repeat = false;
                     }
                     else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
-                              e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
-                              e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
                         e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
-                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2" )
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
                     {
                         m_game->playSound("WizardDeath");
                         m_game->setVolume("WizardDeath", m_effectVolume);
@@ -1865,7 +1865,7 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 else
                 {
-                    
+
                     if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
@@ -1910,6 +1910,9 @@ void Scene_MainGame::sMeleeCollision()
 
         }
     }
+#pragma endregion
+
+#pragma region Dagger
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
         m_game->playSound("Melee");
@@ -1917,7 +1920,7 @@ void Scene_MainGame::sMeleeCollision()
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
         auto& dagger = m_entityManager.addEntity("weapon");
-        dagger->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x*2/3, m_player->getComponent<CAnimation>().animation.getSize().y));
+        dagger->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x * 2 / 3, m_player->getComponent<CAnimation>().animation.getSize().y));
         dagger->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
         dagger->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage));
         dagger->addComponent<CLifeSpan>(0, m_currentFrame);
@@ -1979,7 +1982,7 @@ void Scene_MainGame::sMeleeCollision()
                         ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                         e->destroy();
                     }
-                    
+
                     break;
                 }
                 else
@@ -2009,6 +2012,8 @@ void Scene_MainGame::sMeleeCollision()
             }
         }
     }
+#pragma endregion
+
 }
 void Scene_MainGame::sBreakableCollision()
 {
@@ -2042,6 +2047,7 @@ void Scene_MainGame::sBreakableCollision()
         }
     }
 }
+
 void Scene_MainGame::sArrowCollision()
 {
     if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10 && m_player->getComponent<CInventory>().Arrows != 0)
