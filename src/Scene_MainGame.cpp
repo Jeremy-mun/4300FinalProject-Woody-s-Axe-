@@ -45,12 +45,12 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Gypsy"));
-    m_levelText.setFillColor(sf::Color::White);
+    m_levelText.setFillColor(sf::Color::Red);
 
    
     m_inventorySelectText.setFont(m_game->assets().getFont("Gypsy"));
     m_inventorySelectText.setCharacterSize(15);
-    m_inventorySelectText.setFillColor(sf::Color::White);
+    m_inventorySelectText.setFillColor(sf::Color::Red);
     
 
     m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
