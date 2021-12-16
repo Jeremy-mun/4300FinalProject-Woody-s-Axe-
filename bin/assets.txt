@@ -222,7 +222,7 @@ Animation ShopSign    	TexShopSign     1  0
 
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
-Sound     MusicGame    	sounds/Suspense.wav
+Sound     MusicGame    	sounds/Suspense.ogg
 Sound     MusicOverworld    	sounds/OverworldMusic.ogg
 Sound     UseItem	sounds/UseItem.wav
 Sound     Melee		sounds/Melee.wav

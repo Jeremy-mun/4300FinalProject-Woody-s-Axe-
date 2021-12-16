@@ -2330,8 +2330,6 @@ void Scene_MainGame::sItemCollision()
             }
             else
             {
-                m_levelText.setString("E to Use");
-                m_tutorialTextClock.restart();
                 m_game->playSound("Fire");
             }
             m_player->getComponent<CInventory>().items.push_back(potionAnim.getName());
