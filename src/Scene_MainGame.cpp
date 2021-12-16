@@ -1027,6 +1027,8 @@ void Scene_MainGame::sInteract()
         {
             if (interactable->getComponent<CAnimation>().animation.getName() == "Chest")
             {
+                m_game->playSound("Coin");
+                m_game->setVolume("Coin", m_effectVolume);
                 std::srand(time(0));
                 int coinAmount = std::rand() % 17 + 3;
                 m_player->getComponent<CInventory>().money += coinAmount;
@@ -1815,9 +1817,15 @@ void Scene_MainGame::sMeleeCollision()
                 if (npcHealth.current <= 0)
                 {
                     //m_game->playSound("EnemyDie");
-
                     auto ex = m_entityManager.addEntity("explosion");
-                    if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
+                    m_game->playSound("MonsterDeath");
+                    m_game->setVolume("MonsterDeath", m_effectVolume);
+                    if (e->getComponent<CAnimation>().animation.getName() == "DemonIdle")
+                    {
+                        e->getComponent<CState>().state = "GhostVanish";
+                        e->getComponent<CAnimation>().repeat = false;
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
                     {
                         e->getComponent<CState>().state = "GhostVanish";
                         e->getComponent<CAnimation>().repeat = false;
@@ -1826,7 +1834,6 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                     {
-
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
                         e->getComponent<CAnimation>().repeat = false;
@@ -1844,11 +1851,36 @@ void Scene_MainGame::sMeleeCollision()
                     }
                     else
                     {
+                        
                         ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                         ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                         e->destroy();
                     }
                     break;
+                }
+                else
+                {
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+                        m_game->playSound("SkeletonHurt");
+                        m_game->setVolume("SkeletonHurt", m_effectVolume);
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardLaugh");
+                        m_game->setVolume("WizardLaugh", m_effectVolume);
+                    }
+                    else
+                    {
+                        m_game->playSound("MonsterHit");
+                        m_game->setVolume("MonsterHit", m_effectVolume);
+                    }
                 }
             }
         }
@@ -1858,8 +1890,8 @@ void Scene_MainGame::sMeleeCollision()
             if (RockOverlap.x > 0 && RockOverlap.y > 0)
             {
 
-                m_game->playSound("EnemyHit");
-                m_game->setVolume("EnemyHit", m_effectVolume);
+                m_game->playSound("RockBreak");
+                m_game->setVolume("RockBreak", m_effectVolume);
                 auto ex = m_entityManager.addEntity("explosion");
                 Vec2 exPos = e->getComponent<CTransform>().pos;
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
@@ -1908,8 +1940,8 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 if (npcHealth.current <= 0)
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    m_game->playSound("MonsterDeath");
+                    m_game->setVolume("MonsterDeath", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
@@ -1921,7 +1953,7 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                     {
-
+                        
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
                         e->getComponent<CAnimation>().repeat = false;
@@ -1948,8 +1980,27 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 else
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+                        m_game->playSound("SkeletonHurt");
+                        m_game->setVolume("SkeletonHurt", m_effectVolume);
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardLaugh");
+                        m_game->setVolume("WizardLaugh", m_effectVolume);
+                    }
+                    else
+                    {
+                        m_game->playSound("MonsterHit");
+                        m_game->setVolume("MonsterHit", m_effectVolume);
+                    }
                 }
             }
         }
@@ -1965,6 +2016,8 @@ void Scene_MainGame::sBreakableCollision()
             auto breakableWeaponOverlap = Physics::GetOverlap(weapon, e);
             if (breakableWeaponOverlap.x > 0 && breakableWeaponOverlap.y > 0)
             {
+                m_game->playSound("BreakSound");
+                m_game->setVolume("BreakSound", m_effectVolume);
                 auto ex = m_entityManager.addEntity("explosion");
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                 ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
@@ -2030,8 +2083,8 @@ void Scene_MainGame::sArrowCollision()
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    m_game->playSound("MonsterDeath");
+                    m_game->setVolume("MonsterDeath", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     Vec2 exPos = e->getComponent<CTransform>().pos;
@@ -2074,8 +2127,27 @@ void Scene_MainGame::sArrowCollision()
                 }
                 else
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+                        m_game->playSound("SkeletonHurt");
+                        m_game->setVolume("SkeletonHurt", m_effectVolume);
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardLaugh");
+                        m_game->setVolume("WizardLaugh", m_effectVolume);
+                    }
+                    else
+                    {
+                        m_game->playSound("MonsterHit");
+                        m_game->setVolume("MonsterHit", m_effectVolume);
+                    }
                 }
             }
         }
@@ -2086,8 +2158,8 @@ void Scene_MainGame::sArrowCollision()
             if (RockOverlap.x > 0 && RockOverlap.y > 0)
             {
                 arrow->destroy();
-                m_game->playSound("EnemyHit");
-                m_game->setVolume("EnemyHit", m_effectVolume);
+                m_game->playSound("RockBreak");
+                m_game->setVolume("RockBreak", m_effectVolume);
                 auto ex = m_entityManager.addEntity("explosion");
                 Vec2 exPos = e->getComponent<CTransform>().pos;
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
@@ -2200,6 +2272,7 @@ void Scene_MainGame::sItemCollision()
     auto& playerTransform = m_player->getComponent<CTransform>();
     for (auto potion : m_entityManager.getEntities("potions"))
     {
+        
         auto& potionBoundingBox = potion->getComponent<CBoundingBox>();
         auto& potionAnim = potion->getComponent<CAnimation>().animation;
 
@@ -2207,6 +2280,7 @@ void Scene_MainGame::sItemCollision()
         auto playerPotionsOverlap = Physics::GetOverlap(potion, m_player);
         if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
         {
+            m_game->playSound("Potion");
             m_player->getComponent<CInventory>().items.push_back(potionAnim.getName());
             potion->destroy();
         }
@@ -2268,6 +2342,7 @@ void Scene_MainGame::sEnemyCollision() {
             auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
             if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
             {
+                m_game->playSound("Fear");
                 //auto frame = m_currentFrame;
                 npcState.state = "DemonAttack";
                 auto& npcTransform = npc->getComponent<CTransform>();

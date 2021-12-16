@@ -228,6 +228,14 @@ Sound     EnemyHit	sounds/EnemyHit.wav
 Sound     Coin		sounds/Coin.wav
 Sound     Bow		sounds/Bow.wav
 Sound     WizardDeath	sounds/WizardDeath.ogg
+Sound     WizardLaugh	sounds/WizardLaugh.wav
+Sound     Fear		sounds/YouBelongToMe.wav
+Sound     MonsterDeath  sounds/MonsterDeath.wav
+Sound     Potion	sounds/Potion.wav
+Sound     SkeletonHurt	sounds/skeletonHurt.wav
+Sound     MonsterHit	sounds/monsterHit.wav
+Sound     RockBreak	sounds/BreakRock.wav
+Sound     BreakSound	sounds/BreakableSound.wav
 
 Font      Arial         fonts/arial.ttf
 Font      Mario         fonts/mario.ttf
