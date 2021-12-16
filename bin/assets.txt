@@ -1,6 +1,7 @@
 Texture   MainMenuBackground images/MainMenu_Background.png
 Texture   TexThunder	images/misc/thunder.png
-Texture   TexExplode    images/misc/explosion128.png        
+Texture   TexExplode    images/misc/explosion128.png  
+Texture   TexFireBird	images/misc/fireBird.png      
 Texture   TexRunRight   images/gothic/run_right.png
 Texture   TexJump      	images/gothic/jump.png
 Texture   TexStandD     images/gothic/crouch.png              
@@ -52,7 +53,7 @@ Texture   TexCoinHUD	images/Items/Coin2.png
 Texture	  TexHeart	images/Items/Heart.png
 Texture	  TexRedPotion	images/Items/RedPotion.png
 Texture	  TexGreenPotion images/Items/GreenPotion.png
-Texture	  TexPurplePotion images/Items/PurplePotion.png
+Texture	  TexPurplePotion images/Items/firePickUp.png
 Texture	  TexGoldPotion	images/Items/GoldPotion.png
 Texture	  TexBluePotion	images/Items/BluePotion.png
 Texture	  TexChest	images/Items/Chest.png
@@ -113,6 +114,7 @@ Texture   TexShopSign      images/BackGrounds/Overworld/ShopSign.png
 
 Animation Explosion     TexExplode     	48   2 
 Animation Thunder       TexThunder    	12   2 
+Animation FireBird	TexFireBird	16   2
 Animation RunRight      TexRunRight     24   2    
 Animation Jump         	TexJump        	19   2
 Animation StandDown     TexStandD       8    3
@@ -162,7 +164,7 @@ Animation CoinHUD	TexCoinHUD	 1   0
 Animation Heart		TexHeart	 1   0
 Animation RedPotion	TexRedPotion	 1   0
 Animation GreenPotion	TexGreenPotion	 1   0
-Animation PurplePotion	TexPurplePotion	 1   0
+Animation PurplePotion	TexPurplePotion	 11   11
 Animation GoldPotion	TexGoldPotion	 1   0
 Animation BluePotion	TexBluePotion	 1   0
 Animation Chest		TexChest	 1   0
@@ -239,6 +241,7 @@ Sound     MonsterHit	sounds/monsterHit.wav
 Sound     RockBreak	sounds/BreakRock.wav
 Sound     BreakSound	sounds/BreakableSound.wav
 Sound     GameOver	sounds/GameOver.wav
+Sound     fireBird	sounds/fireBirdSound.wav
 
 Font      Arial         fonts/arial.ttf
 Font      Mario         fonts/mario.ttf

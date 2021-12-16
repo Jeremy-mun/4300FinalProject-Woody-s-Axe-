@@ -464,8 +464,9 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("GhostShriek");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("GhostShriek"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x - 20, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
-                    if (m_npcConfig.Name == "DemonIdle")
+                    else if (m_npcConfig.Name == "DemonIdle")
                     {
                         npc->addComponent<CState>("DemonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
@@ -481,6 +482,11 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("SkeletonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("SkeletonIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else if (m_npcConfig.Name == "FireSkull")
+                    {
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("FireSkull"), true);
                         npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
                     }
                     else
@@ -961,8 +967,12 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         {
             return;
         }
-        m_game->playSound("UseItem");
-        m_game->setVolume("UseItem", m_effectVolume);
+        if (inventory.items[m_select] != "PurplePotion")
+        {
+            m_game->playSound("UseItem");
+            m_game->setVolume("UseItem", m_effectVolume);
+        }
+        
         if (inventory.items[m_select] == "RedPotion") // health
         {
             std::cout << "Red Potion"; 
@@ -1004,14 +1014,17 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         }
         else if (inventory.items[m_select] == "PurplePotion")   // explosive
         {
+            m_game->playSound("fireBird");
+            m_game->setVolume("fireBird", m_effectVolume);
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& eTransform = entity->getComponent<CTransform>();
             auto& potion = m_entityManager.addEntity("arrow");
-            potion->addComponent<CAnimation>(m_game->assets().getAnimation("PurplePotion"), true);
-            potion->addComponent<CBoundingBox>(m_game->assets().getAnimation("PurplePotion").getSize());
+            potion->addComponent<CAnimation>(m_game->assets().getAnimation("FireBird"), false);
+            potion->addComponent<CBoundingBox>(m_game->assets().getAnimation("FireBird").getSize());
             potion->addComponent<CTransform>(Vec2(eTransform.pos.x + eTransform.scale.x * 5, eTransform.pos.y), Vec2(8 * eTransform.scale.x, 0), eTransform.scale, 0);
             potion->addComponent<CDamage>(10);
             potion->addComponent<CLifeSpan>(180, m_currentFrame);
+
         }
 
     }
@@ -1826,6 +1839,7 @@ void Scene_MainGame::sMeleeCollision()
                     auto ex = m_entityManager.addEntity("explosion");
                     m_game->playSound("MonsterDeath");
                     m_game->setVolume("MonsterDeath", m_effectVolume);
+                    e->removeComponent<CHealth>();
                     if (e->getComponent<CAnimation>().animation.getName() == "DemonIdle")
                     {
                         e->getComponent<CState>().state = "GhostVanish";
@@ -1949,6 +1963,7 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 if (npcHealth.current <= 0)
                 {
+                    e->removeComponent<CHealth>();
                     m_game->playSound("MonsterDeath");
                     m_game->setVolume("MonsterDeath", m_effectVolume);
                     //m_game->playSound("EnemyDie");
@@ -2093,6 +2108,7 @@ void Scene_MainGame::sArrowCollision()
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
+                    e->removeComponent<CHealth>();
                     m_game->playSound("MonsterDeath");
                     m_game->setVolume("MonsterDeath", m_effectVolume);
                     //m_game->playSound("EnemyDie");
@@ -2403,7 +2419,77 @@ void Scene_MainGame::sAnimation()
         playerAnimation.animation = m_game->assets().getAnimation(playerState.state);
     }
 #pragma endregion
+    for (auto& e : m_entityManager.getEntities("potions"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
 
+    }
+
+    for (auto& e : m_entityManager.getEntities("arrow"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
+
+    }
 
     for (auto& e : m_entityManager.getEntities("teleport"))
     {
@@ -2564,7 +2650,7 @@ void Scene_MainGame::sCamera()
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
     
     
-    m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nWeapon Swap: TAB");
+    m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space\n\nWeapon Swap: TAB\n\nInteract: F");
     if (m_weaponSwitch == 0)
     {
         //m_levelText.setString("Dagger Activated");
@@ -2595,7 +2681,7 @@ void Scene_MainGame::sCamera()
     m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 128));
     //m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
 
-    m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 6).x, getPosition(0, 0, 2, 6).y));
+    m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2,2).x, getPosition(0, 0, 2, 2).y));
 #pragma endregion
 
     // then set the window view
