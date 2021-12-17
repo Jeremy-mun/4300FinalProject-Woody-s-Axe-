@@ -351,7 +351,7 @@ Item PurplePotion    4  0  16  7  0  0
 Item PurplePotion    4  0  17  8  0  0  
 Item PurplePotion    4  0  19  8  0  0  
 Item PurplePotion    4  0  18  7  0  0  
-NPC WizardIdle     5  0  18  9  0  0  50  6  Follow  3  
+NPC WizardIdle     5  0  19  9  0  0  350  6  Follow  3  
 Tile Portal    6  0  4  10  0  0  
 Tile Portal    5  0  11  1  0  0  
 Tile Portal    5  0  16  10  0  0  

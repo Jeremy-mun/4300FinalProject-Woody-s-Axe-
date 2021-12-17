@@ -54,7 +54,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     
 
     m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
-    m_tutorialText.setCharacterSize(40);
+    m_tutorialText.setCharacterSize(26);
     m_tutorialText.setFillColor(sf::Color::Red);
 
     m_arrowHolderText.setFont(m_game->assets().getFont("Gypsy"));
@@ -68,7 +68,23 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_lighting.setTexture(m_game->assets().getTexture("TexTransparent"));
     m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 768));
     m_lighting.setPosition(0, 0);
+    if (m_levelPath == "levels/level1.txt")
+    {
+        m_walletText.setFillColor(sf::Color::Red);
+        m_arrowHolderText.setFillColor(sf::Color::Red);
+        m_tutorialText.setFillColor(sf::Color::Red);
+        m_levelText.setFillColor(sf::Color::Red);
+        m_inventorySelectText.setFillColor(sf::Color::Red);
 
+    }
+    else
+    {
+        m_walletText.setFillColor(sf::Color::White);
+        m_arrowHolderText.setFillColor(sf::Color::White);
+        m_tutorialText.setFillColor(sf::Color::White);
+        m_levelText.setFillColor(sf::Color::White);
+        m_inventorySelectText.setFillColor(sf::Color::White);
+    }
     m_game->stopSound("GameOver");
     m_game->playSound("MusicGame");
     m_game->setVolume("MusicGame", m_musicVolume);
@@ -785,22 +801,23 @@ void Scene_MainGame::sMovement()
             {
                 if (m_levelPath == "levels/level3.txt")
                 {
-                    m_parallaxRedBackgroundSprites[8].move(sf::Vector2f(1.9f, 0.f));
-                    m_parallaxRedBackgroundSprites[7].move(sf::Vector2f(1.9f, 0.f));
-                    m_parallaxRedBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
+                    m_parallaxRedBackgroundSprites[8].move(sf::Vector2f(2.5f, 0.f));
+                    m_parallaxRedBackgroundSprites[7].move(sf::Vector2f(2.4f, 0.f));
+                    m_parallaxRedBackgroundSprites[6].move(sf::Vector2f(1.9f, 0.f));
                     ///
-                    m_parallaxRedBackgroundSprites[5].move(sf::Vector2f(1.3f, 0.f));
+                    m_parallaxRedBackgroundSprites[5].move(sf::Vector2f(1.5f, 0.f));
                     m_parallaxRedBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
                     m_parallaxRedBackgroundSprites[3].move(sf::Vector2f(1.f, 0.f));
                     ///
-                    m_parallaxRedBackgroundSprites[2].move(sf::Vector2f(0.6f, 0.f));
+                    m_parallaxRedBackgroundSprites[2].move(sf::Vector2f(0.2f, 0.f));
+                    //m_parallaxRedBackgroundSprites[1].setPosition(m_player->getComponent<CTransform>().pos.x - 500, 0);
                 }
                 else if (m_levelPath == "levels/level2.txt")
                 {
-                    m_parallaxDemonBackgroundSprites[3].move(sf::Vector2f(2.0f, 0.f));
-                    m_parallaxDemonBackgroundSprites[2].move(sf::Vector2f(1.7f, 0.f));
-                    m_parallaxDemonBackgroundSprites[1].move(sf::Vector2f(1.3f, 0.f));
-                    m_parallaxDemonBackgroundSprites[0].move(sf::Vector2f(1.0f, 0.f));
+                    m_parallaxDemonBackgroundSprites[3].move(sf::Vector2f(1.0f, 0.f));
+                    m_parallaxDemonBackgroundSprites[2].move(sf::Vector2f(0.8f, 0.f));
+                    m_parallaxDemonBackgroundSprites[1].move(sf::Vector2f(0.4f, 0.f));
+                    m_parallaxDemonBackgroundSprites[0].move(sf::Vector2f(0.1f, 0.f));
                 }
                 else
                 {
@@ -813,7 +830,7 @@ void Scene_MainGame::sMovement()
                     m_parallaxBackgroundSprites[3].move(sf::Vector2f(1.3f, 0.f));
                     ///
                     m_parallaxBackgroundSprites[2].move(sf::Vector2f(1.8f, 0.f));
-                    m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
+                    //m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
                     //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
                 }
             }
@@ -852,22 +869,23 @@ void Scene_MainGame::sMovement()
             {
                 if (m_levelPath == "levels/level3.txt")
                 {
-                    m_parallaxRedBackgroundSprites[8].move(sf::Vector2f(-1.9f, 0.f));
-                    m_parallaxRedBackgroundSprites[7].move(sf::Vector2f(-1.9f, 0.f));
-                    m_parallaxRedBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
+                    m_parallaxRedBackgroundSprites[8].move(sf::Vector2f(-2.5f, 0.f));
+                    m_parallaxRedBackgroundSprites[7].move(sf::Vector2f(-2.4f, 0.f));
+                    m_parallaxRedBackgroundSprites[6].move(sf::Vector2f(-1.9f, 0.f));
                     ///
-                    m_parallaxRedBackgroundSprites[5].move(sf::Vector2f(-1.3f, 0.f));
+                    m_parallaxRedBackgroundSprites[5].move(sf::Vector2f(-1.5f, 0.f));
                     m_parallaxRedBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
                     m_parallaxRedBackgroundSprites[3].move(sf::Vector2f(-1.f, 0.f));
                     ///
-                    m_parallaxRedBackgroundSprites[2].move(sf::Vector2f(-0.6f, 0.f));
+                    m_parallaxRedBackgroundSprites[2].move(sf::Vector2f(-0.2f, 0.f));
+                    
                 }
                 else if (m_levelPath == "levels/level2.txt")
                 {
-                    m_parallaxDemonBackgroundSprites[3].move(sf::Vector2f(-2.0f, 0.f));
-                    m_parallaxDemonBackgroundSprites[2].move(sf::Vector2f(-1.7f, 0.f));
-                    m_parallaxDemonBackgroundSprites[1].move(sf::Vector2f(-1.3f, 0.f));
-                    m_parallaxDemonBackgroundSprites[0].move(sf::Vector2f(-1.0f, 0.f));
+                    m_parallaxDemonBackgroundSprites[3].move(sf::Vector2f(-1.0f, 0.f));
+                    m_parallaxDemonBackgroundSprites[2].move(sf::Vector2f(-0.8f, 0.f));
+                    m_parallaxDemonBackgroundSprites[1].move(sf::Vector2f(-0.4f, 0.f));
+                    m_parallaxDemonBackgroundSprites[0].move(sf::Vector2f(-0.1f, 0.f));
                 }
                 else
                 {
@@ -1121,7 +1139,7 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             potion->addComponent<CAnimation>(m_game->assets().getAnimation("FireBird"), false);
             potion->addComponent<CBoundingBox>(m_game->assets().getAnimation("FireBird").getSize());
             potion->addComponent<CTransform>(Vec2(eTransform.pos.x + eTransform.scale.x * 5, eTransform.pos.y), Vec2(8 * eTransform.scale.x, 0), eTransform.scale, 0);
-            potion->addComponent<CDamage>(10);
+            potion->addComponent<CDamage>(5);
             potion->addComponent<CLifeSpan>(180, m_currentFrame);
 
         }
@@ -1276,7 +1294,8 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack"||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" || 
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" ||
-                            e->getComponent<CAnimation>().animation.getName() == "HellHound")
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound"||
+                            e->getComponent<CAnimation>().animation.getName() == "FireSkull")
                         {
                             e->getComponent<CTransform>().scale.x = 1;
                         }
@@ -1294,7 +1313,8 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonHit"||
-                            e->getComponent<CAnimation>().animation.getName() == "HellHound")
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound" ||
+                            e->getComponent<CAnimation>().animation.getName() == "FireSkull")
                         {
                             e->getComponent<CTransform>().scale.x = -1;
                         }
@@ -2245,6 +2265,7 @@ void Scene_MainGame::sPlayerCollision()
                 pShader.ourShader = m_shaders[0];
                 m_player->addComponent<CInvincibility>(60);
                 playerHealth.current -= npcDamage.damage;
+                m_game->playSound("EnemyHit");
 
                 if (playerHealth.current <= 0)
                 {
@@ -2521,6 +2542,39 @@ void Scene_MainGame::sBreakableCollision()
             }
         }
     }
+    for (auto& weapon : m_entityManager.getEntities("arrow"))
+    {
+        for (auto& e : m_entityManager.getEntities("breakable"))
+        {
+            auto breakableWeaponOverlap = Physics::GetOverlap(weapon, e);
+            if (breakableWeaponOverlap.x > 0 && breakableWeaponOverlap.y > 0)
+            {
+                if (weapon->getComponent<CAnimation>().animation.getName()!= "FireBird")
+                {
+                    weapon->destroy();
+                }
+                
+                m_game->playSound("BreakSound");
+                m_game->setVolume("BreakSound", m_effectVolume);
+                auto ex = m_entityManager.addEntity("explosion");
+                ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
+                e->destroy();
+                if (e->getComponent<CAnimation>().animation.getName() == "Barrel")
+                {
+                    m_player->getComponent<CInventory>().money += (rand() % 6) + 2;
+                }
+                if (e->getComponent<CAnimation>().animation.getName() == "JarBig")
+                {
+                    m_player->getComponent<CInventory>().money += (rand() % 4) + 1;
+                }
+                if (e->getComponent<CAnimation>().animation.getName() == "JarSmall")
+                {
+                    m_player->getComponent<CInventory>().money += (rand() % 3);
+                }
+            }
+        }
+    }
 }
 
 void Scene_MainGame::sArrowCollision()
@@ -2551,7 +2605,11 @@ void Scene_MainGame::sArrowCollision()
             {
                 npcHealth.current -= arrowDamage.damage;
 
-                if (arrow->getComponent<CAnimation>().animation.getName() != "FireBird")
+                if (arrow->getComponent<CAnimation>().animation.getName() != "FireBird" && (e->getComponent<CAnimation>().animation.getName() != "WizardIdle" ||
+                    e->getComponent<CAnimation>().animation.getName() != "WizardRun" ||
+                    e->getComponent<CAnimation>().animation.getName() != "WizardAttack1" ||
+                    e->getComponent<CAnimation>().animation.getName() != "WizardTakeHit" ||
+                    e->getComponent<CAnimation>().animation.getName() != "WizardAttack2"))
                 {
                     arrow->destroy();
                 }
@@ -2560,6 +2618,7 @@ void Scene_MainGame::sArrowCollision()
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                 {
                     e->getComponent<CState>().state = "SkeletonHit";
+                    
                 }
                 else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
                     e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
@@ -2585,8 +2644,9 @@ void Scene_MainGame::sArrowCollision()
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "GhostVanish";
                         e->getComponent<CAnimation>().repeat = false;
+
                     }
-                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                    else if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" )
                     {
@@ -3114,7 +3174,8 @@ void Scene_MainGame::sCamera()
     //m_mPos += Vec2(mDiff.x, mDiff.y);
     view.setCenter(newCamPos);
     
-    
+    m_parallaxRedBackgroundSprites[1].setPosition(newCamPos.x-768, 0);
+    //m_parallaxRedBackgroundSprites[2].setPosition(newCamPos.x - 768, 0);
 #pragma region Setting Up strings and positions of UI Texts
    
     m_levelText.setCharacterSize(30);
@@ -3122,7 +3183,7 @@ void Scene_MainGame::sCamera()
     
     if (!m_paused)
     {
-        m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space     Weapon Swap: TAB\n\nInventory Select Items: Left/Right \n\nItem Use: E");
+        m_tutorialText.setString(" Move: A, D   Jump: Hold W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space     Weapon Swap: TAB\n\nInventory Select Items: Left/Right \n\nItem Use: E");
     }
 
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
