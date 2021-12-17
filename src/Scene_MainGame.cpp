@@ -934,9 +934,11 @@ void Scene_MainGame::sDoAction(const Action& action)
             } 
             else{ m_player->getComponent<CInput>().up = false; }
         }
-        else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
-        else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
-        else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
+        else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true;  }
+        else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true; m_playerOnMovingTile = false;
+        }
+        else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; m_playerOnMovingTile = false;
+        }
         else if (action.name() == "LEFT_CLICK") { grab(); }
         else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
         else if (action.name() == "INTERACT") { sInteract(); }
@@ -1637,7 +1639,7 @@ void Scene_MainGame::sTileCollision()
                         m_playerOnMovingTile = true;
                         if (m_playerOnMovingTile && m_playerOnGround)
                         {
-                            m_player->getComponent<CTransform>().pos = Vec2(tile->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y);
+                            m_player->getComponent<CTransform>().pos = Vec2(tile->getComponent<CTransform>().pos.x, tile->getComponent<CTransform>().pos.y - 50);
 
                         }
 
@@ -2147,7 +2149,6 @@ void Scene_MainGame::sArrowCollision()
                     
                     if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
                     {
-                        
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "GhostVanish";
                         e->getComponent<CAnimation>().repeat = false;
