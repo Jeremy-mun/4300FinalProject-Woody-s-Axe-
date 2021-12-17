@@ -80,6 +80,7 @@ void Scene_MainGame::init(const std::string& levelPath)
 
 void Scene_MainGame::levelCompleted()
 {
+    m_game->stopSound("MusicGame");
     if (m_saveFile == "NONE")
     {
         m_game->changeScene("Load_Level_Menu", std::make_shared<Scene_LoadGame_Menu>(m_game));
