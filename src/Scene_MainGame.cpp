@@ -935,10 +935,8 @@ void Scene_MainGame::sDoAction(const Action& action)
             else{ m_player->getComponent<CInput>().up = false; }
         }
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true;  }
-        else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true; m_playerOnMovingTile = false;
-        }
-        else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; m_playerOnMovingTile = false;
-        }
+        else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
+        else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
         else if (action.name() == "LEFT_CLICK") { grab(); }
         else if (action.name() == "USE_ITEM") { sUseItem(m_player); }
         else if (action.name() == "INTERACT") { sInteract(); }

@@ -122,10 +122,17 @@ protected:
     int						  m_maxHealth = 10, m_damage = 1, m_arrowCount = 10, m_coinCount = 0;
 
     sf::Sprite             parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10, m_lighting;
+    sf::Sprite             parallaxRed1, parallaxRed2, parallaxRed3, parallaxRed4, parallaxRed5, parallaxRed6, parallaxRed7, parallaxRed8, parallaxRed9, parallaxRed10;
+
     std::vector<sf::String> m_parallaxBackgroundTextures = { "TexParallax1" , "TexParallax2" ,"TexParallax3" ,"TexParallax4" 
                                                     ,"TexParallax5" ,"TexParallax6" ,"TexParallax7" 
                                                     ,"TexParallax8" ,"TexParallax9" ,"TexParallax10" };
     std::vector<sf::Sprite> m_parallaxBackgroundSprites = { parallax1, parallax2, parallax3, parallax4, parallax5, parallax6 , parallax7 , parallax8 , parallax9, parallax10 };
+
+    std::vector<sf::String> m_parallaxRedBackgroundTextures = { "TexParallaxRed1" , "TexParallaxRed2" ,"TexParallaxRed3" ,"TexParallaxRed4"
+                                                    ,"TexParallaxRed5" ,"TexParallaxRed6" ,"TexParallaxRed7"
+                                                    ,"TexParallaxRed8" ,"TexParallaxRed9" ,"TexParallaxRed10" };
+    std::vector<sf::Sprite> m_parallaxRedBackgroundSprites = { parallaxRed1, parallaxRed2, parallaxRed3, parallaxRed4, parallaxRed5, parallaxRed6, parallaxRed7, parallaxRed8, parallaxRed9, parallaxRed10 };
 
     std::vector<sf::String> m_shaders =
     {

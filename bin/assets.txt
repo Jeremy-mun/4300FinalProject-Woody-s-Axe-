@@ -88,6 +88,17 @@ Texture   TexParallax9 images/BackGrounds/Parallax/09_Forest.png
 Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
 Texture   TexTransparent images/BackGrounds/Parallax/Transparent.png
 
+Texture   TexParallaxRed1 images/BackGrounds/Parallax2/1.png
+Texture   TexParallaxRed2 images/BackGrounds/Parallax2/2.png
+Texture   TexParallaxRed3 images/BackGrounds/Parallax2/3.png
+Texture   TexParallaxRed4 images/BackGrounds/Parallax2/4.png
+Texture   TexParallaxRed5 images/BackGrounds/Parallax2/5.png
+Texture   TexParallaxRed6 images/BackGrounds/Parallax2/6.png
+Texture   TexParallaxRed7 images/BackGrounds/Parallax2/7.png
+Texture   TexParallaxRed8 images/BackGrounds/Parallax2/8.png
+Texture   TexParallaxRed9 images/BackGrounds/Parallax2/9.png
+Texture   TexParallaxRed10 images/BackGrounds/Parallax2/10.png
+
 Texture   TexShopLevel	 		images/BackGrounds/Overworld/ShopLevel.png
 Texture   TexCompletedLevel 		images/BackGrounds/Overworld/CompletedLevel.png
 Texture   TexUnlockedLevel 		images/BackGrounds/Overworld/UnlockedLevel.png
