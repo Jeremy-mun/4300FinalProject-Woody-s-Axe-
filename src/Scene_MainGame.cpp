@@ -865,7 +865,7 @@ void Scene_MainGame::sMovement()
     }
 #pragma endregion
 
-
+    
     if (!m_playerOnGround)
     {
         m_FrameSinceGrounded++;
@@ -919,7 +919,7 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
         else if (action.name() == "UP") 
         {
-            std::cout << m_player->getComponent<CInput>().canJump << ":" << m_playerOnGround << '\n';
+            
             if (m_player->getComponent<CInput>().canJump || !m_playerOnGround) 
             {
                 if (m_player->getComponent<CInput>().canJump)
@@ -930,7 +930,7 @@ void Scene_MainGame::sDoAction(const Action& action)
                 m_player->getComponent<CInput>().up = true;
                 m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
-
+                m_playerOnMovingTile = false;
             } 
             else{ m_player->getComponent<CInput>().up = false; }
         }
@@ -1518,7 +1518,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
     m_collidingWithTile = false;
-    m_playerOnMovingTile = false;
+    //m_playerOnMovingTile = false;
     if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CBoundingBox>().halfSize.x)
     {
         m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
@@ -1634,7 +1634,13 @@ void Scene_MainGame::sTileCollision()
                     {
                         playerTransform.pos.y -= playerTileOverlap.y;
                         m_playerOnGround = true;
-                        
+                        m_playerOnMovingTile = true;
+                        if (m_playerOnMovingTile && m_playerOnGround)
+                        {
+                            m_player->getComponent<CTransform>().pos = Vec2(tile->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y);
+
+                        }
+
                     }
                 }
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
@@ -1695,6 +1701,7 @@ void Scene_MainGame::sTileCollision()
 
 
     }
+
 
     for (auto tile : m_entityManager.getEntities("damaged"))
     {
@@ -2108,7 +2115,11 @@ void Scene_MainGame::sArrowCollision()
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
                 npcHealth.current -= arrowDamage.damage;
-                arrow->destroy();
+
+                if (arrow->getComponent<CAnimation>().animation.getName() != "FireBird")
+                {
+                    arrow->destroy();
+                }
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")

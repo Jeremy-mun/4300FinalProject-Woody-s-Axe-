@@ -12,7 +12,6 @@ Tile Ground2    0  0  7  11  1  1
 Tile FloatTileSmall    0  0  10  10  1  1  
 Tile FloatTileSmall    0  0  13  9  1  1  
 Tile FloatTileSmall    0  0  16  8  1  1  
-Tile PlatformMiddle    1  0  5  8  1  1  
 Tile Ground2    1  0  19  11  1  1  
 Tile Ground2    2  0  0  11  1  1  
 Tile Ground2    2  0  1  11  1  1  
@@ -249,9 +248,9 @@ MovingTile FloatTileSmall    7  0  15  5  0  1  Patrol  3  3  15  5  15  5  22  
 NPC DemonIdle     8  0  1  1  0  0  7  3  Follow  3  
 NPC DemonIdle     7  0  17  3  0  0  7  3  Follow  3  
 Tile Goal    8  0  13  10  1  1  
-MovingTile FloatTileSmall    1  0  7  6  1  0  Patrol  2  3  7  6  7  6  11  6  
-Tile FloatTileSmall    1  0  5  8  1  1  
-Tile FloatTileBig    1  0  13  5  1  1  
+MovingTile FloatTileSmall    1  0  7  7  1  0  Patrol  2  3  7  7  7  7  11  7  
+Tile FloatTileSmall    1  0  5  9  1  1  
+Tile FloatTileBig    1  0  13  6  1  1  
 Item Coin    0  0  19  8  0  0  
 Item GoldPotion    1  0  13  4  0  0  
 Item Coin    1  0  12  4  0  0  
@@ -290,11 +289,11 @@ Tile Ground    9  0  9  11  1  1
 Tile Ground    9  0  8  11  1  1  
 Tile Ground    9  0  10  11  1  1  
 Item Chest    2  0  9  10  0  0  
-Tile FloatTileSmall    2  0  1  8  1  1  
-Tile FloatTileSmall    2  0  5  7  1  1  
-Item Heart    2  0  1  7  0  0  
+Tile FloatTileSmall    2  0  1  9  1  1  
+Tile FloatTileSmall    2  0  5  8  1  1  
+Item Heart    2  0  1  8  0  0  
 Item Heart    2  0  1  10  0  0  
-Item Coin    2  0  5  6  0  0  
+Item Coin    2  0  5  7  0  0  
 Item JarBig    3  0  17  6  0  0  
 Item JarSmall    3  0  18  7  0  0  
 Item Barrel    3  0  19  4  0  0  
@@ -370,7 +369,6 @@ Item PurplePotion    7  0  13  3  0  0
 Item PurplePotion    7  0  13  2  0  0  
 Item PurplePotion    7  0  17  5  0  0  
 Item PurplePotion    8  0  0  5  0  0  
-Player 416 544 40 64 3 3 2 
 Item PurplePotion    0  0  8  10  0  0  
 Item JarBig    -1  0  19  10  0  0  
 Item JarSmall    0  0  0  10  0  0  
@@ -379,4 +377,5 @@ Item Coin    0  0  13  8  0  0
 NPC HellHound     2  0  4  10  0  0  3  1  Follow  2  
 Item PurplePotion    1  0  12  2  0  0  
 Item PurplePotion    1  0  14  2  0  0  
-Item PurplePotion    1  0  13  2  0  0
+Item PurplePotion    1  0  13  2  0  0  
+Player 416 544 40 64 3 3 2
