@@ -149,6 +149,7 @@ protected:
     void loadLevel(const std::string & filename);
     void loadParallaxBackground();
     void drawParallaxBackground();
+    void drawParallaxBackgroundRed();
     void onEnd();
     void update();
     void spawnPlayer();

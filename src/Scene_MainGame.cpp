@@ -547,17 +547,30 @@ void Scene_MainGame::loadLevel(const std::string& filename)
 
 void Scene_MainGame::loadParallaxBackground()
 {
-    for (auto i = 0; i < m_parallaxBackgroundTextures.size(); i++)
+    if (m_levelPath == "levels/level1.txt")
     {
-        
-        m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]),false);
-        m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
-        m_parallaxBackgroundSprites[i].setPosition(-6500, -256);
+        for (auto i = 0; i < m_parallaxBackgroundTextures.size(); i++)
+        {
+            m_parallaxBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxBackgroundTextures[i]), false);
+            m_parallaxBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+            m_parallaxBackgroundSprites[i].setPosition(-6500, -256);
+        }
+    }
+    if (m_levelPath == "levels/level2.txt")
+    {
+       
+    }
+    for (auto i = 0; i < m_parallaxRedBackgroundTextures.size(); i++)
+    {
+        m_parallaxRedBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxRedBackgroundTextures[i]), false);
+        m_parallaxRedBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+        m_parallaxRedBackgroundSprites[i].setPosition(0, 0);
     }
 }
 
 void Scene_MainGame::drawParallaxBackground()
 {
+
     m_game->window().draw(m_parallaxBackgroundSprites[9]);// Sky;
 
     m_game->window().draw(m_parallaxBackgroundSprites[8]);// Forest
@@ -579,6 +592,41 @@ void Scene_MainGame::drawParallaxBackground()
     
 }
 
+void Scene_MainGame::drawParallaxBackgroundRed()
+{
+
+    m_game->window().draw(m_parallaxRedBackgroundSprites[9]);// White;
+    m_game->window().draw(m_parallaxRedBackgroundSprites[7]);// Red
+    m_parallaxRedBackgroundSprites[6].setPosition(0, 0);
+    
+    
+    m_game->window().draw(m_parallaxRedBackgroundSprites[6]);
+
+    m_game->window().draw(m_parallaxRedBackgroundSprites[1]);
+    m_game->window().draw(m_parallaxRedBackgroundSprites[3]);// Forest
+    m_game->window().draw(m_parallaxRedBackgroundSprites[5]);
+    m_game->window().draw(m_parallaxRedBackgroundSprites[4]);// Forest
+   
+    m_parallaxRedBackgroundSprites[8].setPosition(0, 0);
+    m_game->window().draw(m_parallaxRedBackgroundSprites[8]);// ground
+    //
+
+
+   // Forest
+    ////m_parallaxRedBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
+    //m_game->window().draw(m_parallaxRedBackgroundSprites[4]);// Particles
+    //m_game->window().draw(m_parallaxRedBackgroundSprites[3]);// Forest
+    m_parallaxRedBackgroundSprites[1].setPosition(-400, 0);
+    m_game->window().draw(m_parallaxBackgroundSprites[0]);
+    //m_game->window().draw(m_parallaxBackgroundSprites[2]);
+    ////m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
+    //m_game->window().draw(m_parallaxBackgroundSprites[0]);
+   ;// Bushes
+
+    // Mist
+
+
+}
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
@@ -3113,7 +3161,7 @@ void Scene_MainGame::sRender()
     //tick.setFillColor(sf::Color::Black);
     //m_game->window().draw(spriteBG);
     drawParallaxBackground();
-
+    drawParallaxBackgroundRed();
     
     // draw all Entity textures / animations
     if (m_drawTextures)
