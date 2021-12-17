@@ -545,9 +545,29 @@ void Scene_MainGame::loadLevel(const std::string& filename)
     drawWeaponHolder();
 }
 
+
+
 void Scene_MainGame::loadParallaxBackground()
 {
-    if (m_levelPath == "levels/level1.txt")
+    if (m_levelPath == "levels/level3.txt")
+    {
+        for (auto i = 0; i < m_parallaxRedBackgroundTextures.size(); i++)
+        {
+            m_parallaxRedBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxRedBackgroundTextures[i]), false);
+            m_parallaxRedBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+            m_parallaxRedBackgroundSprites[i].setPosition(-6500, 0);
+        }
+    }
+    else if (m_levelPath == "levels/level2.txt")
+    {
+        for (auto i = 0; i < m_parallaxDemonBackgroundTextures.size(); i++)
+        {
+            m_parallaxDemonBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxDemonBackgroundTextures[i]), false);
+            m_parallaxDemonBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
+            m_parallaxDemonBackgroundSprites[i].setPosition(-6500, -256);
+        }
+    }
+    else
     {
         for (auto i = 0; i < m_parallaxBackgroundTextures.size(); i++)
         {
@@ -556,77 +576,55 @@ void Scene_MainGame::loadParallaxBackground()
             m_parallaxBackgroundSprites[i].setPosition(-6500, -256);
         }
     }
-    if (m_levelPath == "levels/level2.txt")
-    {
-       
-    }
-    for (auto i = 0; i < m_parallaxRedBackgroundTextures.size(); i++)
-    {
-        m_parallaxRedBackgroundSprites[i].setTexture(m_game->assets().getTexture(m_parallaxRedBackgroundTextures[i]), false);
-        m_parallaxRedBackgroundSprites[i].setTextureRect(sf::IntRect(1, 1, 1000000, 1000000));
-        m_parallaxRedBackgroundSprites[i].setPosition(0, 0);
-    }
 }
 
 void Scene_MainGame::drawParallaxBackground()
 {
 
-    m_game->window().draw(m_parallaxBackgroundSprites[9]);// Sky;
+    if (m_levelPath == "levels/level3.txt" || m_levelPath == "level3.txt")
+    {
+        m_game->window().draw(m_parallaxRedBackgroundSprites[0]);// Sky;
+        m_game->window().draw(m_parallaxRedBackgroundSprites[1]);// Forest
+        m_game->window().draw(m_parallaxRedBackgroundSprites[2]);// Forest
+        m_game->window().draw(m_parallaxRedBackgroundSprites[3]);// Forest
+        m_game->window().draw(m_parallaxRedBackgroundSprites[4]);// Sky;
+        m_game->window().draw(m_parallaxRedBackgroundSprites[5]);// Forest
+        m_game->window().draw(m_parallaxRedBackgroundSprites[6]);// Forest
+        m_game->window().draw(m_parallaxRedBackgroundSprites[7]);// Forest
+        m_game->window().draw(m_parallaxRedBackgroundSprites[8]);// Sky;
+        m_game->window().draw(m_parallaxRedBackgroundSprites[9]);// Forest
+    }
+    else if (m_levelPath == "levels/level2.txt" || m_levelPath == "level2.txt")
+    {
+        m_game->window().draw(m_parallaxDemonBackgroundSprites[0]);// Sky;
+        m_game->window().draw(m_parallaxDemonBackgroundSprites[1]);// Forest
+        m_game->window().draw(m_parallaxDemonBackgroundSprites[2]);// Forest
+        m_game->window().draw(m_parallaxDemonBackgroundSprites[3]);// Forest
+    }
+    else
+    {
+        m_game->window().draw(m_parallaxBackgroundSprites[9]);// Sky;
 
-    m_game->window().draw(m_parallaxBackgroundSprites[8]);// Forest
-    m_game->window().draw(m_parallaxBackgroundSprites[7]);// Forest
-    m_game->window().draw(m_parallaxBackgroundSprites[6]);// Forest
+        m_game->window().draw(m_parallaxBackgroundSprites[8]);// Forest
+        m_game->window().draw(m_parallaxBackgroundSprites[7]);// Forest
+        m_game->window().draw(m_parallaxBackgroundSprites[6]);// Forest
 
 
-    m_game->window().draw(m_parallaxBackgroundSprites[5]);// Forest
-    m_parallaxBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
-    m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
-    m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
+        m_game->window().draw(m_parallaxBackgroundSprites[5]);// Forest
+        m_parallaxBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
+        m_game->window().draw(m_parallaxBackgroundSprites[4]);// Particles
+        m_game->window().draw(m_parallaxBackgroundSprites[3]);// Forest
 
 
-    m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
+        m_game->window().draw(m_parallaxBackgroundSprites[1]);// Bushes
 
-    //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
-    //m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+        //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
+        //m_game->window().draw(m_parallaxBackgroundSprites[0]);// Mist
+    }
 
     
 }
 
-void Scene_MainGame::drawParallaxBackgroundRed()
-{
-
-    m_game->window().draw(m_parallaxRedBackgroundSprites[9]);// White;
-    m_game->window().draw(m_parallaxRedBackgroundSprites[7]);// Red
-    m_parallaxRedBackgroundSprites[6].setPosition(0, 0);
-    
-    
-    m_game->window().draw(m_parallaxRedBackgroundSprites[6]);
-
-    m_game->window().draw(m_parallaxRedBackgroundSprites[1]);
-    m_game->window().draw(m_parallaxRedBackgroundSprites[3]);// Forest
-    m_game->window().draw(m_parallaxRedBackgroundSprites[5]);
-    m_game->window().draw(m_parallaxRedBackgroundSprites[4]);// Forest
-   
-    m_parallaxRedBackgroundSprites[8].setPosition(0, 0);
-    m_game->window().draw(m_parallaxRedBackgroundSprites[8]);// ground
-    //
-
-
-   // Forest
-    ////m_parallaxRedBackgroundSprites[4].move(sf::Vector2f(-0.4f, 0.f));
-    //m_game->window().draw(m_parallaxRedBackgroundSprites[4]);// Particles
-    //m_game->window().draw(m_parallaxRedBackgroundSprites[3]);// Forest
-    m_parallaxRedBackgroundSprites[1].setPosition(-400, 0);
-    m_game->window().draw(m_parallaxBackgroundSprites[0]);
-    //m_game->window().draw(m_parallaxBackgroundSprites[2]);
-    ////m_parallaxBackgroundSprites[0].move(sf::Vector2f(-0.2f, 0.f));
-    //m_game->window().draw(m_parallaxBackgroundSprites[0]);
-   ;// Bushes
-
-    // Mist
-
-
-}
 Vec2 Scene_MainGame::getPosition(int rx, int ry, int tx, int ty) const
 {
     float x = rx * (int)m_game->window().getSize().x + (tx * 64) + 32;
@@ -786,17 +784,39 @@ void Scene_MainGame::sMovement()
             
             if (!m_collidingWithTile)
             {
-                m_parallaxBackgroundSprites[8].move(sf::Vector2f(0.5f, 0.f));
-                m_parallaxBackgroundSprites[7].move(sf::Vector2f(0.6f, 0.f));
-                m_parallaxBackgroundSprites[6].move(sf::Vector2f(0.7f, 0.f));
-                ///
-                m_parallaxBackgroundSprites[5].move(sf::Vector2f(1.f, 0.f));
-                m_parallaxBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
-                m_parallaxBackgroundSprites[3].move(sf::Vector2f(1.3f, 0.f));
-                ///
-                m_parallaxBackgroundSprites[2].move(sf::Vector2f(1.8f, 0.f));
-                m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
-                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+                if (m_levelPath == "levels/level3.txt")
+                {
+                    m_parallaxRedBackgroundSprites[8].move(sf::Vector2f(1.9f, 0.f));
+                    m_parallaxRedBackgroundSprites[7].move(sf::Vector2f(1.9f, 0.f));
+                    m_parallaxRedBackgroundSprites[6].move(sf::Vector2f(1.3f, 0.f));
+                    ///
+                    m_parallaxRedBackgroundSprites[5].move(sf::Vector2f(1.3f, 0.f));
+                    m_parallaxRedBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
+                    m_parallaxRedBackgroundSprites[3].move(sf::Vector2f(1.f, 0.f));
+                    ///
+                    m_parallaxRedBackgroundSprites[2].move(sf::Vector2f(0.6f, 0.f));
+                }
+                else if (m_levelPath == "levels/level2.txt")
+                {
+                    m_parallaxDemonBackgroundSprites[3].move(sf::Vector2f(2.0f, 0.f));
+                    m_parallaxDemonBackgroundSprites[2].move(sf::Vector2f(1.7f, 0.f));
+                    m_parallaxDemonBackgroundSprites[1].move(sf::Vector2f(1.3f, 0.f));
+                    m_parallaxDemonBackgroundSprites[0].move(sf::Vector2f(1.0f, 0.f));
+                }
+                else
+                {
+                    m_parallaxBackgroundSprites[8].move(sf::Vector2f(0.5f, 0.f));
+                    m_parallaxBackgroundSprites[7].move(sf::Vector2f(0.6f, 0.f));
+                    m_parallaxBackgroundSprites[6].move(sf::Vector2f(0.7f, 0.f));
+                    ///
+                    m_parallaxBackgroundSprites[5].move(sf::Vector2f(1.f, 0.f));
+                    m_parallaxBackgroundSprites[4].move(sf::Vector2f(1.2f, 0.f));
+                    m_parallaxBackgroundSprites[3].move(sf::Vector2f(1.3f, 0.f));
+                    ///
+                    m_parallaxBackgroundSprites[2].move(sf::Vector2f(1.8f, 0.f));
+                    m_parallaxBackgroundSprites[1].move(sf::Vector2f(1.9f, 0.f));
+                    //m_parallaxBackgroundSprites[0].move(sf::Vector2f(3.0f, 0.f));
+                }
             }
            
         }
@@ -831,17 +851,39 @@ void Scene_MainGame::sMovement()
             pTransform.scale = Vec2(1, 1);
             if (!m_collidingWithTile)
             {
-                m_parallaxBackgroundSprites[8].move(sf::Vector2f(-0.5f, 0.f));
-                m_parallaxBackgroundSprites[7].move(sf::Vector2f(-0.6f, 0.f));
-                m_parallaxBackgroundSprites[6].move(sf::Vector2f(-0.7f, 0.f));
-                ///
-                m_parallaxBackgroundSprites[5].move(sf::Vector2f(-1.f, 0.f));
-                m_parallaxBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
-                m_parallaxBackgroundSprites[3].move(sf::Vector2f(-1.3f, 0.f));
-                ///
-                m_parallaxBackgroundSprites[2].move(sf::Vector2f(-1.8f, 0.f));
-                m_parallaxBackgroundSprites[1].move(sf::Vector2f(-1.9f, 0.f));
-                //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+                if (m_levelPath == "levels/level3.txt")
+                {
+                    m_parallaxRedBackgroundSprites[8].move(sf::Vector2f(-1.9f, 0.f));
+                    m_parallaxRedBackgroundSprites[7].move(sf::Vector2f(-1.9f, 0.f));
+                    m_parallaxRedBackgroundSprites[6].move(sf::Vector2f(-1.3f, 0.f));
+                    ///
+                    m_parallaxRedBackgroundSprites[5].move(sf::Vector2f(-1.3f, 0.f));
+                    m_parallaxRedBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
+                    m_parallaxRedBackgroundSprites[3].move(sf::Vector2f(-1.f, 0.f));
+                    ///
+                    m_parallaxRedBackgroundSprites[2].move(sf::Vector2f(-0.6f, 0.f));
+                }
+                else if (m_levelPath == "levels/level2.txt")
+                {
+                    m_parallaxDemonBackgroundSprites[3].move(sf::Vector2f(-2.0f, 0.f));
+                    m_parallaxDemonBackgroundSprites[2].move(sf::Vector2f(-1.7f, 0.f));
+                    m_parallaxDemonBackgroundSprites[1].move(sf::Vector2f(-1.3f, 0.f));
+                    m_parallaxDemonBackgroundSprites[0].move(sf::Vector2f(-1.0f, 0.f));
+                }
+                else
+                {
+                    m_parallaxBackgroundSprites[8].move(sf::Vector2f(-0.5f, 0.f));
+                    m_parallaxBackgroundSprites[7].move(sf::Vector2f(-0.6f, 0.f));
+                    m_parallaxBackgroundSprites[6].move(sf::Vector2f(-0.7f, 0.f));
+                    ///
+                    m_parallaxBackgroundSprites[5].move(sf::Vector2f(-1.f, 0.f));
+                    m_parallaxBackgroundSprites[4].move(sf::Vector2f(-1.2f, 0.f));
+                    m_parallaxBackgroundSprites[3].move(sf::Vector2f(-1.3f, 0.f));
+                    ///
+                    m_parallaxBackgroundSprites[2].move(sf::Vector2f(-1.8f, 0.f));
+                    m_parallaxBackgroundSprites[1].move(sf::Vector2f(-1.9f, 0.f));
+                    //m_parallaxBackgroundSprites[0].move(sf::Vector2f(-3.0f, 0.f));
+                }
             }
             
         }
@@ -3161,8 +3203,6 @@ void Scene_MainGame::sRender()
     //tick.setFillColor(sf::Color::Black);
     //m_game->window().draw(spriteBG);
     drawParallaxBackground();
-    drawParallaxBackgroundRed();
-    
     // draw all Entity textures / animations
     if (m_drawTextures)
     {

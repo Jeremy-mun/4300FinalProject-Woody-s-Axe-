@@ -88,16 +88,21 @@ Texture   TexParallax9 images/BackGrounds/Parallax/09_Forest.png
 Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
 Texture   TexTransparent images/BackGrounds/Parallax/Transparent.png
 
-Texture   TexParallaxRed1 images/BackGrounds/Parallax2/1.png
-Texture   TexParallaxRed2 images/BackGrounds/Parallax2/2.png
-Texture   TexParallaxRed3 images/BackGrounds/Parallax2/3.png
-Texture   TexParallaxRed4 images/BackGrounds/Parallax2/4.png
-Texture   TexParallaxRed5 images/BackGrounds/Parallax2/5.png
-Texture   TexParallaxRed6 images/BackGrounds/Parallax2/6.png
-Texture   TexParallaxRed7 images/BackGrounds/Parallax2/7.png
-Texture   TexParallaxRed8 images/BackGrounds/Parallax2/8.png
-Texture   TexParallaxRed9 images/BackGrounds/Parallax2/9.png
-Texture   TexParallaxRed10 images/BackGrounds/Parallax2/10.png
+Texture   TexParallaxDemon0 images/BackGrounds/Parallax2/0.png
+Texture   TexParallaxDemon1 images/BackGrounds/Parallax2/1.png
+Texture   TexParallaxDemon2 images/BackGrounds/Parallax2/2.png
+Texture   TexParallaxDemon3 images/BackGrounds/Parallax2/3.png
+
+Texture   TexParallaxRed1 images/BackGrounds/Parallax3/0.png
+Texture   TexParallaxRed2 images/BackGrounds/Parallax3/1.png
+Texture   TexParallaxRed3 images/BackGrounds/Parallax3/2.png
+Texture   TexParallaxRed4 images/BackGrounds/Parallax3/3.png
+Texture   TexParallaxRed5 images/BackGrounds/Parallax3/4.png
+Texture   TexParallaxRed6 images/BackGrounds/Parallax3/5.png
+Texture   TexParallaxRed7 images/BackGrounds/Parallax3/6.png
+Texture   TexParallaxRed8 images/BackGrounds/Parallax3/7.png
+Texture   TexParallaxRed9 images/BackGrounds/Parallax3/8.png
+Texture   TexParallaxRed10 images/BackGrounds/Parallax3/9.png
 
 Texture   TexShopLevel	 		images/BackGrounds/Overworld/ShopLevel.png
 Texture   TexCompletedLevel 		images/BackGrounds/Overworld/CompletedLevel.png
@@ -115,6 +120,8 @@ Texture	  TexOverworldBackground9 	images/BackGrounds/Overworld/OverworldBackgro
 Texture	  TexOverworldBackground10 	images/BackGrounds/Overworld/OverworldBackground10.png
 Texture	  TexOverworldBackground11 	images/BackGrounds/Overworld/OverworldBackground11.png
 Texture	  TexOverworldBackground12	images/BackGrounds/Overworld/OverworldBackground12.png
+
+
 
 Texture   TexArrowsUp      images/BackGrounds/Overworld/ArrowsUp.png
 Texture   TexDamageUp      images/BackGrounds/Overworld/DamageUp.png
