@@ -691,8 +691,7 @@ void Scene_MainGame::sMovement()
    
         if (pInput.up)
         {
-            pTransform.velocity.y = -7 * (m_playerConfig.SPEED) - 3 * pTransform.tempSpeed;
-            pTransform.facing = Vec2(0, -1);
+            pTransform.velocity.y = -5 * (m_playerConfig.SPEED) - 2 * pTransform.tempSpeed;
             pState.state = "Jump";
             pTransform.scale = Vec2(1, 1);
         }
@@ -869,7 +868,7 @@ void Scene_MainGame::sMovement()
     if (!m_playerOnGround)
     {
         m_FrameSinceGrounded++;
-        pTransform.velocity.y += m_FrameSinceGrounded/2 * m_player->getComponent<CGravity>().gravity;
+        pTransform.velocity.y += m_FrameSinceGrounded/4 * m_player->getComponent<CGravity>().gravity;
         
     }
     else
@@ -889,7 +888,7 @@ void Scene_MainGame::sMovement()
     {
         pTransform.velocity.y = -1 * m_MaxYSpeed;
     }
-
+    pTransform.prevPos = pTransform.pos;
     pTransform.pos += pTransform.velocity;
     
 
@@ -919,16 +918,14 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
         else if (action.name() == "UP") 
         {
-            
-            if (m_player->getComponent<CInput>().canJump || !m_playerOnGround) 
+            if (m_player->getComponent<CInput>().canJump)
             {
-                if (m_player->getComponent<CInput>().canJump)
+                if (m_playerOnGround)
                 {
                     m_game->playSound("Jump");
                     m_game->setVolume("Jump", m_effectVolume);
                 }
                 m_player->getComponent<CInput>().up = true;
-                m_player->getComponent<CInput>().canJump = false;
                 m_playerOnGround = false; 
                 m_playerOnMovingTile = false;
             } 
@@ -959,7 +956,7 @@ void Scene_MainGame::sDoAction(const Action& action)
     }
     else if (action.type() == "END")
     {
-        if (action.name() == "UP") { m_player->getComponent<CInput>().up = false; m_player->getComponent<CInput>().canJump = true;}
+        if (action.name() == "UP") { m_player->getComponent<CInput>().up = false; m_player->getComponent<CInput>().canJump = false;}
         else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = false; m_canCrouch = true; m_crouchClock.restart(); }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = false; }
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = false; }
@@ -996,14 +993,14 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& transform = entity->getComponent<CTransform>();
             transform.tempSpeed = 2;
-            transform.duration = 30;
+            transform.duration = 600;
         }
         else if (inventory.items[m_select] == "GreenPotion")  // Damage Increase
         {
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& damage = entity->getComponent<CDamage>();
             damage.tempDamage = 2;
-            damage.duration = 30;
+            damage.duration = 600;
         }
         else if (inventory.items[m_select] == "GoldPotion") // Invincibility
         {
@@ -1442,8 +1439,19 @@ void Scene_MainGame::sTilesAI()
             if (int(length) > 1)
             {
                 desired = desired / length;
+                e->getComponent<CTransform>().prevPos.x = e->getComponent<CTransform>().pos.x;
+                e->getComponent<CTransform>().prevPos.y = e->getComponent<CTransform>().pos.y;
                 e->getComponent<CTransform>().pos.x += e->getComponent<CPatrol>().speed * desired.x;
                 e->getComponent<CTransform>().pos.y += e->getComponent<CPatrol>().speed * desired.y;
+                auto playerTileOverlap = Physics::GetOverlap(m_player, e);
+                if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+                { 
+                    if (m_player->getComponent<CTransform>().prevPos.y < e->getComponent<CTransform>().pos.y)
+                    {
+                        m_player->getComponent<CTransform>().pos.x += e->getComponent<CPatrol>().speed * desired.x;
+                        m_player->getComponent<CTransform>().pos.y += e->getComponent<CPatrol>().speed * desired.y;
+                    }
+                }
                
 
             }
@@ -1477,6 +1485,38 @@ void Scene_MainGame::sStatus()
                 }
             }
         }
+        if (e->hasComponent<CTransform>())
+        {
+            auto& eTransform = e->getComponent<CTransform>();
+            if (eTransform.tempSpeed != 0)
+            {
+                if (eTransform.duration <= 0)
+                {
+                    eTransform.tempSpeed = 0;
+                    eTransform.duration = 0;
+                }
+                else
+                {
+                    eTransform.duration--;
+                }
+            }
+        }
+        if (e->hasComponent<CDamage>())
+        {
+            auto& eDamage = e->getComponent<CDamage>();
+            if (eDamage.tempDamage != 0)
+            {
+                if (eDamage.duration <= 0)
+                {
+                    eDamage.tempDamage = 0;
+                    eDamage.duration = 0;
+                }
+                else
+                {
+                    eDamage.duration--;
+                }
+            }
+        }
     }
 
     // Invincibility frames
@@ -1491,6 +1531,7 @@ void Scene_MainGame::sStatus()
             m_player->removeComponent<CInvincibility>();
         }
     }
+
 }
                            
 void Scene_MainGame::sCollision()
@@ -1509,8 +1550,311 @@ void Scene_MainGame::sCollision()
     }
     sTeleportCollision();
     sEnemyCollision();
-}
 
+}
+void Scene_MainGame::sTileCollision()
+{
+    // Tile collisions with entities are implemented here
+    auto& playerTransform = m_player->getComponent<CTransform>();
+    auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
+    m_playerOnGround = false;
+    m_collidingWithTile = false;
+    m_playerOnMovingTile = false;
+    if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CBoundingBox>().halfSize.x)
+    {
+        m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
+        m_collidingWithTile = true;
+    }
+    for (auto tile : m_entityManager.getEntities("tile"))
+    {
+        auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
+        auto& tileAnimation = tile->getComponent<CAnimation>().animation;
+        if (tileBoundingBox.blockMove || tileAnimation.getName() == "Goal")
+        {
+            auto playerTileOverlap = Physics::GetOverlap(tile, m_player);
+
+            auto& tileTransform = tile->getComponent<CTransform>();
+            if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+            {
+                if (tileAnimation.getName() == "Goal")
+                {
+                    levelCompleted();
+                }
+                else
+                {
+                    while (playerTileOverlap.x > 1 && playerTileOverlap.y > 1)
+                    {
+                        if (playerTileOverlap.x >= playerTileOverlap.y)
+                        {
+                            if (playerTransform.prevPos.y > tileTransform.pos.y)
+                            {
+                                playerTransform.pos.y++;
+                                m_player->getComponent<CInput>().canJump = false;
+                            }
+                            else if (playerTransform.prevPos.y < tileTransform.pos.y)
+                            {
+                                playerTransform.pos.y--;
+                            }
+                        }
+                        else
+                        {
+                            if (playerTransform.prevPos.x > tileTransform.pos.x)
+                            {
+                                playerTransform.pos.x++;
+                            }
+                            else if (playerTransform.prevPos.x < tileTransform.pos.x)
+                            {
+                                playerTransform.pos.x--;
+                            }
+                            m_collidingWithTile = true;
+                        }
+                        playerTileOverlap = Physics::GetOverlap(tile, m_player);
+                    }
+                }
+                if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+                {
+                    if (playerTileOverlap.x >= playerTileOverlap.y + 2)
+                    {
+                        if (playerTransform.prevPos.y < tileTransform.pos.y)
+                        {
+                            m_playerOnGround = true;
+                            m_FrameSinceGrounded = 0;
+                            m_player->getComponent<CInput>().canJump = true;
+                        }
+                    }
+                }
+            }
+            for (auto npc : m_entityManager.getEntities("npc"))
+            {
+                bool grounded = false;
+                auto& npcTransform = npc->getComponent<CTransform>();
+                auto npcTileOverlap = Physics::GetOverlap(tile, npc);
+                if (npcTileOverlap.x > 0 && npcTileOverlap.y > 0)
+                {
+                    if (npcTileOverlap.x > npcTileOverlap.y)
+                    {
+                        if (npcTransform.pos.y > tileTransform.pos.y)
+                        {
+                            bool grounded = true;
+                            if (npc->getComponent<CAnimation>().animation.getName() == "WizardRun" || npc->getComponent<CAnimation>().animation.getName() == "WizardFall" || npc->getComponent<CAnimation>().animation.getName() == "WizardIdle" || npc->getComponent<CAnimation>().animation.getName() == "WizardJump" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                            {
+                                npc->getComponent<CTransform>().velocity.y = 0;
+                            }
+                            npcTransform.pos.y += npcTileOverlap.y;
+                        }
+                        else
+                        {
+                            npcTransform.pos.y -= npcTileOverlap.y;
+                        }
+                    }
+                    else
+                    {
+                        if (npcTransform.pos.x > tileTransform.pos.x)
+                        {
+                            npcTransform.pos.x += npcTileOverlap.x;
+                        }
+                        else
+                        {
+                            npcTransform.pos.x -= npcTileOverlap.x;
+                        }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+    for (auto tile : m_entityManager.getEntities("movingTile"))
+    {
+        auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
+        if (tileBoundingBox.blockMove)
+        {
+            auto playerTileOverlap = Physics::GetOverlap(tile, m_player);
+
+            auto& tileTransform = tile->getComponent<CTransform>();
+            if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+            {
+                while (playerTileOverlap.x > 1 && playerTileOverlap.y > 1)
+                {
+                    if (playerTileOverlap.x >= playerTileOverlap.y)
+                    {
+                        if (playerTransform.prevPos.y > tileTransform.pos.y)
+                        {
+                            playerTransform.pos.y++;
+                            m_player->getComponent<CInput>().canJump = false;
+                        }
+                        else if (playerTransform.prevPos.y < tileTransform.pos.y)
+                        {
+                            playerTransform.pos.y--;
+                        }
+                    }
+                    else
+                    {
+                        if (playerTransform.prevPos.x > tileTransform.pos.x)
+                        {
+                            playerTransform.pos.x++;
+                        }
+                        else if (playerTransform.prevPos.x < tileTransform.pos.x)
+                        {
+                            playerTransform.pos.x--;
+                        }
+                        m_collidingWithTile = true;
+                    }
+                    playerTileOverlap = Physics::GetOverlap(tile, m_player);
+                }
+                if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+                {
+                    if (playerTileOverlap.x >= playerTileOverlap.y + 2)
+                    {
+                        if (playerTransform.prevPos.y < tileTransform.pos.y)
+                        {
+                            m_playerOnGround = true;
+                            m_FrameSinceGrounded = 0;
+                            m_player->getComponent<CInput>().canJump = true;
+                        }
+                    }
+                }
+            }
+            for (auto npc : m_entityManager.getEntities("npc"))
+            {
+                auto& npcTransform = npc->getComponent<CTransform>();
+                auto npcTileOverlap = Physics::GetOverlap(tile, npc);
+                if (npcTileOverlap.x > 0 && npcTileOverlap.y > 0)
+                {
+                    if (npcTileOverlap.x > npcTileOverlap.y)
+                    {
+                        if (npcTransform.pos.y > tileTransform.pos.y)
+                        {
+                            npcTransform.pos.y += npcTileOverlap.y;
+                        }
+                        else
+                        {
+                            npcTransform.pos.y -= npcTileOverlap.y;
+                        }
+                    }
+                    else
+                    {
+                        if (npcTransform.pos.x > tileTransform.pos.x)
+                        {
+                            npcTransform.pos.x += npcTileOverlap.x;
+                        }
+                        else
+                        {
+                            npcTransform.pos.x -= npcTileOverlap.x;
+                        }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            continue;
+        }
+
+
+    }
+
+    for (auto tile : m_entityManager.getEntities("damaged"))
+    {
+        auto& tileBoundingBox = tile->getComponent<CBoundingBox>();
+        if (tileBoundingBox.blockMove)
+        {
+            auto playerTileOverlap = Physics::GetOverlap(tile, m_player);
+
+            auto& tileTransform = tile->getComponent<CTransform>();
+            if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+            {
+                while (playerTileOverlap.x > 1 && playerTileOverlap.y > 1)
+                {
+                    if (playerTileOverlap.x >= playerTileOverlap.y)
+                    {
+                        if (playerTransform.prevPos.y > tileTransform.pos.y)
+                        {
+                            playerTransform.pos.y++;
+                            m_player->getComponent<CInput>().canJump = false;
+                        }
+                        else if (playerTransform.prevPos.y < tileTransform.pos.y)
+                        {
+                            playerTransform.pos.y--;
+                        }
+                    }
+                    else
+                    {
+                        if (playerTransform.prevPos.x > tileTransform.pos.x)
+                        {
+                            playerTransform.pos.x++;
+                        }
+                        else if (playerTransform.prevPos.x < tileTransform.pos.x)
+                        {
+                            playerTransform.pos.x--;
+                        }
+                        m_collidingWithTile = true;
+                    }
+                    playerTileOverlap = Physics::GetOverlap(tile, m_player);
+                }
+                if (playerTileOverlap.x > 0 && playerTileOverlap.y > 0)
+                {
+                    if (playerTileOverlap.x >= playerTileOverlap.y + 2)
+                    {
+                        if (playerTransform.prevPos.y < tileTransform.pos.y)
+                        {
+                            m_playerOnGround = true;
+                            m_FrameSinceGrounded = 0;
+                            m_player->getComponent<CInput>().canJump = true;
+                        }
+                    }
+                }
+            }
+            for (auto npc : m_entityManager.getEntities("npc"))
+            {
+                bool grounded = false;
+                auto& npcTransform = npc->getComponent<CTransform>();
+                auto npcTileOverlap = Physics::GetOverlap(tile, npc);
+                if (npcTileOverlap.x > 0 && npcTileOverlap.y > 0)
+                {
+                    if (npcTileOverlap.x > npcTileOverlap.y)
+                    {
+                        if (npcTransform.pos.y > tileTransform.pos.y)
+                        {
+                            bool grounded = true;
+                            if (npc->getComponent<CAnimation>().animation.getName() == "WizardRun" || npc->getComponent<CAnimation>().animation.getName() == "WizardFall" || npc->getComponent<CAnimation>().animation.getName() == "WizardIdle" || npc->getComponent<CAnimation>().animation.getName() == "WizardJump" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack1" || npc->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                            {
+                                npc->getComponent<CTransform>().velocity.y = 0;
+                            }
+                            npcTransform.pos.y += npcTileOverlap.y;
+                        }
+                        else
+                        {
+                            npcTransform.pos.y -= npcTileOverlap.y;
+                        }
+                    }
+                    else
+                    {
+                        if (npcTransform.pos.x > tileTransform.pos.x)
+                        {
+                            npcTransform.pos.x += npcTileOverlap.x;
+                        }
+                        else
+                        {
+                            npcTransform.pos.x -= npcTileOverlap.x;
+                        }
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            continue;
+        }
+    }
+}
+/*
 void Scene_MainGame::sTileCollision()
 {
     // Tile collisions with entities are implemented here
@@ -1787,6 +2131,7 @@ void Scene_MainGame::sTileCollision()
         }
     }
 }
+*/
 void Scene_MainGame::sPlayerCollision()
 {
     // Player collisions with NPC's are implemented here
