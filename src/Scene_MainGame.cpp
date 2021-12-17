@@ -45,7 +45,13 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_gridText.setCharacterSize(12);
     m_gridText.setFont(m_game->assets().getFont("Arial"));
     m_levelText.setFont(m_game->assets().getFont("Gypsy"));
-    m_levelText.setFillColor(sf::Color::White);
+    m_levelText.setFillColor(sf::Color::Red);
+
+   
+    m_inventorySelectText.setFont(m_game->assets().getFont("Gypsy"));
+    m_inventorySelectText.setCharacterSize(15);
+    m_inventorySelectText.setFillColor(sf::Color::Red);
+    
 
     m_tutorialText.setFont(m_game->assets().getFont("Gypsy"));
     m_tutorialText.setCharacterSize(40);
@@ -63,6 +69,7 @@ void Scene_MainGame::init(const std::string& levelPath)
     m_lighting.setTextureRect(sf::IntRect(1, 1, 1280, 768));
     m_lighting.setPosition(0, 0);
 
+    m_game->stopSound("GameOver");
     m_game->playSound("MusicGame");
     m_game->setVolume("MusicGame", m_musicVolume);
     m_game->loopSound("MusicGame");
@@ -341,7 +348,7 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                 {
                     auto portal = m_entityManager.addEntity("teleport");
                     portal->addComponent<CTransform>(getPosition(m_tileConfig.RX, m_tileConfig.RY, m_tileConfig.TX, m_tileConfig.TY));
-                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), false);
+                    portal->addComponent<CAnimation>(m_game->assets().getAnimation(m_tileConfig.Name), true);
                     portal->addComponent<CBoundingBox>(m_game->assets().getAnimation(m_tileConfig.Name).getSize(), m_tileConfig.BM, m_tileConfig.BV);
                     portal->addComponent<CDraggable>();
                     continue;
@@ -465,8 +472,9 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("GhostShriek");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("GhostShriek"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(m_game->assets().getAnimation(m_npcConfig.Name).getSize().x - 20, m_game->assets().getAnimation(m_npcConfig.Name).getSize().y), m_npcConfig.BM, m_npcConfig.BV);
                     }
-                    if (m_npcConfig.Name == "DemonIdle")
+                    else if (m_npcConfig.Name == "DemonIdle")
                     {
                         npc->addComponent<CState>("DemonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("DemonIdle"), true);
@@ -482,6 +490,11 @@ void Scene_MainGame::loadLevel(const std::string& filename)
                     {
                         npc->addComponent<CState>("SkeletonIdle");
                         npc->addComponent<CAnimation>(m_game->assets().getAnimation("SkeletonIdle"), true);
+                        npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
+                    }
+                    else if (m_npcConfig.Name == "FireSkull")
+                    {
+                        npc->addComponent<CAnimation>(m_game->assets().getAnimation("FireSkull"), true);
                         npc->addComponent<CBoundingBox>(Vec2(50, 70), m_npcConfig.BM, m_npcConfig.BV);
                     }
                     else
@@ -635,14 +648,16 @@ void Scene_MainGame::update()
     // When the game is paused
     if (m_paused)
     {
-        m_levelText.setString("Paused"); 
+        m_tutorialText.setString("Paused"); 
         m_levelText.setCharacterSize(24);
         /*m_walletText.setString("\n  Coins: x" + std::to_string(m_wallet));*/
-        m_game->pauseSound("MusicLevel");
+        m_game->pauseSound("MusicGame");
+        m_game->pauseSound("MonsterDeath");
+        m_game->pauseSound("Fear");
         sCamera();
         drawInventory();
         sHUD();
-        
+        m_tutorialText.setPosition(sf::Vector2f(m_player->getComponent<CTransform>().pos.x - 32, m_player->getComponent<CTransform>().pos.y - 128));
         return;
     } 
     if (m_player->getComponent<CInput>().attack)
@@ -712,7 +727,7 @@ void Scene_MainGame::sMovement()
                     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
                 }
                 
-                if (m_crouchClock.getElapsedTime().asSeconds() > 1)
+                if (m_crouchClock.getElapsedTime().asSeconds() > 2)
                 {
                     m_canCrouch = false;
                 }
@@ -758,7 +773,7 @@ void Scene_MainGame::sMovement()
                     m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, 20), true, false);
                 }
 
-                if (m_crouchClock.getElapsedTime().asSeconds() > 1)
+                if (m_crouchClock.getElapsedTime().asSeconds() > 2)
                 {
                     m_canCrouch = false;
                 }
@@ -849,7 +864,7 @@ void Scene_MainGame::sMovement()
     }
 #pragma endregion
 
-
+    
     if (!m_playerOnGround)
     {
         m_FrameSinceGrounded++;
@@ -893,8 +908,9 @@ void Scene_MainGame::sDoAction(const Action& action)
 {                      
     if (action.type() == "START")
     {
-        if (action.name() == "PAUSE") {  setPaused(!m_paused);
-        }
+        if (action.name() == "PAUSE") {  setPaused(!m_paused); m_game->playSound("MusicGame"); m_game->playSound("MusicGame");
+        m_game->setVolume("MusicGame", m_musicVolume);
+        m_game->loopSound("MusicGame");}
         else if (action.name() == "QUIT") { onEnd(); }
         else if (action.name() == "TOGGLE_FOLLOW") { m_follow = !m_follow; }
         else if (action.name() == "TOGGLE_TEXTURE") { m_drawTextures = !m_drawTextures; }
@@ -902,7 +918,7 @@ void Scene_MainGame::sDoAction(const Action& action)
         else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid; }
         else if (action.name() == "UP") 
         {
-            if (m_player->getComponent<CInput>().canJump) 
+            if (m_player->getComponent<CInput>().canJump)
             {
                 if (m_playerOnGround)
                 {
@@ -911,11 +927,11 @@ void Scene_MainGame::sDoAction(const Action& action)
                 }
                 m_player->getComponent<CInput>().up = true;
                 m_playerOnGround = false; 
-
+                m_playerOnMovingTile = false;
             } 
             else{ m_player->getComponent<CInput>().up = false; }
         }
-        else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true; }
+        else if (action.name() == "DOWN") { m_player->getComponent<CInput>().down = true;  }
         else if (action.name() == "LEFT") { m_player->getComponent<CInput>().left = true;}
         else if (action.name() == "RIGHT") { m_player->getComponent<CInput>().right = true; }
         else if (action.name() == "LEFT_CLICK") { grab(); }
@@ -959,8 +975,12 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         {
             return;
         }
-        m_game->playSound("UseItem");
-        m_game->setVolume("UseItem", m_effectVolume);
+        if (inventory.items[m_select] != "PurplePotion")
+        {
+            m_game->playSound("UseItem");
+            m_game->setVolume("UseItem", m_effectVolume);
+        }
+        
         if (inventory.items[m_select] == "RedPotion") // health
         {
             std::cout << "Red Potion"; 
@@ -1002,14 +1022,18 @@ void Scene_MainGame::sUseItem(std::shared_ptr<Entity> entity)
         }
         else if (inventory.items[m_select] == "PurplePotion")   // explosive
         {
+            
+            m_game->playSound("fireBird");
+            m_game->setVolume("fireBird", m_effectVolume);
             inventory.items.erase(inventory.items.begin() + m_select);
             auto& eTransform = entity->getComponent<CTransform>();
             auto& potion = m_entityManager.addEntity("arrow");
-            potion->addComponent<CAnimation>(m_game->assets().getAnimation("PurplePotion"), true);
-            potion->addComponent<CBoundingBox>(m_game->assets().getAnimation("PurplePotion").getSize());
+            potion->addComponent<CAnimation>(m_game->assets().getAnimation("FireBird"), false);
+            potion->addComponent<CBoundingBox>(m_game->assets().getAnimation("FireBird").getSize());
             potion->addComponent<CTransform>(Vec2(eTransform.pos.x + eTransform.scale.x * 5, eTransform.pos.y), Vec2(8 * eTransform.scale.x, 0), eTransform.scale, 0);
             potion->addComponent<CDamage>(10);
             potion->addComponent<CLifeSpan>(180, m_currentFrame);
+
         }
 
     }
@@ -1025,29 +1049,34 @@ void Scene_MainGame::sInteract()
         {
             if (interactable->getComponent<CAnimation>().animation.getName() == "Chest")
             {
+                m_game->playSound("Coin");
+                m_game->setVolume("Coin", m_effectVolume);
                 std::srand(time(0));
                 int coinAmount = std::rand() % 17 + 3;
                 m_player->getComponent<CInventory>().money += coinAmount;
                 int itemID = std::rand() % 100;
-                if (itemID < 30)
+                if (m_player->getComponent<CInventory>().items.size() < 9)
                 {
-                    m_player->getComponent<CInventory>().items.push_back("RedPotion");
-                }
-                else if (itemID <60)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("BluePotion");
-                }
-                else if (itemID < 75)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("GreenPotion");
-                }
-                else if (itemID < 90)
-                {
-                    m_player->getComponent<CInventory>().items.push_back("PurplePotion");
-                }
-                else
-                {
-                    m_player->getComponent<CInventory>().items.push_back("GoldPotion");
+                    if (itemID < 30)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("RedPotion");
+                    }
+                    else if (itemID < 60)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("BluePotion");
+                    }
+                    else if (itemID < 75)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("GreenPotion");
+                    }
+                    else if (itemID < 90)
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("PurplePotion");
+                    }
+                    else
+                    {
+                        m_player->getComponent<CInventory>().items.push_back("GoldPotion");
+                    }
                 }
                 interactable->destroy();
             }
@@ -1140,8 +1169,9 @@ void Scene_MainGame::sAI()
 
             if (!Visionblocked)
             {
-                
+
                 // Performing Steering
+
                 Vec2 target = m_player->getComponent<CTransform>().pos;
                 Vec2 desired = target - e->getComponent<CTransform>().pos;
                 float length = desired.dist(Vec2(0, 0));
@@ -1155,7 +1185,8 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" || 
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack"||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" || 
-                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" )
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit" ||
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound")
                         {
                             e->getComponent<CTransform>().scale.x = 1;
                         }
@@ -1172,7 +1203,8 @@ void Scene_MainGame::sAI()
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                             e->getComponent<CAnimation>().animation.getName() == "SkeletonDead" ||
-                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit")
+                            e->getComponent<CAnimation>().animation.getName() == "SkeletonHit"||
+                            e->getComponent<CAnimation>().animation.getName() == "HellHound")
                         {
                             e->getComponent<CTransform>().scale.x = -1;
                         }
@@ -1291,6 +1323,7 @@ void Scene_MainGame::sAI()
             }
             else if (e->getComponent<CTransform>().pos != e->getComponent<CFollowPlayer>().home && Visionblocked)
             {
+          
                 Vec2 target = e->getComponent<CFollowPlayer>().home;
                 Vec2 desired = target - e->getComponent<CTransform>().pos;
                 float length = desired.dist(Vec2(0, 0));
@@ -1511,7 +1544,10 @@ void Scene_MainGame::sCollision()
     sHeartCollision();
     sArrowPickCollision();
     sCoinCollision();
-    sItemCollision();
+    if (m_player->getComponent<CInventory>().items.size() < 9)
+    {
+        sItemCollision();
+    }
     sTeleportCollision();
     sEnemyCollision();
 
@@ -1826,7 +1862,7 @@ void Scene_MainGame::sTileCollision()
     auto& playerBoundingBox = m_player->getComponent<CBoundingBox>();
     m_playerOnGround = false;
     m_collidingWithTile = false;
-    m_playerOnMovingTile = false;
+    //m_playerOnMovingTile = false;
     if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CBoundingBox>().halfSize.x)
     {
         m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
@@ -1942,7 +1978,13 @@ void Scene_MainGame::sTileCollision()
                     {
                         playerTransform.pos.y -= playerTileOverlap.y;
                         m_playerOnGround = true;
-                        
+                        m_playerOnMovingTile = true;
+                        if (m_playerOnMovingTile && m_playerOnGround)
+                        {
+                            m_player->getComponent<CTransform>().pos = Vec2(tile->getComponent<CTransform>().pos.x, tile->getComponent<CTransform>().pos.y - 50);
+
+                        }
+
                     }
                 }
                 else if (playerTransform.prevPos.y < tileTransform.pos.y && playerTileOverlap.x > playerTileOverlap.y - 2)
@@ -2000,7 +2042,10 @@ void Scene_MainGame::sTileCollision()
         {
             continue;
         }
+
+
     }
+
 
     for (auto tile : m_entityManager.getEntities("damaged"))
     {
@@ -2124,8 +2169,8 @@ void Scene_MainGame::sPlayerCollision()
 
 void Scene_MainGame::sMeleeCollision()
 {
-    //Melee collisions with NPC's are implemented here
-    
+ //Melee collisions with NPC's are implemented here
+#pragma region Axe
     if (m_player->getComponent<CAnimation>().animation.getName() == "Axe" && m_frameSinceAttack == 24)
     {
         m_game->playSound("Melee");
@@ -2135,7 +2180,7 @@ void Scene_MainGame::sMeleeCollision()
         auto& axe = m_entityManager.addEntity("weapon");
         axe->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().animation.getSize());
         axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
-        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage)*3);
+        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage) * 3);
         axe->addComponent<CLifeSpan>(0, m_currentFrame);
         for (auto& e : m_entityManager.getEntities("npc"))
         {
@@ -2143,7 +2188,11 @@ void Scene_MainGame::sMeleeCollision()
             auto npcWeaponOverlap = Physics::GetOverlap(axe, e);
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
-                npcHealth.current -= axe->getComponent<CDamage>().damage;
+                if (npcHealth.current >= 0)
+                {
+                    npcHealth.current -= axe->getComponent<CDamage>().damage;
+                }
+
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
@@ -2160,9 +2209,11 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 if (npcHealth.current <= 0)
                 {
-                    //m_game->playSound("EnemyDie");
-
+                    m_game->stopSound("Fear");
                     auto ex = m_entityManager.addEntity("explosion");
+                    m_game->playSound("MonsterDeath");
+                    m_game->setVolume("MonsterDeath", m_effectVolume);
+                    e->removeComponent<CHealth>();
                     if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
                     {
                         e->getComponent<CState>().state = "GhostVanish";
@@ -2172,16 +2223,15 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                     {
-
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
                         e->getComponent<CAnimation>().repeat = false;
                     }
                     else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
-                              e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
-                              e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
                         e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
-                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2" )
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
                     {
                         m_game->playSound("WizardDeath");
                         m_game->setVolume("WizardDeath", m_effectVolume);
@@ -2190,11 +2240,36 @@ void Scene_MainGame::sMeleeCollision()
                     }
                     else
                     {
-                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
+                        ex->addComponent<CAnimation>(m_game->assets().getAnimation("Thunder"), false);
                         ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                         e->destroy();
                     }
                     break;
+                }
+                else
+                {
+
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+                        m_game->playSound("SkeletonHurt");
+                        m_game->setVolume("SkeletonHurt", m_effectVolume);
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardLaugh");
+                        m_game->setVolume("WizardLaugh", m_effectVolume);
+                    }
+                    else
+                    {
+                        m_game->playSound("MonsterHit");
+                        m_game->setVolume("MonsterHit", m_effectVolume);
+                    }
                 }
             }
         }
@@ -2204,8 +2279,8 @@ void Scene_MainGame::sMeleeCollision()
             if (RockOverlap.x > 0 && RockOverlap.y > 0)
             {
 
-                m_game->playSound("EnemyHit");
-                m_game->setVolume("EnemyHit", m_effectVolume);
+                m_game->playSound("RockBreak");
+                m_game->setVolume("RockBreak", m_effectVolume);
                 auto ex = m_entityManager.addEntity("explosion");
                 Vec2 exPos = e->getComponent<CTransform>().pos;
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
@@ -2218,24 +2293,27 @@ void Scene_MainGame::sMeleeCollision()
 
         }
     }
+#pragma endregion
+
+#pragma region Dagger
     if (m_player->getComponent<CAnimation>().animation.getName() == "Dagger" && (m_frameSinceAttack == 10 || m_frameSinceAttack == 40 || m_frameSinceAttack == 60))
     {
         m_game->playSound("Melee");
         m_game->setVolume("Melee", m_effectVolume);
         auto& playerTransform = m_player->getComponent<CTransform>();
         auto& playerDamage = m_player->getComponent<CDamage>();
-        auto& axe = m_entityManager.addEntity("weapon");
-        axe->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x*2/3, m_player->getComponent<CAnimation>().animation.getSize().y));
-        axe->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
-        axe->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage));
-        axe->addComponent<CLifeSpan>(0, m_currentFrame);
+        auto& dagger = m_entityManager.addEntity("weapon");
+        dagger->addComponent<CBoundingBox>(Vec2(m_player->getComponent<CAnimation>().animation.getSize().x * 2 / 3, m_player->getComponent<CAnimation>().animation.getSize().y));
+        dagger->addComponent<CTransform>(Vec2(playerTransform.pos.x + playerTransform.scale.x * 5, playerTransform.pos.y), Vec2(5 * playerTransform.scale.x, 0), playerTransform.scale, 0);
+        dagger->addComponent<CDamage>((playerDamage.damage + playerDamage.tempDamage));
+        dagger->addComponent<CLifeSpan>(0, m_currentFrame);
         for (auto& e : m_entityManager.getEntities("npc"))
         {
             auto& npcHealth = e->getComponent<CHealth>();
-            auto npcWeaponOverlap = Physics::GetOverlap(axe, e);
+            auto npcWeaponOverlap = Physics::GetOverlap(dagger, e);
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
-                npcHealth.current -= axe->getComponent<CDamage>().damage;
+                npcHealth.current -= dagger->getComponent<CDamage>().damage;
 
                 // Animation when enemy gets hit
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
@@ -2254,8 +2332,10 @@ void Scene_MainGame::sMeleeCollision()
                 }
                 if (npcHealth.current <= 0)
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    m_game->stopSound("Fear");
+                    e->removeComponent<CHealth>();
+                    m_game->playSound("MonsterDeath");
+                    m_game->setVolume("MonsterDeath", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
@@ -2267,8 +2347,6 @@ void Scene_MainGame::sMeleeCollision()
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                         e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
                     {
-
-                        //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "SkeletonDead";
                         e->getComponent<CAnimation>().repeat = false;
                     }
@@ -2289,17 +2367,38 @@ void Scene_MainGame::sMeleeCollision()
                         ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
                         e->destroy();
                     }
-                    
+
                     break;
                 }
                 else
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+                        m_game->playSound("SkeletonHurt");
+                        m_game->setVolume("SkeletonHurt", m_effectVolume);
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardLaugh");
+                        m_game->setVolume("WizardLaugh", m_effectVolume);
+                    }
+                    else
+                    {
+                        m_game->playSound("MonsterHit");
+                        m_game->setVolume("MonsterHit", m_effectVolume);
+                    }
                 }
             }
         }
     }
+#pragma endregion
+
 }
 void Scene_MainGame::sBreakableCollision()
 {
@@ -2311,6 +2410,8 @@ void Scene_MainGame::sBreakableCollision()
             auto breakableWeaponOverlap = Physics::GetOverlap(weapon, e);
             if (breakableWeaponOverlap.x > 0 && breakableWeaponOverlap.y > 0)
             {
+                m_game->playSound("BreakSound");
+                m_game->setVolume("BreakSound", m_effectVolume);
                 auto ex = m_entityManager.addEntity("explosion");
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
                 ex->addComponent<CTransform>().pos = e->getComponent<CTransform>().pos;
@@ -2331,6 +2432,7 @@ void Scene_MainGame::sBreakableCollision()
         }
     }
 }
+
 void Scene_MainGame::sArrowCollision()
 {
     if (m_player->getComponent<CAnimation>().animation.getName() == "Bow" && m_frameSinceAttack == 10 && m_player->getComponent<CInventory>().Arrows != 0)
@@ -2358,7 +2460,11 @@ void Scene_MainGame::sArrowCollision()
             if (npcWeaponOverlap.x > 0 && npcWeaponOverlap.y > 0)
             {
                 npcHealth.current -= arrowDamage.damage;
-                arrow->destroy();
+
+                if (arrow->getComponent<CAnimation>().animation.getName() != "FireBird")
+                {
+                    arrow->destroy();
+                }
                 if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
                     e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
@@ -2376,15 +2482,16 @@ void Scene_MainGame::sArrowCollision()
                 //m_game->playSound("EnemyHit");
                 if (npcHealth.current <= 0)
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    m_game->stopSound("Fear");
+                    e->removeComponent<CHealth>();
+                    m_game->playSound("MonsterDeath");
+                    m_game->setVolume("MonsterDeath", m_effectVolume);
                     //m_game->playSound("EnemyDie");
                     auto ex = m_entityManager.addEntity("explosion");
                     Vec2 exPos = e->getComponent<CTransform>().pos;
                     
                     if (e->getComponent<CAnimation>().animation.getName() == "GhostShriek")
                     {
-                        
                         //ex->addComponent<CAnimation>(m_game->assets().getAnimation("GhostVanish"), false);
                         e->getComponent<CState>().state = "GhostVanish";
                         e->getComponent<CAnimation>().repeat = false;
@@ -2420,8 +2527,27 @@ void Scene_MainGame::sArrowCollision()
                 }
                 else
                 {
-                    m_game->playSound("EnemyHit");
-                    m_game->setVolume("EnemyHit", m_effectVolume);
+                    if (e->getComponent<CAnimation>().animation.getName() == "SkeletonIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonAttack" ||
+                        e->getComponent<CAnimation>().animation.getName() == "SkeletonWalk")
+                    {
+                        m_game->playSound("SkeletonHurt");
+                        m_game->setVolume("SkeletonHurt", m_effectVolume);
+                    }
+                    else if (e->getComponent<CAnimation>().animation.getName() == "WizardIdle" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardRun" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack1" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardTakeHit" ||
+                        e->getComponent<CAnimation>().animation.getName() == "WizardAttack2")
+                    {
+                        m_game->playSound("WizardLaugh");
+                        m_game->setVolume("WizardLaugh", m_effectVolume);
+                    }
+                    else
+                    {
+                        m_game->playSound("MonsterHit");
+                        m_game->setVolume("MonsterHit", m_effectVolume);
+                    }
                 }
             }
         }
@@ -2432,8 +2558,8 @@ void Scene_MainGame::sArrowCollision()
             if (RockOverlap.x > 0 && RockOverlap.y > 0)
             {
                 arrow->destroy();
-                m_game->playSound("EnemyHit");
-                m_game->setVolume("EnemyHit", m_effectVolume);
+                m_game->playSound("RockBreak");
+                m_game->setVolume("RockBreak", m_effectVolume);
                 auto ex = m_entityManager.addEntity("explosion");
                 Vec2 exPos = e->getComponent<CTransform>().pos;
                 ex->addComponent<CAnimation>(m_game->assets().getAnimation("Explosion"), false);
@@ -2546,6 +2672,7 @@ void Scene_MainGame::sItemCollision()
     auto& playerTransform = m_player->getComponent<CTransform>();
     for (auto potion : m_entityManager.getEntities("potions"))
     {
+        
         auto& potionBoundingBox = potion->getComponent<CBoundingBox>();
         auto& potionAnim = potion->getComponent<CAnimation>().animation;
 
@@ -2553,6 +2680,14 @@ void Scene_MainGame::sItemCollision()
         auto playerPotionsOverlap = Physics::GetOverlap(potion, m_player);
         if (playerPotionsOverlap.x > potionBoundingBox.halfSize.x && playerPotionsOverlap.y > potionBoundingBox.halfSize.y)
         {
+            if (potionAnim.getName() != "PurplePotion")
+            {
+                m_game->playSound("Potion");
+            }
+            else
+            {
+                m_game->playSound("Fire");
+            }
             m_player->getComponent<CInventory>().items.push_back(potionAnim.getName());
             potion->destroy();
         }
@@ -2614,6 +2749,7 @@ void Scene_MainGame::sEnemyCollision() {
             auto npcPlayerOverlap = Physics::GetOverlap(m_player, npc);
             if (npcPlayerOverlap.x > 0 && npcPlayerOverlap.y > 0)
             {
+                m_game->playSound("Fear");
                 //auto frame = m_currentFrame;
                 npcState.state = "DemonAttack";
                 auto& npcTransform = npc->getComponent<CTransform>();
@@ -2664,7 +2800,113 @@ void Scene_MainGame::sAnimation()
         playerAnimation.animation = m_game->assets().getAnimation(playerState.state);
     }
 #pragma endregion
+    for (auto& e : m_entityManager.getEntities("potions"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
 
+    }
+
+    for (auto& e : m_entityManager.getEntities("arrow"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
+
+    }
+
+    for (auto& e : m_entityManager.getEntities("teleport"))
+    {
+        if (e->hasComponent<CState>())
+        {
+            //Animation for special NPC Octorok
+            if (e->getComponent<CState>().state == e->getComponent<CAnimation>().animation.getName())
+            {
+                e->getComponent<CAnimation>().animation.update();
+                if (e->getComponent<CAnimation>().repeat == false)
+                {
+                    if (e->getComponent<CAnimation>().animation.hasEnded())
+                    {
+                        e->destroy();
+                    }
+                }
+            }
+            else
+            {
+                e->getComponent<CAnimation>().animation = m_game->assets().getAnimation(e->getComponent<CState>().state);
+            }
+        }
+        else
+        {
+            //Animation for Patrol NPCs
+            e->getComponent<CAnimation>().animation.update();
+            if (e->getComponent<CAnimation>().repeat == false)
+            {
+                if (e->getComponent<CAnimation>().animation.hasEnded())
+                {
+                    e->destroy();
+                }
+            }
+        }
+
+    }
 
     for (auto& e : m_entityManager.getEntities("tile"))
     {
@@ -2785,42 +3027,85 @@ void Scene_MainGame::sCamera()
     
 #pragma region Setting Up strings and positions of UI Texts
    
-    m_levelText.setCharacterSize(12);
+    m_levelText.setCharacterSize(30);
     Vec2 levelTextPos = Vec2(m_player->getComponent<CTransform>().pos.x - 40, m_player->getComponent<CTransform>().pos.y - 96);
     
-    
-    m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nWeapon Swap: TAB");
-    if (m_weaponSwitch == 0)
+    if (!m_paused)
     {
-        //m_levelText.setString("Dagger Activated");
-    }
-    else if (m_weaponSwitch == 1)
-    {
-        //m_levelText.setString("  Bow Activated");
-    }
-    else
-    {
-        //m_levelText.setString("  Axe Activated");
+        m_tutorialText.setString(" Move: A, D   Jump: W \n\nSlide: Hold S while Moving\n\nUse Weapon: Space     Weapon Swap: TAB\n\nInventory Select Items: Left/Right \n\nItem Use: E");
     }
 
     if (m_weaponTextClock.getElapsedTime().asSeconds() > 2)
     {
-        m_levelText.setString("");
+        //m_levelText.setString("");
         for (auto& weaponSwap : m_entityManager.getEntities("weaponSwap"))
         {
             weaponSwap->destroy();
         }
 
     }
-    /*if (m_tutorialTextClock.getElapsedTime().asSeconds() > 3)
+
+    // Setting texts for help during the game
+
+    if (m_tutorialTextClock.getElapsedTime().asSeconds() > 0.1)
     {
-        m_tutorialText.setString("");
-    }*/
+        m_levelText.setString("");
+    }
 
-    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 128));
-    //m_tutorialText.setPosition(sf::Vector2f(levelTextPos.x - 50, levelTextPos.y - 50));
 
-    m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 6).x, getPosition(0, 0, 2, 6).y));
+    for (auto interactable : m_entityManager.getEntities("interactable"))
+    {
+        auto IsInside = Physics::IsInside(interactable->getComponent<CTransform>().pos, m_player);
+        if (IsInside)
+        {
+            m_levelText.setString("F to Interact");
+            m_tutorialTextClock.restart();
+        }
+    }
+    for (auto interactable : m_entityManager.getEntities("breakable"))
+    {
+        auto IsInside = Physics::IsInside(interactable->getComponent<CTransform>().pos, m_player);
+        if (IsInside)
+        {
+            m_levelText.setString("Space to Break");
+            m_tutorialTextClock.restart();
+        }
+    }
+    
+    for (auto interactable : m_entityManager.getEntities("arrowpick"))
+    {
+        auto IsInside = Physics::IsInside(Vec2(interactable->getComponent<CTransform>().pos.x + 32, interactable->getComponent<CTransform>().pos.y), m_player);
+        if (IsInside)
+        {   
+            if (m_player->getComponent<CInventory>().Arrows == m_player->getComponent<CInventory>().maxArrows)
+            {
+                m_levelText.setString("Full");
+                m_tutorialTextClock.restart();
+            }
+        }
+    }
+    m_levelText.setPosition(sf::Vector2f(levelTextPos.x, levelTextPos.y - 10));
+    if (m_levelText.getString() == "Full")
+    {
+        m_levelText.setPosition(sf::Vector2f(levelTextPos.x + 32, levelTextPos.y - 10));
+    }
+
+
+  /*  if (m_player->getComponent<CTransform>().pos.x > getPosition(0, 0, 50, 0).x)
+    {
+     
+            m_tutorialText.setString("Arrows, Fire Spell and Axe are \nstrong enough to break damaged rocks");
+            m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 71, 1).x, getPosition(0, 0, 71, 1).y));
+
+    }
+    else
+    {
+       */ m_tutorialText.setPosition(sf::Vector2f(getPosition(0, 0, 2, 1).x, getPosition(0, 0, 2, 1).y));
+    //}
+
+  
+
+    
 #pragma endregion
 
     // then set the window view
@@ -2920,7 +3205,7 @@ void Scene_MainGame::sHUD()
     Vec2 InventoryPos = Vec2(playerPos.x - InventoryPosOffset.x, InventoryPosOffset.y);
     Vec2 weaponHolderOffset = Vec2(m_gridSize.x * 4 + m_gridSize.x / 2, 32);
     Vec2 weaponHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5, InventoryPos.y);
-    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 , InventoryPos.y + 55);
+    Vec2 arrowHolderPos = Vec2(InventoryPos.x - m_gridSize.x * 5 , InventoryPos.y + 70);
 
     //sf::Vector2f newCamPos(playerPos.x, playerPos.y);
     if (InventoryPos.x < view.getSize().x / 2 - InventoryPosOffset.x)
@@ -2936,7 +3221,7 @@ void Scene_MainGame::sHUD()
     if (arrowHolderPos.x < view.getSize().x / 2)
     {
         arrowHolderPos.x = InventoryPos.x - m_gridSize.x * 5 ;
-        arrowHolderPos.y = InventoryPos.y + 55;
+        arrowHolderPos.y = InventoryPos.y + 70;
     }
 
 
@@ -2945,7 +3230,7 @@ void Scene_MainGame::sHUD()
         weaponHolder->getComponent<CTransform>().pos = Vec2(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y - 90);
     }
     
-    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y + 32);
+    Vec2 coinHUDPosition = Vec2(weaponHolderPos.x, weaponHolderPos.y + m_gridSize.y + 64);
 
     
     for (auto& weaponHolder : m_entityManager.getEntities("weaponHolder"))
@@ -2988,6 +3273,8 @@ void Scene_MainGame::sHUD()
         }
     }
     inventorySelect.setPosition(InventoryPos.x + 64 * m_select  -(m_gridSize.x * 4), InventoryPos.y);
+    m_inventorySelectText.setString("E");
+    m_inventorySelectText.setPosition(inventorySelect.getPosition().x, inventorySelect.getPosition().y + 32);
     
 }
 
@@ -3051,6 +3338,47 @@ void Scene_MainGame::drawMinimap()
     minimapView.zoom(2.5f);
     m_game->window().setView(minimapView);
 
+    for (auto e : m_entityManager.getEntities("arrowpick"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    for (auto e : m_entityManager.getEntities("breakable"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    for (auto e : m_entityManager.getEntities("interactable"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+
+    for (auto e : m_entityManager.getEntities("teleport"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
+    for (auto e : m_entityManager.getEntities("damaged"))
+    {
+
+        if (e->hasComponent<CAnimation>())
+        {
+            m_game->window().draw(e->getComponent<CAnimation>().animation.getSprite());
+        }
+    }
     for (auto e : m_entityManager.getEntities("tile"))
     {
         
@@ -3389,6 +3717,7 @@ void Scene_MainGame::sRender()
     m_game->window().draw(m_walletText);
     m_game->window().draw(m_levelText);
     m_game->window().draw(m_arrowHolderText);
+    m_game->window().draw(m_inventorySelectText);
     if (m_minimap)
     {
         drawMinimap();

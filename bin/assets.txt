@@ -1,5 +1,7 @@
 Texture   MainMenuBackground images/MainMenu_Background.png
-Texture   TexExplode    images/misc/explosion128.png        
+Texture   TexThunder	images/misc/thunder.png
+Texture   TexExplode    images/misc/explosion128.png  
+Texture   TexFireBird	images/misc/fireBird.png      
 Texture   TexRunRight   images/gothic/run_right.png
 Texture   TexJump      	images/gothic/jump.png
 Texture   TexStandD     images/gothic/crouch.png              
@@ -51,7 +53,7 @@ Texture   TexCoinHUD	images/Items/Coin2.png
 Texture	  TexHeart	images/Items/Heart.png
 Texture	  TexRedPotion	images/Items/RedPotion.png
 Texture	  TexGreenPotion images/Items/GreenPotion.png
-Texture	  TexPurplePotion images/Items/PurplePotion.png
+Texture	  TexPurplePotion images/Items/firePickUp.png
 Texture	  TexGoldPotion	images/Items/GoldPotion.png
 Texture	  TexBluePotion	images/Items/BluePotion.png
 Texture	  TexChest	images/Items/Chest.png
@@ -86,6 +88,17 @@ Texture   TexParallax9 images/BackGrounds/Parallax/09_Forest.png
 Texture   TexParallax10 images/BackGrounds/Parallax/10_Sky.png
 Texture   TexTransparent images/BackGrounds/Parallax/Transparent.png
 
+Texture   TexParallaxRed1 images/BackGrounds/Parallax2/1.png
+Texture   TexParallaxRed2 images/BackGrounds/Parallax2/2.png
+Texture   TexParallaxRed3 images/BackGrounds/Parallax2/3.png
+Texture   TexParallaxRed4 images/BackGrounds/Parallax2/4.png
+Texture   TexParallaxRed5 images/BackGrounds/Parallax2/5.png
+Texture   TexParallaxRed6 images/BackGrounds/Parallax2/6.png
+Texture   TexParallaxRed7 images/BackGrounds/Parallax2/7.png
+Texture   TexParallaxRed8 images/BackGrounds/Parallax2/8.png
+Texture   TexParallaxRed9 images/BackGrounds/Parallax2/9.png
+Texture   TexParallaxRed10 images/BackGrounds/Parallax2/10.png
+
 Texture   TexShopLevel	 		images/BackGrounds/Overworld/ShopLevel.png
 Texture   TexCompletedLevel 		images/BackGrounds/Overworld/CompletedLevel.png
 Texture   TexUnlockedLevel 		images/BackGrounds/Overworld/UnlockedLevel.png
@@ -111,6 +124,8 @@ Texture   TexShopPedestal  images/BackGrounds/Overworld/ShopPedestal.png
 Texture   TexShopSign      images/BackGrounds/Overworld/ShopSign.png
 
 Animation Explosion     TexExplode     	48   2 
+Animation Thunder       TexThunder    	12   2 
+Animation FireBird	TexFireBird	16   2
 Animation RunRight      TexRunRight     24   2    
 Animation Jump         	TexJump        	19   2
 Animation StandDown     TexStandD       8    3
@@ -143,7 +158,7 @@ Animation SkeletonIdle	   TexSkeleton	 4  4
 Animation SkeletonWalk	   TexSkeletonWalk	 4  4
 Animation SkeletonAttack	   TexSkeletonAttack	 8  4
 Animation SkeletonHit	   TexSkeletonHit	 4  4
-Animation SkeletonDead	   TexSkeletonDead	 4  4
+Animation SkeletonDead	   TexSkeletonDead	 4  8
 
 Animation WizardIdle   	TexWizardIdle		8  2	
 Animation WizardAttack1	TexWizardAttack1	7  2
@@ -160,7 +175,7 @@ Animation CoinHUD	TexCoinHUD	 1   0
 Animation Heart		TexHeart	 1   0
 Animation RedPotion	TexRedPotion	 1   0
 Animation GreenPotion	TexGreenPotion	 1   0
-Animation PurplePotion	TexPurplePotion	 1   0
+Animation PurplePotion	TexPurplePotion	 11   11
 Animation GoldPotion	TexGoldPotion	 1   0
 Animation BluePotion	TexBluePotion	 1   0
 Animation Chest		TexChest	 1   0
@@ -218,7 +233,7 @@ Animation ShopSign    	TexShopSign     1  0
 
 Sound     MusicTitle    sounds/MenuMusic.ogg
 Sound     MusicLevel    sounds/music.ogg
-Sound     MusicGame    	sounds/MainGameMusic.wav
+Sound     MusicGame    	sounds/Suspense.ogg
 Sound     MusicOverworld    	sounds/OverworldMusic.ogg
 Sound     UseItem	sounds/UseItem.wav
 Sound     Melee		sounds/Melee.wav
@@ -228,6 +243,16 @@ Sound     EnemyHit	sounds/EnemyHit.wav
 Sound     Coin		sounds/Coin.wav
 Sound     Bow		sounds/Bow.wav
 Sound     WizardDeath	sounds/WizardDeath.ogg
+Sound     WizardLaugh	sounds/WizardLaugh.wav
+Sound     Fear		sounds/YouBelongToMe.wav
+Sound     MonsterDeath  sounds/MonsterDeath.wav
+Sound     Potion	sounds/Potion.wav
+Sound     SkeletonHurt	sounds/skeletonHurt.wav
+Sound     MonsterHit	sounds/monsterHit.wav
+Sound     RockBreak	sounds/BreakRock.wav
+Sound     BreakSound	sounds/BreakableSound.wav
+Sound     GameOver	sounds/GameOver.wav
+Sound     fireBird	sounds/fireBirdSound.wav
 
 Font      Arial         fonts/arial.ttf
 Font      Mario         fonts/mario.ttf

@@ -44,7 +44,10 @@ void Scene_GameOver::init()
 	}
 
 	m_title = "Game Over";
-
+	m_game->playSound("GameOver");
+	m_game->stopSound("Fear");
+	m_game->stopSound("MonsterDeath");
+	m_game->stopSound("MonsterHit");
 	m_menuStrings.push_back("Continue");
 	m_menuStrings.push_back("Main Menu");
 
